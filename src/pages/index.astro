@@ -2,6 +2,8 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import LinkBar from "../components/LinkBar.astro";
 import BibtexBlock from "../components/BibtexBlock.astro";
+import MethodologyFigure from "../components/MethodologyFigure.astro";
+import PrevalenceChart from "../components/PrevalenceChart.astro";
 import { authors, affiliations, paper } from "../data/paper";
 ---
 <BaseLayout title={paper.title}>
@@ -22,21 +24,67 @@ import { authors, affiliations, paper } from "../data/paper";
 
   <LinkBar />
 
+  <p class="tldr">
+    <strong>TL;DR:</strong> Since 2022, NLP conferences require every paper to
+    disclose its own limitations — creating a huge, unanalyzed archive of
+    researchers admitting what's wrong with their own work. We built a
+    human-AI pipeline (validated against expert annotators) to categorize
+    over 16,000 of these disclosures, and found that what researchers report
+    barely varies by research area — a surprisingly uniform picture of how
+    the field talks about its own shortcomings.
+  </p>
+
   <h2>Abstract</h2>
   <p>{paper.abstract}</p>
+
+  <h2>Methodology</h2>
+  <p>
+    A human-AI pipeline alternates between an LLM proposing codes for each
+    sentence and a researcher reviewing any genuinely new category it
+    surfaces. Click a stage to see how it works, with a real worked example:
+  </p>
+  <MethodologyFigure />
+  <p class="section-cta">
+    <a href={`${import.meta.env.BASE_URL}methodology`}>Full methodology walkthrough &rarr;</a>
+  </p>
 
   <h2>Dataset</h2>
   <p>
     This site's <a href={`${import.meta.env.BASE_URL}explore`}>explorer</a> covers
     the <strong>16,047-paper LLM-coded dataset</strong> — every ACL/EMNLP main and
     Findings paper (2020–2025) with a Limitations section, coded with sentence-level
-    evidence spans and justifications. The LLM coding was validated against a
-    separate <strong>150-paper human-coded reference set</strong> (four expert
-    annotators), reaching a Krippendorff's α of <strong>0.644</strong> among human
-    annotators alone and <strong>0.647</strong> with the LLM included as a coder —
-    that reference set isn't separately browsable here since a few of its papers
-    come from small workshop tracks outside this site's ACL/EMNLP main+Findings
-    scope, but it's the basis for treating the LLM coding as reliable.
+    evidence spans and justifications.
+  </p>
+
+  <h3>Inter-annotator agreement</h3>
+  <p>
+    To make sure the LLM's coding is trustworthy, it was validated against a
+    separate <strong>150-paper reference set</strong> independently coded by
+    four expert human annotators (that reference set isn't separately
+    browsable here, since a few of its papers come from small workshop
+    tracks outside this site's ACL/EMNLP main+Findings scope).
+  </p>
+  <p class="iaa-numbers">
+    <span class="badge badge-human">Human annotators only</span>
+    <strong>α = 0.644</strong>
+    <span class="iaa-arrow">&rarr;</span>
+    <span class="badge badge-llm">+ LLM as a coder</span>
+    <strong>α = 0.647</strong>
+  </p>
+  <p>
+    Agreement barely changes when the LLM is added as a fifth coder — the
+    basis for treating its coding of the remaining ~16,000 papers as
+    reliable.
+  </p>
+  <p class="section-cta">
+    <a href={`${import.meta.env.BASE_URL}results`}>See the full per-code agreement breakdown &rarr;</a>
+  </p>
+
+  <h2>Results</h2>
+  <p>Which limitations come up most often across the 16,047 LLM-coded papers:</p>
+  <PrevalenceChart />
+  <p class="section-cta">
+    <a href={`${import.meta.env.BASE_URL}results`}>Full results: temporal trends &amp; the homogeneity finding &rarr;</a>
   </p>
 
   <BibtexBlock />
@@ -60,5 +108,21 @@ import { authors, affiliations, paper } from "../data/paper";
   h1 { margin-top: 0.25rem; }
   .authors { font-size: 1.05rem; }
   .affiliations { color: var(--color-muted); font-size: 0.9rem; }
+  .tldr {
+    border-left: 3px solid var(--color-accent);
+    padding: 0.25rem 0 0.25rem 1rem;
+    margin: 1.5rem 0;
+    color: var(--color-muted);
+  }
+  h3 { margin-top: 1.5rem; }
+  .iaa-numbers {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+  }
+  .iaa-arrow { color: var(--color-muted); }
+  .section-cta { font-weight: 600; }
   .cta { margin-top: 2rem; font-size: 1.05rem; font-weight: 600; }
 </style>

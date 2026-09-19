@@ -1,0 +1,115 @@
+---
+const stages = [
+  {
+    title: "Limitations Section",
+    kicker: "Input",
+    detail:
+      "Every ACL/EMNLP paper's Limitations section is pulled as plain text — the starting point for the whole pipeline.",
+  },
+  {
+    title: "Semantic Unit Segmentation",
+    kicker: "Gemini 2.5 Flash",
+    detail:
+      'The section is split into individual sentences ("semantic units"), e.g. s₁ = "This study is limited by …", s₂ = "Moreover, our model is …". Each sentence is coded independently next.',
+  },
+  {
+    title: "Automatic Hybrid Coding",
+    kicker: "Gemini 3.1 Pro",
+    detail:
+      "Two passes against the current codebook Cₜ₋₁: Deductive assigns existing codes (s₁ → Code 1); Inductive proposes a new code where nothing fits (s₁ → “Poor data”).",
+  },
+  {
+    title: "Handling New Codes",
+    kicker: "Cluster → Recommend → Human Review → Apply",
+    detail:
+      "Inductively-proposed codes are clustered across papers, a candidate definition is recommended, a researcher reviews it, then applies it to the codebook — the only step with a human in the loop, kept specifically so the codebook stays interpretable.",
+  },
+  {
+    title: "Annotated Data + Updated Codebook",
+    kicker: "Output",
+    detail:
+      "Each sentence's final codes (s₁ → [Code 1, Code 4], s₂ → [Code 3]) plus an updated codebook Cₜ (new Code 4 added here) — which becomes Cₜ₋₁ for the next iteration.",
+  },
+];
+---
+<div class="methodology-figure">
+  {stages.map((stage, i) => (
+    <>
+      <details class="stage">
+        <summary>
+          <span class="stage-number">{i + 1}</span>
+          <span class="stage-title">{stage.title}</span>
+          <span class="stage-kicker">{stage.kicker}</span>
+        </summary>
+        <p class="stage-detail">{stage.detail}</p>
+      </details>
+      {i < stages.length - 1 && <span class="stage-arrow" aria-hidden="true">&rarr;</span>}
+    </>
+  ))}
+</div>
+<p class="methodology-loop-note">
+  The updated codebook feeds back as the starting codebook for the next paper/iteration —
+  this is why the process is called <em>iterative</em> hybrid coding.
+</p>
+
+<style>
+  .methodology-figure {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin: 1.25rem 0 0.5rem;
+  }
+  .stage {
+    flex: 1 1 160px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    background: var(--color-bg);
+  }
+  .stage[open] { border-color: var(--color-accent); }
+  .stage summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .stage summary::-webkit-details-marker { display: none; }
+  .stage summary:hover .stage-title { color: var(--color-accent); }
+  .stage-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  .stage-title { font-weight: 600; font-size: 0.9rem; }
+  .stage-kicker { font-size: 0.72rem; color: var(--color-muted); }
+  .stage-detail {
+    margin: 0.6rem 0 0;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+  .stage-arrow {
+    align-self: center;
+    color: var(--color-muted);
+    font-size: 1.1rem;
+  }
+  .methodology-loop-note {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin-top: 0.75rem;
+  }
+
+  @media (max-width: 700px) {
+    .stage-arrow { transform: rotate(90deg); }
+  }
+</style>

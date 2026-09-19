@@ -1,0 +1,90 @@
+---
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+import type { GlobalIndex } from "../../scripts/types";
+
+// Resolved relative to the project root (where `astro build`/`astro dev` is
+// invoked, per package.json) rather than import.meta.url - Astro's Vite
+// pipeline doesn't guarantee the latter maps back to this file's real
+// on-disk location.
+const indexPath = path.resolve(process.cwd(), "public/data/index.json");
+
+let topCodes: { name: string; pct: number; barPct: number }[] = [];
+let totalPapers = 0;
+
+if (existsSync(indexPath)) {
+  const globalIndex: GlobalIndex = JSON.parse(readFileSync(indexPath, "utf-8"));
+  totalPapers = globalIndex.papers.length;
+  const counts = new Map<number, number>();
+  for (const p of globalIndex.papers) {
+    for (const c of p.codes) counts.set(c, (counts.get(c) ?? 0) + 1);
+  }
+  // "Non-Limitation: *" codes mark sentences that read like a limitation but
+  // aren't one (future work, contextual justification, etc.) - excluded here
+  // since this chart is specifically about how common actual limitations are.
+  const ranked = [...counts.entries()]
+    .filter(([idx]) => !globalIndex.codes[idx].startsWith("Non-Limitation"))
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([idx, count]) => ({ name: globalIndex.codes[idx], pct: (count / totalPapers) * 100 }));
+  const maxPct = Math.max(...ranked.map((r) => r.pct), 1);
+  topCodes = ranked.map((r) => ({ ...r, barPct: (r.pct / maxPct) * 100 }));
+}
+---
+{topCodes.length > 0 && (
+  <div class="prevalence-chart">
+    {topCodes.map((c) => (
+      <div class="prevalence-row">
+        <span class="prevalence-label">{c.name}</span>
+        <div class="prevalence-track">
+          <div class="prevalence-fill" style={`width: ${c.barPct}%`}></div>
+        </div>
+        <span class="prevalence-value">{c.pct.toFixed(1)}%</span>
+      </div>
+    ))}
+    <p class="prevalence-caption">
+      % of the {totalPapers.toLocaleString()} LLM-coded papers carrying each code (top 8 of 50).
+    </p>
+  </div>
+)}
+
+<style>
+  .prevalence-chart { margin: 1rem 0; }
+  .prevalence-row {
+    display: grid;
+    grid-template-columns: minmax(0, 15rem) 1fr 3rem;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0.5rem 0;
+  }
+  .prevalence-label {
+    font-size: 0.85rem;
+    line-height: 1.25;
+  }
+  .prevalence-track {
+    background: var(--color-border);
+    border-radius: 4px;
+    height: 0.6rem;
+    overflow: hidden;
+  }
+  .prevalence-fill {
+    background: var(--color-accent);
+    height: 100%;
+    border-radius: 4px;
+  }
+  .prevalence-value {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    text-align: right;
+  }
+  .prevalence-caption {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin-top: 0.6rem;
+  }
+
+  @media (max-width: 520px) {
+    .prevalence-row { grid-template-columns: 1fr; row-gap: 0.2rem; }
+    .prevalence-value { text-align: left; }
+  }
+</style>
