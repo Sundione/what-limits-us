@@ -6,11 +6,12 @@ import { paper } from "../data/paper";
 <BaseLayout title={`Explore the dataset — ${paper.title}`}>
   <h1>Explore the dataset</h1>
   <p class="intro">
-    Search and filter the {" "}
-    <span class="badge badge-llm">LLM-coded</span> (16,047 papers) and{" "}
-    <span class="badge badge-human">Human-coded</span> (150 papers) datasets. Click a
-    paper to see its Limitations section with sentence-level code highlighting, or
-    click a code to find every other paper that carries it.
+    Search and filter the 16,047 LLM-coded papers. Click a paper to see its
+    Limitations section with sentence-level code highlighting, or click a code
+    to find every other paper that carries it. (A separate 150-paper
+    human-coded reference set was used to validate this coding — see the{" "}
+    <a href={import.meta.env.BASE_URL}>landing page</a> for how the two
+    compare.)
   </p>
 
   <noscript>
@@ -130,7 +131,6 @@ import { paper } from "../data/paper";
     font-size: 0.85rem;
   }
   .explorer .sentence { margin: 0.6rem 0; }
-  .explorer .limitation-text { white-space: pre-line; }
   .explorer .sentence mark {
     background: color-mix(in srgb, var(--color-accent) 25%, transparent);
     color: inherit;
@@ -169,11 +169,4 @@ import { paper } from "../data/paper";
     cursor: pointer;
     padding: 0;
   }
-  .explorer .human-codes {
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--color-border);
-  }
-  .explorer .human-codes .note { color: var(--color-muted); font-size: 0.85rem; }
-  .explorer .code-list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
 </style>

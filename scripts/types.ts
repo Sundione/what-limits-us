@@ -19,8 +19,6 @@ export interface IndexEntry {
   venue: string;
   track: string;
   codes: number[];
-  inLlmDataset: boolean;
-  inHumanDataset: boolean;
 }
 
 export interface PaperDetail {
@@ -30,10 +28,7 @@ export interface PaperDetail {
   year: number;
   venue: string;
   track: string;
-  inLlmDataset: boolean;
-  inHumanDataset: boolean;
-  llm: LlmCoding | null;
-  human: HumanCoding | null;
+  llm: LlmCoding;
 }
 
 export interface Sentence {
@@ -63,13 +58,6 @@ export interface LlmCoding {
   codes: CodeAssignment[];
 }
 
-export interface HumanCoding {
-  codebookVersion: "codebook_initial";
-  limitation: string;
-  sentences: Sentence[];
-  codes: { code: string; origin: "existing" | "new" }[];
-}
-
 /** Raw shape of one row in llm_coded_dataset/*\/papers_*.json */
 export interface RawLlmPaper {
   paper_id: string;
@@ -97,13 +85,3 @@ export interface RawEvidence {
   justification: string;
 }
 
-/** Raw shape of one row in human_coded_dataset/human_code.csv after CSV parsing */
-export interface RawHumanRow {
-  paper_id: string;
-  title: string;
-  abstract: string;
-  limitation: string;
-  segmented_text: string;
-  existing_code: string;
-  new_code: string;
-}

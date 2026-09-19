@@ -25,6 +25,20 @@ import { authors, affiliations, paper } from "../data/paper";
   <h2>Abstract</h2>
   <p>{paper.abstract}</p>
 
+  <h2>Dataset</h2>
+  <p>
+    This site's <a href={`${import.meta.env.BASE_URL}explore`}>explorer</a> covers
+    the <strong>16,047-paper LLM-coded dataset</strong> — every ACL/EMNLP main and
+    Findings paper (2020–2025) with a Limitations section, coded with sentence-level
+    evidence spans and justifications. The LLM coding was validated against a
+    separate <strong>150-paper human-coded reference set</strong> (four expert
+    annotators), reaching a Krippendorff's α of <strong>0.644</strong> among human
+    annotators alone and <strong>0.647</strong> with the LLM included as a coder —
+    that reference set isn't separately browsable here since a few of its papers
+    come from small workshop tracks outside this site's ACL/EMNLP main+Findings
+    scope, but it's the basis for treating the LLM coding as reliable.
+  </p>
+
   <BibtexBlock />
 
   <p class="cta">
