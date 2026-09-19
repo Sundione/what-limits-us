@@ -1,0 +1,73 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site repo
+        uses: actions/checkout@v4
+
+      - name: Read pinned dataset ref
+        id: dataset_ref
+        run: echo "ref=$(node -p "require('./dataset.config.json').ref")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pinned dataset checkout
+        id: dataset_cache
+        uses: actions/cache@v4
+        with:
+          path: .dataset-src
+          key: dataset-src-${{ steps.dataset_ref.outputs.ref }}
+
+      - name: Checkout pinned dataset commit
+        if: steps.dataset_cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: Sundione/nlp-self-reported-limitations
+          ref: ${{ steps.dataset_ref.outputs.ref }}
+          path: .dataset-src
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate data
+        run: npm run generate:data
+        env:
+          DATASET_SOURCE_DIR: ${{ github.workspace }}/.dataset-src
+
+      - name: Build site
+        run: npx astro build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

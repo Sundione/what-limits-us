@@ -1,0 +1,66 @@
+---
+import { paper } from "../data/paper";
+---
+<div class="bibtex-block">
+  <div class="bibtex-header">
+    <span>BibTeX</span>
+    <button type="button" class="copy-btn" data-copy-target="bibtex-text">Copy</button>
+  </div>
+  <pre id="bibtex-text">{paper.bibtex}</pre>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>("[data-copy-target]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const targetId = button.dataset.copyTarget;
+      const target = targetId ? document.getElementById(targetId) : null;
+      if (!target?.textContent) return;
+      try {
+        await navigator.clipboard.writeText(target.textContent);
+        const original = button.textContent;
+        button.textContent = "Copied!";
+        setTimeout(() => {
+          button.textContent = original;
+        }, 1500);
+      } catch {
+        button.textContent = "Select & copy manually";
+      }
+    });
+  });
+</script>
+
+<style>
+  .bibtex-block {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+  .bibtex-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.9rem;
+    background: color-mix(in srgb, var(--color-border) 35%, transparent);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .copy-btn {
+    font: inherit;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
+    cursor: pointer;
+  }
+  .copy-btn:hover { border-color: var(--color-accent); }
+  pre {
+    margin: 0;
+    padding: 0.9rem;
+    overflow-x: auto;
+    font-size: 0.8rem;
+    white-space: pre;
+  }
+</style>
