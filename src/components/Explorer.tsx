@@ -190,8 +190,8 @@ export default function Explorer() {
               <span class="result-meta">
                 {p.year} · {p.venue}
                 {p.track ? `-${p.track}` : ""}
-                {p.inLlmDataset && <span class="badge badge-llm">LLM-coded</span>}
-                {p.inHumanDataset && <span class="badge badge-human">Human-coded</span>}
+                {" · "}
+                {p.codes.length} code{p.codes.length === 1 ? "" : "s"}
               </span>
             </button>
           </li>
@@ -223,13 +223,11 @@ function PaperDetailView({
 
   const sentenceCodes = useMemo(() => {
     const map = new Map<string, { code: string; start: number | null; end: number | null; exact: boolean; justification: string }[]>();
-    if (detail.llm) {
-      for (const assignment of detail.llm.codes) {
-        for (const ev of assignment.evidence) {
-          const list = map.get(ev.sentenceId) ?? [];
-          list.push({ code: assignment.code, start: ev.start, end: ev.end, exact: ev.exact, justification: ev.justification });
-          map.set(ev.sentenceId, list);
-        }
+    for (const assignment of detail.llm.codes) {
+      for (const ev of assignment.evidence) {
+        const list = map.get(ev.sentenceId) ?? [];
+        list.push({ code: assignment.code, start: ev.start, end: ev.end, exact: ev.exact, justification: ev.justification });
+        map.set(ev.sentenceId, list);
       }
     }
     return map;
@@ -240,60 +238,38 @@ function PaperDetailView({
       <h2>{detail.title}</h2>
       <p class="detail-meta">
         {detail.year} · {detail.id}
-        {detail.inLlmDataset && <span class="badge badge-llm">LLM-coded</span>}
-        {detail.inHumanDataset && <span class="badge badge-human">Human-coded</span>}
       </p>
 
-      {detail.llm ? (
-        <div class="sentences">
-          {detail.llm.sentences.map((s) => {
-            const marks = (sentenceCodes.get(s.id) ?? []).slice().sort((a, b) => (a.start ?? 0) - (b.start ?? 0));
-            return (
-              <p class="sentence" key={s.id}>
-                <span>{renderSentence(s.text, marks)}</span>
-                {marks.length > 0 && (
-                  <span class="chip-row">
-                    {marks.map((m) => (
-                      <span key={m.code}>
-                        <button type="button" class="code-chip" onClick={() => setOpenJustification(openJustification === `${s.id}:${m.code}` ? null : `${s.id}:${m.code}`)}>
-                          {m.code}
-                          {!m.exact && <em> (approx.)</em>}
-                        </button>
-                        {openJustification === `${s.id}:${m.code}` && (
-                          <span class="justification-box">
-                            {m.justification}{" "}
-                            <button type="button" class="link-btn" onClick={() => onCodeClick(m.code)}>
-                              See all papers with this code →
-                            </button>
-                          </span>
-                        )}
-                      </span>
-                    ))}
-                  </span>
-                )}
-              </p>
-            );
-          })}
-        </div>
-      ) : (
-        <p class="limitation-text">{detail.human?.limitation}</p>
-      )}
-
-      {detail.human && (
-        <div class="human-codes">
-          <h3><span class="badge badge-human">Human-coded</span> codes for this paper</h3>
-          <p class="note">No sentence-level evidence is available for human-coded papers — codes are assigned at the whole-paper level.</p>
-          <ul class="code-list">
-            {detail.human.codes.map((c) => (
-              <li key={c.code}>
-                <button type="button" class="code-chip" onClick={() => onCodeClick(c.code)}>
-                  {c.code}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <div class="sentences">
+        {detail.llm.sentences.map((s) => {
+          const marks = (sentenceCodes.get(s.id) ?? []).slice().sort((a, b) => (a.start ?? 0) - (b.start ?? 0));
+          return (
+            <p class="sentence" key={s.id}>
+              <span>{renderSentence(s.text, marks)}</span>
+              {marks.length > 0 && (
+                <span class="chip-row">
+                  {marks.map((m) => (
+                    <span key={m.code}>
+                      <button type="button" class="code-chip" onClick={() => setOpenJustification(openJustification === `${s.id}:${m.code}` ? null : `${s.id}:${m.code}`)}>
+                        {m.code}
+                        {!m.exact && <em> (approx.)</em>}
+                      </button>
+                      {openJustification === `${s.id}:${m.code}` && (
+                        <span class="justification-box">
+                          {m.justification}{" "}
+                          <button type="button" class="link-btn" onClick={() => onCodeClick(m.code)}>
+                            See all papers with this code →
+                          </button>
+                        </span>
+                      )}
+                    </span>
+                  ))}
+                </span>
+              )}
+            </p>
+          );
+        })}
+      </div>
     </article>
   );
 }

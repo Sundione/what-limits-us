@@ -2,21 +2,17 @@ import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { parse } from "csv-parse/sync";
 
 import { deriveVenueTrack } from "./lib/deriveVenueTrack.js";
 import { loadCodeDefinitions } from "./lib/codebook.js";
-import { parseHumanCodeList } from "./lib/parseHumanCodes.js";
 import { resolveEvidence } from "./lib/resolveEvidence.js";
 import type {
   CodeAssignment,
   CodebookVersion,
   GlobalIndex,
-  HumanCoding,
   IndexEntry,
   LlmCoding,
   PaperDetail,
-  RawHumanRow,
   RawLlmPaper,
   Sentence,
 } from "./types.js";
@@ -29,7 +25,6 @@ interface DatasetConfig {
   ref: string;
   license: string;
   codebookVersionByFile: Record<string, CodebookVersion>;
-  humanDatasetCodebookVersion: "codebook_initial";
 }
 
 const config: DatasetConfig = JSON.parse(readFileSync(path.join(REPO_ROOT, "dataset.config.json"), "utf-8"));
@@ -84,14 +79,6 @@ function loadLlmPapers(datasetDir: string): Map<string, { paper: RawLlmPaper; co
   return byId;
 }
 
-function loadHumanRows(datasetDir: string): RawHumanRow[] {
-  const filePath = path.join(datasetDir, "human_coded_dataset", "human_code.csv");
-  return parse(readFileSync(filePath, "utf-8"), {
-    columns: true,
-    skip_empty_lines: true,
-  }) as RawHumanRow[];
-}
-
 function buildLlmCoding(
   raw: RawLlmPaper,
   codebookVersion: CodebookVersion,
@@ -128,40 +115,26 @@ function buildLlmCoding(
   };
 }
 
-function buildHumanCoding(raw: RawHumanRow): HumanCoding {
-  const segmentedText: Record<string, string> = JSON.parse(raw.segmented_text);
-  const sentences = toSentences(segmentedText);
-  const existing = parseHumanCodeList(raw.existing_code).map((code) => ({ code, origin: "existing" as const }));
-  const newCodes = parseHumanCodeList(raw.new_code).map((code) => ({ code, origin: "new" as const }));
-  return {
-    codebookVersion: "codebook_initial",
-    limitation: raw.limitation,
-    sentences,
-    codes: [...existing, ...newCodes],
-  };
-}
-
 function main() {
   const datasetDir = resolveDatasetDir();
   console.log(`[generate-data] reading dataset from ${datasetDir}`);
 
+  // Explorer scope is the LLM-coded dataset only (16,047 papers). The
+  // human-coded dataset (150 papers) is used as a reference standard
+  // described on the landing page, not browsed here - it also carries a
+  // handful of workshop/demo venues (wassa, c3nlp, sighan, fieldmatters,
+  // nlp4convai, textgraphs, privatenlp, teachingnlp) that exist only in
+  // that 150-paper set and fall outside this site's ACL/EMNLP main+Findings
+  // scope, so pulling it into the explorer's venue/track filters would
+  // introduce noise the LLM dataset itself doesn't have.
   const llmPapers = loadLlmPapers(datasetDir);
-  const humanRows = loadHumanRows(datasetDir);
   const codeDefinitions = loadCodeDefinitions(datasetDir);
 
-  console.log(`[generate-data] loaded ${llmPapers.size} llm papers, ${humanRows.length} human rows`);
-
-  const humanById = new Map(humanRows.map((row) => [row.paper_id, row]));
-  const allIds = new Set<string>([...llmPapers.keys(), ...humanById.keys()]);
+  console.log(`[generate-data] loaded ${llmPapers.size} papers`);
 
   const codeSet = new Set<string>();
   for (const { paper } of llmPapers.values()) {
     for (const c of [...paper.existing_code, ...paper.new_code]) codeSet.add(c.trim());
-  }
-  for (const row of humanRows) {
-    for (const c of [...parseHumanCodeList(row.existing_code), ...parseHumanCodeList(row.new_code)]) {
-      codeSet.add(c);
-    }
   }
   const codes = [...codeSet].sort((a, b) => a.localeCompare(b));
   const codeIndex = new Map(codes.map((c, i) => [c, i]));
@@ -176,54 +149,34 @@ function main() {
   rmSync(outDataDir, { recursive: true, force: true });
   mkdirSync(outPapersDir, { recursive: true });
 
-  for (const id of allIds) {
+  for (const [id, { paper, codebookVersion }] of llmPapers) {
     const { year, venue, track } = deriveVenueTrack(id);
-    const llmEntry = llmPapers.get(id);
-    const humanRow = humanById.get(id);
 
-    let llm: LlmCoding | null = null;
+    const built = buildLlmCoding(paper, codebookVersion);
+    totalFallback += built.fallbackCount;
+    totalSpans += built.totalSpans;
+
     const codeSetForPaper = new Set<number>();
-
-    if (llmEntry) {
-      const built = buildLlmCoding(llmEntry.paper, llmEntry.codebookVersion);
-      llm = built.coding;
-      totalFallback += built.fallbackCount;
-      totalSpans += built.totalSpans;
-      for (const c of llm.codes) codeSetForPaper.add(codeIndex.get(c.code)!);
-    }
-
-    let human: HumanCoding | null = null;
-    if (humanRow) {
-      human = buildHumanCoding(humanRow);
-      for (const c of human.codes) codeSetForPaper.add(codeIndex.get(c.code)!);
-    }
-
-    const title = llmEntry?.paper.title ?? humanRow?.title ?? "";
-    const abstract = llmEntry?.paper.abstract ?? humanRow?.abstract ?? "";
+    for (const c of built.coding.codes) codeSetForPaper.add(codeIndex.get(c.code)!);
 
     const detail: PaperDetail = {
       id,
-      title,
-      abstract,
+      title: paper.title,
+      abstract: paper.abstract,
       year,
       venue,
       track,
-      inLlmDataset: Boolean(llmEntry),
-      inHumanDataset: Boolean(humanRow),
-      llm,
-      human,
+      llm: built.coding,
     };
     writeFileSync(path.join(outPapersDir, `${id}.json`), JSON.stringify(detail));
 
     indexEntries.push({
       id,
-      title,
+      title: paper.title,
       year,
       venue,
       track,
       codes: [...codeSetForPaper].sort((a, b) => a - b),
-      inLlmDataset: detail.inLlmDataset,
-      inHumanDataset: detail.inHumanDataset,
     });
   }
 
