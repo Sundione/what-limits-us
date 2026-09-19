@@ -1,0 +1,181 @@
+---
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+import type { GlobalIndex } from "../../scripts/types";
+
+// Resolved relative to the project root (where `astro build`/`astro dev` is
+// invoked, per package.json) rather than import.meta.url - Astro's Vite
+// pipeline doesn't guarantee the latter maps back to this file's real
+// on-disk location.
+const indexPath = path.resolve(process.cwd(), "public/data/index.json");
+
+interface Row {
+  name: string;
+  pct: number;
+  barPct: number;
+}
+
+function rankTop8(globalIndex: GlobalIndex, counts: Map<number, number>, totalPapers: number, includeNonLimitation: boolean): Row[] {
+  const ranked = [...counts.entries()]
+    .filter(([idx]) => includeNonLimitation || !globalIndex.codes[idx].startsWith("Non-Limitation"))
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([idx, count]) => ({ name: globalIndex.codes[idx], pct: (count / totalPapers) * 100 }));
+  const maxPct = Math.max(...ranked.map((r) => r.pct), 1);
+  return ranked.map((r) => ({ ...r, barPct: (r.pct / maxPct) * 100 }));
+}
+
+let limitationsOnly: Row[] = [];
+let allCodes: Row[] = [];
+let totalPapers = 0;
+
+if (existsSync(indexPath)) {
+  const globalIndex: GlobalIndex = JSON.parse(readFileSync(indexPath, "utf-8"));
+  totalPapers = globalIndex.papers.length;
+  const counts = new Map<number, number>();
+  for (const p of globalIndex.papers) {
+    for (const c of p.codes) counts.set(c, (counts.get(c) ?? 0) + 1);
+  }
+  limitationsOnly = rankTop8(globalIndex, counts, totalPapers, false);
+  allCodes = rankTop8(globalIndex, counts, totalPapers, true);
+}
+---
+{limitationsOnly.length > 0 && (
+  <div class="prevalence-chart">
+    {/*
+      The radio inputs live as direct children of .prevalence-chart (not
+      nested inside .chart-toggle) so the `~` general-sibling selector below
+      can reach the panels - `~` only matches elements that share the same
+      parent. The <label for="..."> elements still work correctly regardless
+      of where they sit in the DOM.
+    */}
+    <input type="radio" name="prevalence-view" id="view-limitations" class="chart-toggle-input" checked />
+    <input type="radio" name="prevalence-view" id="view-all" class="chart-toggle-input" />
+
+    <div class="chart-toggle">
+      <label for="view-limitations">Limitations only</label>
+      <label for="view-all">All codes</label>
+    </div>
+
+    <div class="chart-panel" id="panel-limitations">
+      {limitationsOnly.map((c) => (
+        <div class="prevalence-row">
+          <span class="prevalence-label">{c.name}</span>
+          <div class="prevalence-track">
+            <div class="prevalence-fill" style={`width: ${c.barPct}%`}></div>
+          </div>
+          <span class="prevalence-value">{c.pct.toFixed(1)}%</span>
+        </div>
+      ))}
+      <p class="prevalence-caption">
+        % of the {totalPapers.toLocaleString()} LLM-coded papers carrying each code
+        (top 8 of 50, excluding "Non-Limitation: *" codes — those mark sentences that
+        read like a limitation but aren't one, e.g. future-work mentions).
+      </p>
+    </div>
+
+    <div class="chart-panel" id="panel-all">
+      {allCodes.map((c) => (
+        <div class="prevalence-row">
+          <span class="prevalence-label">{c.name}</span>
+          <div class="prevalence-track">
+            <div class="prevalence-fill" style={`width: ${c.barPct}%`}></div>
+          </div>
+          <span class="prevalence-value">{c.pct.toFixed(1)}%</span>
+        </div>
+      ))}
+      <p class="prevalence-caption">
+        % of the {totalPapers.toLocaleString()} LLM-coded papers carrying each code
+        (top 8 of 50, all codes including "Non-Limitation: *" — sentences that read
+        like a limitation but were judged not to be one).
+      </p>
+    </div>
+  </div>
+)}
+
+<style>
+  .prevalence-chart { margin: 1rem 0; }
+
+  /* Visually hidden but still focusable/clickable-via-label (unlike
+     display:none, which would remove it from keyboard focus entirely). */
+  .chart-toggle-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .chart-toggle {
+    display: inline-flex;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.15rem;
+    margin-bottom: 0.75rem;
+  }
+  .chart-toggle label {
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--color-muted);
+  }
+  /* input and label aren't adjacent siblings (see markup note above), so the
+     active-state style is reached via input -> ~ -> .chart-toggle -> label. */
+  #view-limitations:checked ~ .chart-toggle label[for="view-limitations"],
+  #view-all:checked ~ .chart-toggle label[for="view-all"] {
+    background: var(--color-accent);
+    color: white;
+  }
+  #view-limitations:focus-visible ~ .chart-toggle label[for="view-limitations"],
+  #view-all:focus-visible ~ .chart-toggle label[for="view-all"] {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+  }
+
+  .chart-panel { display: none; }
+  #view-limitations:checked ~ #panel-limitations { display: block; }
+  #view-all:checked ~ #panel-all { display: block; }
+
+  .prevalence-row {
+    display: grid;
+    grid-template-columns: minmax(0, 15rem) 1fr 3rem;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0.5rem 0;
+  }
+  .prevalence-label {
+    font-size: 0.85rem;
+    line-height: 1.25;
+  }
+  .prevalence-track {
+    background: var(--color-border);
+    border-radius: 4px;
+    height: 0.6rem;
+    overflow: hidden;
+  }
+  .prevalence-fill {
+    background: var(--color-accent);
+    height: 100%;
+    border-radius: 4px;
+  }
+  .prevalence-value {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    text-align: right;
+  }
+  .prevalence-caption {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin-top: 0.6rem;
+  }
+
+  @media (max-width: 520px) {
+    .prevalence-row { grid-template-columns: 1fr; row-gap: 0.2rem; }
+    .prevalence-value { text-align: left; }
+  }
+</style>
