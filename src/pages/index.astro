@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import LinkBar from "../components/LinkBar.astro";
+import BibtexBlock from "../components/BibtexBlock.astro";
+import { authors, affiliations, paper } from "../data/paper";
+---
+<BaseLayout title={paper.title}>
+  <span class="venue-badge">{paper.venue}</span>
+  <h1>{paper.title}</h1>
+
+  <p class="authors">
+    {authors.map((author, i) => (
+      <>
+        <span>{author.name}<sup>{author.affiliation === "chula" ? "†" : "‡"}{author.corresponding ? "*" : ""}</sup></span>
+        {i < authors.length - 1 ? ", " : ""}
+      </>
+    ))}
+  </p>
+  <p class="affiliations">
+    <sup>†</sup> {affiliations.chula} &nbsp;&nbsp; <sup>‡</sup> {affiliations.google}
+  </p>
+
+  <LinkBar />
+
+  <h2>Abstract</h2>
+  <p>{paper.abstract}</p>
+
+  <BibtexBlock />
+
+  <p class="cta">
+    <a href={`${import.meta.env.BASE_URL}explore`}>Explore the dataset &rarr;</a>
+  </p>
+</BaseLayout>
+
+<style>
+  .venue-badge {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+  h1 { margin-top: 0.25rem; }
+  .authors { font-size: 1.05rem; }
+  .affiliations { color: var(--color-muted); font-size: 0.9rem; }
+  .cta { margin-top: 2rem; font-size: 1.05rem; font-weight: 600; }
+</style>

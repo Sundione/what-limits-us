@@ -1,0 +1,37 @@
+---
+import { paper } from "../data/paper";
+const { links } = paper;
+---
+<div class="link-bar">
+  <a class="link-pill" href={links.arxiv}>arXiv</a>
+  {links.aclAnthology
+    ? <a class="link-pill" href={links.aclAnthology}>ACL Anthology</a>
+    : <span class="link-pill link-pill-disabled" title="Not yet published">ACL Anthology (pending)</span>}
+  <a class="link-pill" href={links.datasetGithub}>Dataset (GitHub)</a>
+  {links.datasetHuggingFace
+    ? <a class="link-pill" href={links.datasetHuggingFace}>Dataset (Hugging Face)</a>
+    : null}
+</div>
+
+<style>
+  .link-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 1.25rem 0;
+  }
+  .link-pill {
+    display: inline-block;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    color: var(--color-text);
+  }
+  .link-pill:hover { border-color: var(--color-accent); }
+  .link-pill-disabled {
+    color: var(--color-muted);
+    cursor: default;
+  }
+</style>

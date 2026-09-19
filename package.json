@@ -1,0 +1,24 @@
+{
+  "name": "what-limits-us",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "generate:data": "tsx scripts/generate-data.ts",
+    "dev": "npm run generate:data && astro dev",
+    "build": "npm run generate:data && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/preact": "^6.0.5",
+    "astro": "^7.3.3",
+    "preact": "^10.24.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "csv-parse": "^7.0.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

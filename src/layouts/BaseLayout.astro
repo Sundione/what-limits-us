@@ -1,0 +1,116 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = "Companion site for \"What Limits Us?\" (EMNLP 2026 Findings)." } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.svg`} type="image/svg+xml" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav>
+        <a class="brand" href={import.meta.env.BASE_URL}>What Limits Us?</a>
+        <a href={`${import.meta.env.BASE_URL}explore`}>Explore the dataset</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <p>
+        Companion site for an EMNLP 2026 Findings paper. Dataset released under
+        <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+      </p>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --color-bg: #ffffff;
+    --color-text: #1a1a1a;
+    --color-muted: #5a5a5a;
+    --color-border: #e0e0e0;
+    --color-accent: #1d4ed8;
+    --color-llm: #7c3aed;
+    --color-llm-bg: #f3e8ff;
+    --color-human: #0f766e;
+    --color-human-bg: #ccfbf1;
+    --max-width: 860px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-bg: #12121a;
+      --color-text: #e8e8ec;
+      --color-muted: #a0a0ad;
+      --color-border: #2c2c38;
+      --color-accent: #7aa2ff;
+      --color-llm: #c4b5fd;
+      --color-llm-bg: #2e1f4d;
+      --color-human: #5eead4;
+      --color-human-bg: #0f3d38;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.55;
+  }
+
+  a { color: var(--color-accent); }
+
+  .site-header {
+    border-bottom: 1px solid var(--color-border);
+  }
+  .site-header nav {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .brand { font-weight: 700; text-decoration: none; color: var(--color-text); }
+
+  main {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
+
+  .site-footer {
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted);
+    font-size: 0.85rem;
+  }
+  .site-footer p {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 1.25rem;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-llm { background: var(--color-llm-bg); color: var(--color-llm); }
+  .badge-human { background: var(--color-human-bg); color: var(--color-human); }
+</style>

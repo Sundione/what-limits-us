@@ -1,0 +1,179 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Explorer from "../components/Explorer";
+import { paper } from "../data/paper";
+---
+<BaseLayout title={`Explore the dataset — ${paper.title}`}>
+  <h1>Explore the dataset</h1>
+  <p class="intro">
+    Search and filter the {" "}
+    <span class="badge badge-llm">LLM-coded</span> (16,047 papers) and{" "}
+    <span class="badge badge-human">Human-coded</span> (150 papers) datasets. Click a
+    paper to see its Limitations section with sentence-level code highlighting, or
+    click a code to find every other paper that carries it.
+  </p>
+
+  <noscript>
+    <p class="noscript-warning">
+      This explorer requires JavaScript to search and filter the dataset client-side.
+      With JavaScript disabled, you can instead browse the raw data directly on{" "}
+      <a href="https://github.com/Sundione/nlp-self-reported-limitations">GitHub</a>.
+    </p>
+  </noscript>
+
+  <Explorer client:load />
+</BaseLayout>
+
+<style is:global>
+  .intro { color: var(--color-muted); }
+  .noscript-warning {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1rem;
+    background: color-mix(in srgb, var(--color-border) 25%, transparent);
+  }
+
+  .explorer .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+  }
+  .explorer .controls input[type="search"] {
+    flex: 1 1 220px;
+  }
+  .explorer .controls input,
+  .explorer .controls select {
+    padding: 0.45rem 0.6rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font: inherit;
+  }
+
+  .explorer .active-filter {
+    font-size: 0.9rem;
+  }
+  .explorer .active-filter button {
+    font: inherit;
+    border: none;
+    background: none;
+    color: var(--color-accent);
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+  }
+
+  .explorer .result-count {
+    color: var(--color-muted);
+    font-size: 0.85rem;
+  }
+
+  .explorer .results {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    max-height: 420px;
+    overflow-y: auto;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+  }
+  .explorer .results li + li { border-top: 1px solid var(--color-border); }
+  .explorer .results li.result-active { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+  .explorer .result-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.6rem 0.9rem;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+  .explorer .result-row:hover { background: color-mix(in srgb, var(--color-border) 30%, transparent); }
+  .explorer .result-title { font-weight: 600; }
+  .explorer .result-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-muted);
+    font-size: 0.8rem;
+  }
+
+  .explorer .detail-pane {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    position: relative;
+  }
+  .explorer .close-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.9rem;
+    font: inherit;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
+    border-radius: 6px;
+    padding: 0.2rem 0.6rem;
+    cursor: pointer;
+  }
+  .explorer .detail-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-muted);
+    font-size: 0.85rem;
+  }
+  .explorer .sentence { margin: 0.6rem 0; }
+  .explorer .limitation-text { white-space: pre-line; }
+  .explorer .sentence mark {
+    background: color-mix(in srgb, var(--color-accent) 25%, transparent);
+    color: inherit;
+    border-radius: 3px;
+  }
+  .explorer .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+  }
+  .explorer .code-chip {
+    font: inherit;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-accent);
+    background: none;
+    color: var(--color-accent);
+    cursor: pointer;
+  }
+  .explorer .justification-box {
+    display: block;
+    margin-top: 0.3rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-border) 30%, transparent);
+    font-size: 0.85rem;
+  }
+  .explorer .link-btn {
+    font: inherit;
+    border: none;
+    background: none;
+    color: var(--color-accent);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+  }
+  .explorer .human-codes {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .explorer .human-codes .note { color: var(--color-muted); font-size: 0.85rem; }
+  .explorer .code-list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+</style>

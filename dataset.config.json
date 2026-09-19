@@ -1,0 +1,12 @@
+{
+  "repo": "Sundione/nlp-self-reported-limitations",
+  "ref": "5eee600fc2c0d6e7ae8b993b343122860cf15d11",
+  "license": "CC-BY-4.0",
+  "codebookVersionByFile": {
+    "2020_2022": "codebook_initial",
+    "2023": "codebook_after_2022",
+    "2024": "codebook_after_2023",
+    "2025": "codebook_after_2024"
+  },
+  "humanDatasetCodebookVersion": "codebook_initial"
+}
