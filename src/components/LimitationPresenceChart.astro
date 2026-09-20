@@ -1,0 +1,123 @@
+---
+import { presenceRows, adoptionPct, type PresenceRow } from "../data/limitationPresence";
+
+const years = [2020, 2021, 2022, 2023, 2024, 2025];
+const rowFor = (venue: PresenceRow["venue"], year: number) =>
+  presenceRows.find((r) => r.venue === venue && r.year === year)!;
+const aclRows = years.map((y) => rowFor("ACL", y));
+const emnlpRows = years.map((y) => rowFor("EMNLP", y));
+
+const width = 640;
+const height = 260;
+const padL = 40;
+const padR = 16;
+const padT = 16;
+const padB = 30;
+const plotW = width - padL - padR;
+const plotH = height - padT - padB;
+
+const xFor = (i: number) => padL + (i / (years.length - 1)) * plotW;
+const yFor = (pct: number) => padT + (1 - pct / 100) * plotH;
+
+const aclPoints = aclRows.map((row, i) => ({ x: xFor(i), y: yFor(adoptionPct(row)), row }));
+const emnlpPoints = emnlpRows.map((row, i) => ({ x: xFor(i), y: yFor(adoptionPct(row)), row }));
+const aclLine = aclPoints.map((p) => `${p.x},${p.y}`).join(" ");
+const emnlpLine = emnlpPoints.map((p) => `${p.x},${p.y}`).join(" ");
+const gridPcts = [0, 50, 100];
+
+function tooltip(venue: string, row: PresenceRow) {
+  return `${venue} ${row.year}: ${adoptionPct(row).toFixed(1)}% (${row.papersWithLimitations}/${row.totalPapers} papers)`;
+}
+---
+<div class="presence-chart">
+  <div class="presence-legend">
+    <span class="legend-item"><span class="legend-swatch legend-acl"></span>ACL</span>
+    <span class="legend-item"><span class="legend-swatch legend-emnlp"></span>EMNLP</span>
+  </div>
+
+  <svg
+    viewBox={`0 0 ${width} ${height}`}
+    role="img"
+    aria-label="Percentage of ACL and EMNLP papers with an explicit Limitations section, 2020 to 2025. Both rise from single digits to effectively 100% following the EMNLP 2022 / ACL 2023 mandatory-reporting policy."
+  >
+    {gridPcts.map((pct) => (
+      <g>
+        <line x1={padL} x2={width - padR} y1={yFor(pct)} y2={yFor(pct)} class="gridline" />
+        <text x={padL - 8} y={yFor(pct)} class="axis-label" text-anchor="end" dominant-baseline="middle">{pct}%</text>
+      </g>
+    ))}
+    {years.map((y, i) => (
+      <text x={xFor(i)} y={height - 8} class="axis-label" text-anchor="middle">{y}</text>
+    ))}
+
+    <polyline points={aclLine} class="line-acl" fill="none" />
+    <polyline points={emnlpLine} class="line-emnlp" fill="none" />
+
+    {aclPoints.map((p) => (
+      <circle cx={p.x} cy={p.y} r="3.5" class="point-acl">
+        <title>{tooltip("ACL", p.row)}</title>
+      </circle>
+    ))}
+    {emnlpPoints.map((p) => (
+      <circle cx={p.x} cy={p.y} r="3.5" class="point-emnlp">
+        <title>{tooltip("EMNLP", p.row)}</title>
+      </circle>
+    ))}
+  </svg>
+
+  <p class="presence-caption">
+    % of accepted papers with an explicit Limitations section, by year (hover
+    a point for exact counts). From EMNLP 2022 onward, pipeline extraction
+    failures aren't counted against adoption — a failed extraction is
+    inconclusive, not evidence the section is missing; only papers confirmed
+    to have no explicit section count as non-adopters.
+  </p>
+
+  <details class="presence-table-details">
+    <summary>View exact counts</summary>
+    <table class="presence-table">
+      <thead><tr><th>Year</th><th>ACL</th><th>EMNLP</th></tr></thead>
+      <tbody>
+        {years.map((y, i) => (
+          <tr>
+            <td>{y}</td>
+            <td>{adoptionPct(aclRows[i]).toFixed(1)}% ({aclRows[i].papersWithLimitations}/{aclRows[i].totalPapers})</td>
+            <td>{adoptionPct(emnlpRows[i]).toFixed(1)}% ({emnlpRows[i].papersWithLimitations}/{emnlpRows[i].totalPapers})</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </details>
+</div>
+
+<style>
+  .presence-chart { margin: 1rem 0; }
+  .presence-legend {
+    display: flex;
+    gap: 1.25rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+  .legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .legend-swatch { display: inline-block; width: 1.4rem; height: 0; border-top: 3px solid; }
+  .legend-acl { border-top-color: var(--color-accent); border-top-style: solid; }
+  .legend-emnlp { border-top-color: var(--color-text); border-top-style: dashed; }
+
+  svg { width: 100%; height: auto; max-width: 640px; }
+  .gridline { stroke: var(--color-border); stroke-width: 1; }
+  .axis-label { fill: var(--color-muted); font-size: 10px; }
+  .line-acl { stroke: var(--color-accent); stroke-width: 2.5; }
+  .line-emnlp { stroke: var(--color-text); stroke-width: 2; stroke-dasharray: 6 4; }
+  .point-acl { fill: var(--color-accent); }
+  .point-emnlp { fill: var(--color-text); }
+
+  .presence-caption { font-size: 0.8rem; color: var(--color-muted); margin-top: 0.5rem; }
+
+  .presence-table-details { margin-top: 0.5rem; font-size: 0.85rem; }
+  .presence-table { border-collapse: collapse; margin-top: 0.5rem; }
+  .presence-table th, .presence-table td {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--color-border);
+    text-align: left;
+  }
+</style>
