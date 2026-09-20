@@ -7,7 +7,12 @@ const RESULTS_LIMIT = 200;
 
 function readParams() {
   const params = new URLSearchParams(location.search);
-  return { paper: params.get("paper"), code: params.get("code") };
+  return {
+    paper: params.get("paper"),
+    code: params.get("code"),
+    year: params.get("year"),
+    venue: params.get("venue"),
+  };
 }
 
 function pushParams(next: { paper?: string | null; code?: string | null }) {
@@ -38,9 +43,11 @@ export default function Explorer() {
   // Initial state from URL, and keep in sync with back/forward navigation.
   useEffect(() => {
     const apply = () => {
-      const { paper, code } = readParams();
+      const { paper, code, year, venue } = readParams();
       setPaperId(paper);
       setCodeFilter(code);
+      setYear(year ?? "");
+      setVenue(venue ?? "");
     };
     apply();
     addEventListener("popstate", apply);
