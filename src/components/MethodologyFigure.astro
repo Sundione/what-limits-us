@@ -1,115 +1,139 @@
 ---
-const stages = [
+// Hover-zone rectangles are positioned as percentages of the source PNG's
+// own dimensions (1691x672, sources/visualizations/hybrid/Iterative_Hybrid_Coding_2.png)
+// so they scale correctly with the image at any display width.
+interface Zone {
+  label: string;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  detail: string;
+}
+
+const zones: Zone[] = [
   {
-    title: "Limitations Section",
-    kicker: "Input",
-    detail:
-      "Every ACL/EMNLP paper's Limitations section is pulled as plain text — the starting point for the whole pipeline.",
+    label: "Limitations Section",
+    left: 18.5, top: 20, width: 11, height: 34,
+    detail: "Input: the raw text of a paper's Limitations section, e.g. “This study is limited by …”",
   },
   {
-    title: "Semantic Unit Segmentation",
-    kicker: "Gemini 2.5 Flash",
-    detail:
-      'The section is split into individual sentences ("semantic units"), e.g. s₁ = "This study is limited by …", s₂ = "Moreover, our model is …". Each sentence is coded independently next.',
+    label: "Semantic Unit Segmentation",
+    left: 32.5, top: 15, width: 10.5, height: 39,
+    detail: "Gemini 2.5 Flash splits the section into individual sentences (s₁, s₂, …), each coded independently next.",
   },
   {
-    title: "Automatic Hybrid Coding",
-    kicker: "Gemini 3.1 Pro",
-    detail:
-      "Two passes against the current codebook Cₜ₋₁: Deductive assigns existing codes (s₁ → Code 1); Inductive proposes a new code where nothing fits (s₁ → “Poor data”).",
+    label: "Deductive coding",
+    left: 54, top: 19, width: 13, height: 30,
+    detail: "Gemini 3.1 Pro assigns existing codes from the current codebook Cₜ₋₁ (e.g. s₁ → Code 1, s₂ → Code 3).",
   },
   {
-    title: "Handling New Codes",
-    kicker: "Cluster → Recommend → Human Review → Apply",
-    detail:
-      "Inductively-proposed codes are clustered across papers, a candidate definition is recommended, a researcher reviews it, then applies it to the codebook — the only step with a human in the loop, kept specifically so the codebook stays interpretable.",
+    label: "Inductive coding",
+    left: 54, top: 50, width: 13, height: 27,
+    detail: "Where no existing code fits, the model proposes a new one (e.g. s₁ → “Poor data”) instead of forcing a bad match.",
   },
   {
-    title: "Annotated Data + Updated Codebook",
-    kicker: "Output",
-    detail:
-      "Each sentence's final codes (s₁ → [Code 1, Code 4], s₂ → [Code 3]) plus an updated codebook Cₜ (new Code 4 added here) — which becomes Cₜ₋₁ for the next iteration.",
+    label: "Handling New Codes",
+    left: 69, top: 15, width: 9.5, height: 67,
+    detail: "Inductively-proposed codes are clustered, a definition is recommended, a researcher reviews it, then applies it to the codebook — the only step with a human in the loop.",
+  },
+  {
+    label: "Annotated Data",
+    left: 82.5, top: 8, width: 16, height: 34,
+    detail: "Output: each sentence's final code list, e.g. s₁ → [Code 1, Code 4], s₂ → [Code 3].",
+  },
+  {
+    label: "Updated Codebook",
+    left: 82.5, top: 60, width: 16, height: 20,
+    detail: "The codebook after this paper's new code (Code 4) is applied — this becomes Cₜ₋₁ for the next paper/iteration.",
   },
 ];
 ---
-<div class="methodology-figure">
-  {stages.map((stage, i) => (
-    <>
-      <details class="stage">
-        <summary>
-          <span class="stage-number">{i + 1}</span>
-          <span class="stage-title">{stage.title}</span>
-          <span class="stage-kicker">{stage.kicker}</span>
-        </summary>
-        <p class="stage-detail">{stage.detail}</p>
-      </details>
-      {i < stages.length - 1 && <span class="stage-arrow" aria-hidden="true">&rarr;</span>}
-    </>
+<div class="methodology-figure-wrap">
+  <img
+    src={`${import.meta.env.BASE_URL}methodology/iterative-hybrid-coding.png`}
+    alt="Iterative Hybrid Coding pipeline: a Limitations Section is segmented into sentences, coded deductively (existing codes) and inductively (new codes), new codes go through cluster/recommend/human-review/apply before updating the codebook, producing Annotated Data and an Updated Codebook that feeds back into the next iteration."
+    class="methodology-figure-img"
+  />
+  {zones.map((zone) => (
+    <button
+      type="button"
+      class="hover-zone"
+      style={`left:${zone.left}%; top:${zone.top}%; width:${zone.width}%; height:${zone.height}%;`}
+      aria-label={`${zone.label}: ${zone.detail}`}
+    >
+      <span class="tooltip">
+        <strong>{zone.label}</strong>
+        <span>{zone.detail}</span>
+      </span>
+    </button>
   ))}
 </div>
-<p class="methodology-loop-note">
-  The updated codebook feeds back as the starting codebook for the next paper/iteration —
-  this is why the process is called <em>iterative</em> hybrid coding.
-</p>
+<p class="methodology-hint">Hover or tap a stage of the diagram for details.</p>
 
 <style>
-  .methodology-figure {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
-    gap: 0.5rem;
-    margin: 1.25rem 0 0.5rem;
-  }
-  .stage {
-    flex: 1 1 160px;
+  .methodology-figure-wrap {
+    position: relative;
+    width: 100%;
+    margin: 1.25rem 0 0.25rem;
     border: 1px solid var(--color-border);
     border-radius: 8px;
-    padding: 0.6rem 0.75rem;
-    background: var(--color-bg);
+    /* deliberately not overflow:hidden - tooltips pop up above their hover
+       zone and would get clipped by the container for zones near the top */
   }
-  .stage[open] { border-color: var(--color-accent); }
-  .stage summary {
-    cursor: pointer;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-  .stage summary::-webkit-details-marker { display: none; }
-  .stage summary:hover .stage-title { color: var(--color-accent); }
-  .stage-number {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.25rem;
-    height: 1.25rem;
-    border-radius: 999px;
-    background: var(--color-accent);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 700;
-  }
-  .stage-title { font-weight: 600; font-size: 0.9rem; }
-  .stage-kicker { font-size: 0.72rem; color: var(--color-muted); }
-  .stage-detail {
-    margin: 0.6rem 0 0;
-    padding-top: 0.6rem;
-    border-top: 1px solid var(--color-border);
-    font-size: 0.85rem;
-    color: var(--color-muted);
-  }
-  .stage-arrow {
-    align-self: center;
-    color: var(--color-muted);
-    font-size: 1.1rem;
-  }
-  .methodology-loop-note {
-    font-size: 0.85rem;
-    color: var(--color-muted);
-    margin-top: 0.75rem;
+  .methodology-figure-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 7px;
   }
 
-  @media (max-width: 700px) {
-    .stage-arrow { transform: rotate(90deg); }
+  .hover-zone {
+    position: absolute;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+  }
+  .hover-zone:hover,
+  .hover-zone:focus-visible {
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+    outline: none;
+  }
+
+  .tooltip {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%) translateY(4px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    width: max-content;
+    max-width: 15rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 6px;
+    background: var(--color-text);
+    color: var(--color-bg);
+    font-size: 0.78rem;
+    line-height: 1.35;
+    text-align: left;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease, transform 0.12s ease;
+    z-index: 5;
+  }
+  .hover-zone:hover .tooltip,
+  .hover-zone:focus-visible .tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .methodology-hint {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+    margin-top: 0.4rem;
   }
 </style>

@@ -4,6 +4,7 @@ import LinkBar from "../components/LinkBar.astro";
 import BibtexBlock from "../components/BibtexBlock.astro";
 import MethodologyFigure from "../components/MethodologyFigure.astro";
 import PrevalenceChart from "../components/PrevalenceChart.astro";
+import LimitationPresenceChart from "../components/LimitationPresenceChart.astro";
 import { authors, affiliations, paper } from "../data/paper";
 ---
 <BaseLayout title={paper.title}>
@@ -25,13 +26,10 @@ import { authors, affiliations, paper } from "../data/paper";
   <LinkBar />
 
   <p class="tldr">
-    <strong>TL;DR:</strong> Since 2022, NLP conferences require every paper to
-    disclose its own limitations — creating a huge, unanalyzed archive of
-    researchers admitting what's wrong with their own work. We built a
-    human-AI pipeline (validated against expert annotators) to categorize
-    over 16,000 of these disclosures, and found that what researchers report
-    barely varies by research area — a surprisingly uniform picture of how
-    the field talks about its own shortcomings.
+    <strong>TL;DR:</strong> This paper analyzed Limitations sections from
+    16,067 ACL and EMNLP papers to understand their trends over time, their
+    correlations with paper attributes, and the rhetorical strategies
+    researchers use to present them.
   </p>
 
   <h2>Abstract</h2>
@@ -41,7 +39,7 @@ import { authors, affiliations, paper } from "../data/paper";
   <p>
     A human-AI pipeline alternates between an LLM proposing codes for each
     sentence and a researcher reviewing any genuinely new category it
-    surfaces. Click a stage to see how it works, with a real worked example:
+    surfaces. Hover a stage of the actual pipeline figure for details:
   </p>
   <MethodologyFigure />
   <p class="section-cta">
@@ -81,6 +79,16 @@ import { authors, affiliations, paper } from "../data/paper";
   </p>
 
   <h2>Results</h2>
+
+  <h3>Limitations section adoption</h3>
+  <p>
+    A Limitations section was optional until EMNLP 2022 and ACL 2023 made it
+    mandatory. Adoption jumped almost immediately from single digits to
+    effectively 100%:
+  </p>
+  <LimitationPresenceChart />
+
+  <h3>Most common limitations</h3>
   <p>Which limitations come up most often across the 16,047 LLM-coded papers:</p>
   <PrevalenceChart />
   <p class="section-cta">
