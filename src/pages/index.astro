@@ -3,12 +3,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import LinkBar from "../components/LinkBar.astro";
 import BibtexBlock from "../components/BibtexBlock.astro";
 import MethodologyFigure from "../components/MethodologyFigure.astro";
-import PrevalenceChart from "../components/PrevalenceChart.astro";
 import LimitationPresenceChart from "../components/LimitationPresenceChart.astro";
+import LiveAnnotationDemo from "../components/LiveAnnotationDemo.astro";
 import { authors, affiliations, paper } from "../data/paper";
 ---
-<BaseLayout title={paper.title}>
-  <span class="venue-badge">{paper.venue}</span>
+<BaseLayout title={`${paper.title} — NLP Limitations`}>
   <h1>{paper.title}</h1>
 
   <p class="authors">
@@ -20,17 +19,29 @@ import { authors, affiliations, paper } from "../data/paper";
     ))}
   </p>
   <p class="affiliations">
-    <sup>†</sup> {affiliations.chula} &nbsp;&nbsp; <sup>‡</sup> {affiliations.google}
+    <span><sup>†</sup> {affiliations.chula}</span> &nbsp;&bull;&nbsp; <span><sup>‡</sup> {affiliations.google}</span>
   </p>
+
+  <div class="venue-strip">
+    <span class="venue-pill">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="venue-icon">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+      {paper.venue}
+    </span>
+  </div>
 
   <LinkBar />
 
-  <p class="tldr">
-    <strong>TL;DR:</strong> This paper analyzed Limitations sections from
-    16,067 ACL and EMNLP papers to understand their trends over time, their
-    correlations with paper attributes, and the rhetorical strategies
-    researchers use to present them.
-  </p>
+  <div class="tldr">
+    <div class="tldr-title">
+      <span class="tldr-badge">TL;DR</span>
+    </div>
+    <p class="tldr-text">
+      This paper analyzed Limitations sections from <strong>16,067 ACL and EMNLP papers</strong> to understand their trends over time, their correlations with paper attributes, and the rhetorical strategies researchers use to present them.
+    </p>
+  </div>
 
   <h2>Abstract</h2>
   <p>{paper.abstract}</p>
@@ -45,6 +56,8 @@ import { authors, affiliations, paper } from "../data/paper";
   <p class="section-cta">
     <a href={`${import.meta.env.BASE_URL}methodology`}>Full methodology walkthrough &rarr;</a>
   </p>
+
+  <LiveAnnotationDemo />
 
   <h2>Dataset</h2>
   <p>
@@ -63,10 +76,25 @@ import { authors, affiliations, paper } from "../data/paper";
     tracks outside this site's ACL/EMNLP main+Findings scope).
   </p>
   <p class="iaa-numbers">
-    <span class="badge badge-human">Human annotators only</span>
+    <span class="badge badge-human">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;">
+        <circle cx="12" cy="7" r="4"></circle>
+        <path d="M5.5 21a8.38 8.38 0 0 1 13 0"></path>
+      </svg>
+      Human annotators only
+    </span>
     <strong>α = 0.644</strong>
     <span class="iaa-arrow">&rarr;</span>
-    <span class="badge badge-llm">+ LLM as a coder</span>
+    <span class="badge badge-llm">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;">
+        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+        <circle cx="12" cy="5" r="2"></circle>
+        <path d="M12 7v4"></path>
+        <line x1="8" y1="16" x2="8.01" y2="16"></line>
+        <line x1="16" y1="16" x2="16.01" y2="16"></line>
+      </svg>
+      + LLM as a coder
+    </span>
     <strong>α = 0.647</strong>
   </p>
   <p>
@@ -88,13 +116,11 @@ import { authors, affiliations, paper } from "../data/paper";
   </p>
   <LimitationPresenceChart />
 
-  <h3>Most common limitations</h3>
-  <p>Which limitations come up most often across the 16,047 LLM-coded papers:</p>
-  <PrevalenceChart />
   <p class="section-cta">
-    <a href={`${import.meta.env.BASE_URL}results`}>Full results: temporal trends &amp; the homogeneity finding &rarr;</a>
+    <a href={`${import.meta.env.BASE_URL}results`}>Full results: most common limitations, temporal trends &amp; homogeneity &rarr;</a>
   </p>
 
+  <h2>Citation</h2>
   <BibtexBlock />
 
   <p class="cta">
@@ -103,33 +129,114 @@ import { authors, affiliations, paper } from "../data/paper";
 </BaseLayout>
 
 <style>
-  .venue-badge {
-    display: inline-block;
-    padding: 0.2rem 0.7rem;
-    border-radius: 999px;
-    background: var(--color-accent);
-    color: white;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
+  h1 {
+    margin-top: 0.5rem;
+    font-size: 2.2rem;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
   }
-  h1 { margin-top: 0.25rem; }
-  .authors { font-size: 1.05rem; }
-  .affiliations { color: var(--color-muted); font-size: 0.9rem; }
-  .tldr {
-    border-left: 3px solid var(--color-accent);
-    padding: 0.25rem 0 0.25rem 1rem;
-    margin: 1.5rem 0;
+  .authors {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 0.35rem;
+  }
+  .affiliations {
     color: var(--color-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-top: 0;
+    margin-bottom: 0.6rem;
   }
-  h3 { margin-top: 1.5rem; }
+  .venue-strip {
+    margin: 0.4rem 0 1.25rem;
+  }
+  .venue-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.28rem 0.75rem;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  .venue-icon {
+    color: #2563eb;
+  }
+
+  .tldr {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-left: 4px solid #0284c7;
+    border-radius: 8px;
+    padding: 0.9rem 1.2rem;
+    margin: 1.5rem 0 2rem;
+  }
+  .tldr-title {
+    margin-bottom: 0.4rem;
+  }
+  .tldr-badge {
+    display: inline-block;
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 0.74rem;
+    font-weight: 800;
+    padding: 0.12rem 0.48rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+  .tldr-text {
+    margin: 0;
+    color: #0f172a;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  h2 {
+    margin-top: 2.25rem;
+    font-size: 1.5rem;
+    font-weight: 750;
+    letter-spacing: -0.015em;
+    color: #0f172a;
+  }
+  h3 {
+    margin-top: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    color: #1e293b;
+  }
+
   .iaa-numbers {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
     font-size: 1rem;
   }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .badge-human {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+  }
+  .badge-llm {
+    background: #f5f3ff;
+    color: #5b21b6;
+    border: 1px solid #ddd6fe;
+  }
+
   .iaa-arrow { color: var(--color-muted); }
   .section-cta { font-weight: 600; }
   .cta { margin-top: 2rem; font-size: 1.05rem; font-weight: 600; }

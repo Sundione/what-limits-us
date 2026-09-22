@@ -1,0 +1,424 @@
+---
+// Ultra-simple, high-impact landing page showcase for Deductive vs. Inductive Coding.
+// Shows in 10 seconds how the pipeline assigns existing codes vs. discovers new ones with human review.
+import PersonIcon from "./PersonIcon.astro";
+---
+
+<div class="simple-showcase-wrap">
+  <div class="showcase-header">
+    <span class="showcase-badge">HOW IT WORKS IN PRACTICE</span>
+    <h3 class="showcase-title">Deductive vs. Inductive Coding</h3>
+    <p class="showcase-subtitle">
+      How the model handles a familiar limitation vs. a genuinely new one when analyzing a paper:
+    </p>
+  </div>
+
+  <div class="showcase-grid">
+    <!-- Card 1: Deductive (Existing Code) -->
+    <div class="showcase-card deductive-card">
+      <div class="card-top">
+        <span class="type-pill deductive">CASE 1: DEDUCTIVE</span>
+        <span class="status-pill matched">&check; Matches Codebook</span>
+      </div>
+
+      <div class="sentence-box">
+        <span class="box-label">Sentence from Paper:</span>
+        <p class="quote">“Our benchmark only covers English, leaving low-resource language generalization unmeasured.”</p>
+      </div>
+
+      <div class="flow-steps">
+        <div class="flow-step">
+          <span class="step-icon search">&telrec;</span>
+          <div class="step-text">
+            <strong>Check Codebook (Cₜ₋₁):</strong>
+            <span>Model finds an exact conceptual fit in existing definitions.</span>
+          </div>
+        </div>
+
+        <div class="flow-arrow">&darr;</div>
+
+        <div class="flow-step highlight-step deductive-hl">
+          <span class="step-icon check">&check;</span>
+          <div class="step-text">
+            <strong>Assign Code:</strong>
+            <span class="code-tag blue">Scope Limitation</span>
+            <span class="theme-tag-small">Theme 2: Constraints &amp; Scope</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-outcome pass-outcome">
+        &check; <strong>Outcome:</strong> Coded immediately. No codebook change needed.
+      </div>
+    </div>
+
+    <!-- Card 2: Inductive (New Code + Human in the loop) -->
+    <div class="showcase-card inductive-card">
+      <div class="card-top">
+        <span class="type-pill inductive">CASE 2: INDUCTIVE</span>
+        <span class="status-pill new-needed">&plus; New Code Proposed</span>
+      </div>
+
+      <div class="sentence-box">
+        <span class="box-label">Sentence from Paper:</span>
+        <p class="quote">“Crowdsourced labels exhibited high noise, as annotators strongly disagreed on subjective sarcasm.”</p>
+      </div>
+
+      <div class="flow-steps">
+        <div class="flow-step">
+          <span class="step-icon warning">&excl;</span>
+          <div class="step-text">
+            <strong>Check Codebook (Cₜ₋₁):</strong>
+            <span>No code fits (labor bottleneck &ne; noisy/subjective labels).</span>
+          </div>
+        </div>
+
+        <div class="flow-arrow">&darr;</div>
+
+        <div class="flow-step">
+          <span class="step-icon spark">&bigstar;</span>
+          <div class="step-text">
+            <strong>Model Proposes New Category:</strong>
+            <em>“Low Data Quality: Label Noise &amp; Disagreement”</em>
+          </div>
+        </div>
+
+        <div class="flow-arrow">&darr;</div>
+
+        <div class="flow-step highlight-step human-hl">
+          <span class="step-icon human">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: -2px;">
+              <circle cx="12" cy="7" r="4"></circle>
+              <path d="M5.5 21a8.38 8.38 0 0 1 13 0"></path>
+            </svg>
+          </span>
+          <div class="step-text">
+            <strong>Human Researcher Reviews &amp; Approves:</strong>
+            <span class="code-tag emerald">&plus; Code 4: Low Data Quality</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-outcome new-outcome">
+        &bigstar; <strong>Outcome:</strong> Codebook expands from Cₜ₋₁ &rarr; Cₜ for subsequent papers.
+      </div>
+    </div>
+  </div>
+
+  <div class="showcase-footer">
+    <span class="loopback-note">
+      <strong>Iterative Growth:</strong> Over 4 conference iterations (2020–2025), this exact loop expanded our codebook from <strong>25 initial seed codes to 50 comprehensive codes</strong>.
+    </span>
+    <div class="footer-links">
+      <a href={`${import.meta.env.BASE_URL}codebook`} class="subtle-link">Browse all 50 codes &rarr;</a>
+      <a href={`${import.meta.env.BASE_URL}explore`} class="primary-link">Explore the dataset &rarr;</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .simple-showcase-wrap {
+    margin: 2rem 0 2.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  .showcase-header {
+    padding: 1.35rem 1.5rem 1rem;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .showcase-badge {
+    display: inline-block;
+    padding: 0.18rem 0.55rem;
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.45rem;
+  }
+
+  .showcase-title {
+    margin: 0 0 0.35rem;
+    font-size: 1.25rem;
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  .showcase-subtitle {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--color-muted);
+    line-height: 1.45;
+  }
+
+  /* Side-by-side grid */
+  .showcase-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    padding: 1.25rem 1.5rem;
+  }
+
+  @media (max-width: 840px) {
+    .showcase-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .showcase-card {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1.15rem;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .showcase-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+  }
+
+  .deductive-card {
+    border-color: #bfdbfe;
+  }
+
+  .inductive-card {
+    border-color: #fed7aa;
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .type-pill {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .type-pill.deductive {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .type-pill.inductive {
+    background: #ffedd5;
+    color: #9a3412;
+  }
+
+  .status-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+  }
+
+  .status-pill.matched {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+  }
+
+  .status-pill.new-needed {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+  }
+
+  .sentence-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.65rem 0.85rem;
+  }
+
+  .box-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+  }
+
+  .quote {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: #0f172a;
+    font-style: italic;
+  }
+
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    flex: 1;
+  }
+
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.5rem 0.7rem;
+    background: #fafafa;
+    border: 1px solid #f1f5f9;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .step-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    background: #e2e8f0;
+    color: #475569;
+  }
+
+  .step-icon.check { background: #dbeafe; color: #1e40af; }
+  .step-icon.warning { background: #fee2e2; color: #991b1b; }
+  .step-icon.spark { background: #ffedd5; color: #c2410c; }
+  .step-icon.human { background: #f59e0b; color: #ffffff; }
+
+  .step-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    color: #334155;
+  }
+
+  .step-text strong {
+    color: #0f172a;
+    font-size: 0.83rem;
+  }
+
+  .flow-arrow {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    line-height: 0.8;
+  }
+
+  .highlight-step.deductive-hl {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+
+  .highlight-step.human-hl {
+    background: #fffbeb;
+    border-color: #fde68a;
+  }
+
+  .code-tag {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    width: max-content;
+  }
+
+  .code-tag.blue { background: #dbeafe; color: #1d4ed8; }
+  .code-tag.emerald { background: #dcfce7; color: #15803d; }
+
+  .theme-tag-small {
+    font-size: 0.74rem;
+    color: #64748b;
+  }
+
+  .card-outcome {
+    padding: 0.55rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .pass-outcome {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+
+  .new-outcome {
+    background: #fff7ed;
+    color: #9a3412;
+    border: 1px solid #fed7aa;
+  }
+
+  /* Footer */
+  .showcase-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .loopback-note {
+    font-size: 0.84rem;
+    color: #475569;
+    max-width: 600px;
+    line-height: 1.45;
+  }
+
+  .footer-links {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .subtle-link {
+    font-size: 0.84rem;
+    color: #475569;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .subtle-link:hover {
+    color: #0f172a;
+    text-decoration: underline;
+  }
+
+  .primary-link {
+    font-size: 0.84rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    background: #2563eb;
+    color: #ffffff;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+
+  .primary-link:hover {
+    background: #1d4ed8;
+    color: #ffffff;
+  }
+</style>
