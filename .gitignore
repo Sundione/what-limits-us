@@ -1,6 +1,25 @@
+# OS & System
+.DS_Store
+
+# IDEs & AI tools
 .vscode
+.claude
+.agents
+
+# Docs & Non-web source artifacts
 docs
 sources
+
+# Scratch & Analysis scripts (not related to web-page)
+/scripts/*.py
+/scripts/inspect-pdf.ts
+scratch/
+*.log
+
+# Python environment & cache
+__pycache__/
+*.py[cod]
+.venv/
 
 # Node / Astro
 node_modules

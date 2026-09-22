@@ -1,9 +1,13 @@
 ---
-// Reproduces the paper's Figure 2 design (colors sampled directly from the
-// paper PDF): stacked bars for raw paper counts (dark = has an explicit
-// Limitations section, light = doesn't) on the left axis, plus a % adoption
-// line per venue on the right axis. Bars link to the explorer, pre-filtered
-// to that year+venue, per user request.
+// Reproduces the paper's Figure 2 design with exact 1:1 PDF geometry, scale, and colors:
+// - Samplings directly from sources/visualizations/basic_statistics/2026-05-25_limitation_section_presence_by_venue_and_year.pdf
+// - Exact plot area (x=166.32..1890.55, y=100.18..1013.29, height=913.11)
+// - Razor-sharp vector rendering and exact callout box placements
+// - Fully interactive data exploration:
+//     * Click any legend item to toggle series on/off (rotate data view)
+//     * Hover any legend item to spotlight/isolate that series
+//     * Preset filters (All, Adoption Rates Only, Paper Volumes Only, ACL Only, EMNLP Only)
+//     * Interactive hover tooltips on bars and line markers with exact counts
 import { presenceRows, adoptionPct, type PresenceRow } from "../data/limitationPresence";
 
 const years = [2020, 2021, 2022, 2023, 2024, 2025];
@@ -15,140 +19,437 @@ const COLORS = {
   aclLight: "#b6dbff",
   emnlpDark: "#e69f00",
   emnlpLight: "#ffe2b3",
+  grid: "#e5e7eb",
+  axisText: "#374151",
+  axisTitle: "#111827",
 };
 
-const width = 720;
-const height = 400;
-const padL = 46;
-const padR = 46;
-const padT = 16;
-const padB = 78; // room for x labels + legend
-const plotW = width - padL - padR;
-const plotH = height - padT - padB;
+// Exact Matplotlib PDF coordinates
+const width = 2025;
+const height = 1320;
+const xMin = 166.32;
+const xMax = 1890.55;
+const plotW = xMax - xMin; // 1724.23
+const yTop = 100.18;
+const yBottom = 1013.29;
+const plotH = yBottom - yTop; // 913.11
 
-const countMax = 3500; // matches the paper's own left-axis scale
+const countMax = 3500;
 const pctMax = 100;
 
-const groupW = plotW / years.length;
-const barW = groupW * 0.32;
-const barGap = groupW * 0.06;
+const slotW = plotW / years.length; // 287.37
+const barW = 114.95;
+const intraGap = 28.74;
 
-const yForCount = (n: number) => padT + (1 - n / countMax) * plotH;
-const yForPct = (p: number) => padT + (1 - p / pctMax) * plotH;
-const xForGroupCenter = (i: number) => padL + groupW * i + groupW / 2;
+const yForCount = (n: number) => yBottom - (n / countMax) * plotH;
+const yForPct = (p: number) => yBottom - (p / pctMax) * plotH;
 
-interface Bar {
+interface BarData {
+  venue: PresenceRow["venue"];
+  year: number;
   x: number;
-  yTop: number;
+  cx: number;
+  hasY: number;
   hasH: number;
+  noY: number;
   noH: number;
   row: PresenceRow;
-  darkColor: string;
-  lightColor: string;
+  pct: number;
+  hasSeries: string;
+  noSeries: string;
 }
 
-const aclBars: Bar[] = years.map((year, i) => {
+const aclBars: BarData[] = years.map((year, i) => {
   const row = rowFor("ACL", year);
-  const cx = xForGroupCenter(i);
-  const x = cx - barGap / 2 - barW;
-  const hasTop = yForCount(row.papersWithLimitations);
-  const noTop = yForCount(row.totalPapers);
-  return { x, yTop: hasTop, hasH: yForCount(0) - hasTop, noH: hasTop - noTop, row, darkColor: COLORS.aclDark, lightColor: COLORS.aclLight };
+  const slotLeft = xMin + i * slotW;
+  const x = slotLeft + intraGap;
+  const cx = x + barW / 2;
+  const hasY = yForCount(row.papersWithLimitations);
+  const hasH = yBottom - hasY;
+  const noY = yForCount(row.totalPapers);
+  const noH = hasY - noY;
+  return {
+    venue: "ACL",
+    year,
+    x,
+    cx,
+    hasY,
+    hasH,
+    noY,
+    noH,
+    row,
+    pct: adoptionPct(row),
+    hasSeries: "acl-has",
+    noSeries: "acl-no",
+  };
 });
-const emnlpBars: Bar[] = years.map((year, i) => {
+
+const emnlpBars: BarData[] = years.map((year, i) => {
   const row = rowFor("EMNLP", year);
-  const cx = xForGroupCenter(i);
-  const x = cx + barGap / 2;
-  const hasTop = yForCount(row.papersWithLimitations);
-  const noTop = yForCount(row.totalPapers);
-  return { x, yTop: hasTop, hasH: yForCount(0) - hasTop, noH: hasTop - noTop, row, darkColor: COLORS.emnlpDark, lightColor: COLORS.emnlpLight };
+  const slotLeft = xMin + i * slotW;
+  const x = slotLeft + intraGap + barW + intraGap;
+  const cx = x + barW / 2;
+  const hasY = yForCount(row.papersWithLimitations);
+  const hasH = yBottom - hasY;
+  const noY = yForCount(row.totalPapers);
+  const noH = hasY - noY;
+  return {
+    venue: "EMNLP",
+    year,
+    x,
+    cx,
+    hasY,
+    hasH,
+    noY,
+    noH,
+    row,
+    pct: adoptionPct(row),
+    hasSeries: "emnlp-has",
+    noSeries: "emnlp-no",
+  };
 });
 
-const aclLinePoints = years.map((year, i) => ({ x: xForGroupCenter(i), y: yForPct(adoptionPct(rowFor("ACL", year))), row: rowFor("ACL", year) }));
-const emnlpLinePoints = years.map((year, i) => ({ x: xForGroupCenter(i), y: yForPct(adoptionPct(rowFor("EMNLP", year))), row: rowFor("EMNLP", year) }));
-const aclLine = aclLinePoints.map((p) => `${p.x},${p.y}`).join(" ");
-const emnlpLine = emnlpLinePoints.map((p) => `${p.x},${p.y}`).join(" ");
+const aclLinePoints = aclBars.map((b) => ({
+  x: b.cx,
+  y: yForPct(b.pct),
+  pct: b.pct,
+  row: b.row,
+}));
 
-// Pre-mandate years are the ones worth a direct % label (post-mandate values
-// cluster near 100% and are already obvious from the line's position).
-const labelYears = new Set([2020, 2021]);
-const aclLabelPoints = aclLinePoints.filter((p) => labelYears.has(p.row.year) || (p.row.venue === "ACL" && p.row.year === 2022));
-const emnlpLabelPoints = emnlpLinePoints.filter((p) => labelYears.has(p.row.year));
+const emnlpLinePoints = emnlpBars.map((b) => ({
+  x: b.cx,
+  y: yForPct(b.pct),
+  pct: b.pct,
+  row: b.row,
+}));
 
-const countGrid = [0, 500, 1000, 1500, 2000, 2500, 3000, 3500];
+const aclLine = aclLinePoints.map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(" ");
+const emnlpLine = emnlpLinePoints.map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(" ");
+
+// Top callout boxes (7 post-mandate boxes aligned cleanly near the top header, matching PDF)
+const topCallouts = [
+  { cx: emnlpBars[2].cx, y: 38, text: "97.8%", color: COLORS.emnlpDark, width: 112, series: "emnlp-line" },
+  { cx: aclBars[3].cx,   y: 38, text: "98.9%", color: COLORS.aclDark,   width: 112, series: "acl-line" },
+  { cx: emnlpBars[3].cx, y: 38, text: "99.2%", color: COLORS.emnlpDark, width: 112, series: "emnlp-line" },
+  { cx: aclBars[4].cx,   y: 38, text: "99.4%", color: COLORS.aclDark,   width: 112, series: "acl-line" },
+  { cx: emnlpBars[4].cx, y: 38, text: "99.9%", color: COLORS.emnlpDark, width: 112, series: "emnlp-line" },
+  { cx: aclBars[5].cx,   y: 38, text: "99.6%", color: COLORS.aclDark,   width: 112, series: "acl-line" },
+  { cx: emnlpBars[5].cx, y: 38, text: "100.0%", color: COLORS.emnlpDark, width: 128, series: "emnlp-line" },
+];
+
+// Bottom callout boxes (5 pre-mandate boxes, positioned above dots matching Figure 2 PDF)
+const bottomCallouts = [
+  { cx: aclBars[0].cx,   y: yForPct(2.4) - 48, text: "2.4%", color: COLORS.aclDark,   width: 96, series: "acl-line" },
+  { cx: emnlpBars[0].cx, y: yForPct(4.8) - 48, text: "4.8%", color: COLORS.emnlpDark, width: 96, series: "emnlp-line" },
+  { cx: aclBars[1].cx,   y: yForPct(2.9) - 48, text: "2.9%", color: COLORS.aclDark,   width: 96, series: "acl-line" },
+  { cx: emnlpBars[1].cx, y: yForPct(4.2) - 48, text: "4.2%", color: COLORS.emnlpDark, width: 96, series: "emnlp-line" },
+  { cx: aclBars[2].cx,   y: yForPct(9.1) - 48, text: "9.1%", color: COLORS.aclDark,   width: 96, series: "acl-line" },
+];
+
+const countGrid = [500, 1000, 1500, 2000, 2500, 3000, 3500];
 const pctGrid = [0, 20, 40, 60, 80, 100];
 
 function exploreUrl(year: number, venue: string) {
   return `${import.meta.env.BASE_URL}explore?year=${year}&venue=${venue}`;
 }
 ---
-<div class="presence-chart">
-  <svg
-    viewBox={`0 0 ${width} ${height}`}
-    role="img"
-    aria-label="Number and percentage of ACL and EMNLP papers with an explicit Limitations section, 2020 to 2025, styled after the paper's own Figure 2. Both venues rise from single digits to effectively 100% following the EMNLP 2022 / ACL 2023 mandatory-reporting policy. Click a bar to see that year's papers."
-  >
-    {countGrid.map((n) => (
-      <g>
-        <line x1={padL} x2={width - padR} y1={yForCount(n)} y2={yForCount(n)} class="gridline" />
-        <text x={padL - 6} y={yForCount(n)} class="axis-label" text-anchor="end" dominant-baseline="middle">{n}</text>
+
+<div class="presence-chart-wrapper" id="presence-chart-root">
+  <!-- Interactive View Rotation Toolbar -->
+  <div class="chart-toolbar" role="toolbar" aria-label="Interactive chart view options">
+    <span class="toolbar-label">Quick Views:</span>
+    <div class="preset-buttons">
+      <button type="button" class="preset-btn active" data-preset="all">Show All</button>
+      <button type="button" class="preset-btn" data-preset="lines-only">Adoption Rates Only</button>
+      <button type="button" class="preset-btn" data-preset="bars-only">Paper Volumes Only</button>
+      <button type="button" class="preset-btn" data-preset="acl-only">ACL Only</button>
+      <button type="button" class="preset-btn" data-preset="emnlp-only">EMNLP Only</button>
+    </div>
+  </div>
+
+  <div class="svg-container">
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label="Number and percentage of ACL and EMNLP papers with an explicit Limitations section, 2020 to 2025. Exact scale and proportions from paper Figure 2."
+      class="presence-svg"
+      text-rendering="geometricPrecision"
+      shape-rendering="geometricPrecision"
+    >
+      <!-- Chart Canvas Background -->
+      <rect width={width} height={height} fill="#ffffff" />
+
+      <!-- Horizontal Gridlines & Left Y-Axis Tick Labels -->
+      {countGrid.map((n) => (
+        <g class="grid-row">
+          <line x1={xMin} x2={xMax} y1={yForCount(n)} y2={yForCount(n)} stroke={COLORS.grid} stroke-width="1.6" />
+          <text x={xMin - 20} y={yForCount(n)} class="axis-num" text-anchor="end" dominant-baseline="middle">{n}</text>
+        </g>
+      ))}
+      <text x={xMin - 20} y={yForCount(0)} class="axis-num" text-anchor="end" dominant-baseline="middle">0</text>
+
+      <!-- Right Y-Axis (% labels aligned directly with grid) -->
+      {pctGrid.map((p) => (
+        <text x={xMax + 22} y={yForPct(p)} class="axis-num" text-anchor="start" dominant-baseline="middle">{p}%</text>
+      ))}
+
+      <!-- Left Axis Title (Rotated 90 deg counter-clockwise) -->
+      <text x={55} y={yTop + plotH / 2} class="axis-title" transform={`rotate(-90 55 ${yTop + plotH / 2})`} text-anchor="middle">
+        Number of Papers
+      </text>
+
+      <!-- X-Axis Year Labels (Centered under each venue pair) -->
+      {years.map((y, i) => (
+        <text x={xMin + i * slotW + slotW / 2} y={yBottom + 52} class="axis-year" text-anchor="middle">
+          {y}
+        </text>
+      ))}
+
+      <!-- Stacked Bars (ACL & EMNLP) with interactive data attributes -->
+      <g class="bars-layer">
+        {[...aclBars, ...emnlpBars].map((bar) => {
+          const tooltipPayload = JSON.stringify({
+            venue: bar.venue,
+            year: bar.year,
+            total: bar.row.totalPapers,
+            has: bar.row.papersWithLimitations,
+            no: bar.row.totalPapers - bar.row.papersWithLimitations,
+            pct: bar.pct.toFixed(1),
+            failure: bar.row.extractionFailures,
+            missing: bar.row.noExplicitLimitations,
+          });
+          return (
+            <g class="bar-group" data-year={bar.year} data-venue={bar.venue}>
+              <!-- Has Limitations (dark lower segment) -->
+              <a href={exploreUrl(bar.year, bar.venue.toLowerCase())} class="bar-seg-link" data-series={bar.hasSeries}>
+                <rect
+                  x={bar.x}
+                  y={bar.hasY}
+                  width={barW}
+                  height={bar.hasH}
+                  fill={bar.venue === "ACL" ? COLORS.aclDark : COLORS.emnlpDark}
+                  class="chart-elem bar-seg has-seg"
+                  data-info={tooltipPayload}
+                  tabindex="0"
+                  role="button"
+                  aria-label={`${bar.venue} ${bar.year}: ${bar.row.papersWithLimitations.toLocaleString()} papers with Limitations (${bar.pct.toFixed(1)}% adopted)`}
+                />
+              </a>
+              <!-- No Limitations (light upper segment) -->
+              <a href={exploreUrl(bar.year, bar.venue.toLowerCase())} class="bar-seg-link" data-series={bar.noSeries}>
+                <rect
+                  x={bar.x}
+                  y={bar.noY}
+                  width={barW}
+                  height={bar.noH}
+                  fill={bar.venue === "ACL" ? COLORS.aclLight : COLORS.emnlpLight}
+                  class="chart-elem bar-seg no-seg"
+                  data-info={tooltipPayload}
+                  tabindex="0"
+                  role="button"
+                  aria-label={`${bar.venue} ${bar.year}: ${(bar.row.totalPapers - bar.row.papersWithLimitations).toLocaleString()} papers without Limitations`}
+                />
+              </a>
+            </g>
+          );
+        })}
       </g>
-    ))}
-    {pctGrid.map((p) => (
-      <text x={width - padR + 6} y={yForPct(p)} class="axis-label" text-anchor="start" dominant-baseline="middle">{p}%</text>
-    ))}
-    <text x={14} y={padT + plotH / 2} class="axis-title" transform={`rotate(-90 14 ${padT + plotH / 2})`} text-anchor="middle">Number of papers</text>
 
-    {years.map((y, i) => (
-      <text x={xForGroupCenter(i)} y={height - padB + 18} class="axis-label" text-anchor="middle">{y}</text>
-    ))}
+      <!-- Solid Adoption Rate Lines -->
+      <g class="lines-layer">
+        <!-- ACL adoption line -->
+        <polyline
+          points={aclLine}
+          stroke={COLORS.aclDark}
+          stroke-width="5"
+          fill="none"
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          class="chart-elem series-line"
+          data-series="acl-line"
+        />
+        <!-- EMNLP adoption line -->
+        <polyline
+          points={emnlpLine}
+          stroke={COLORS.emnlpDark}
+          stroke-width="5"
+          fill="none"
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          class="chart-elem series-line"
+          data-series="emnlp-line"
+        />
 
-    {[...aclBars, ...emnlpBars].map((bar) => (
-      <a href={exploreUrl(bar.row.year, bar.row.venue.toLowerCase())} class="bar-link">
-        <title>{`${bar.row.venue} ${bar.row.year}: ${bar.row.papersWithLimitations.toLocaleString()} of ${bar.row.totalPapers.toLocaleString()} papers have an explicit Limitations section (${adoptionPct(bar.row).toFixed(1)}% adopted). Click to see these papers.`}</title>
-        <rect x={bar.x} y={bar.yTop} width={barW} height={bar.hasH} fill={bar.darkColor} class="bar-seg" />
-        <rect x={bar.x} y={bar.yTop - bar.noH} width={barW} height={bar.noH} fill={bar.lightColor} class="bar-seg" />
-      </a>
-    ))}
-
-    <polyline points={aclLine} class="line-acl" fill="none" />
-    <polyline points={emnlpLine} class="line-emnlp" fill="none" />
-    {aclLinePoints.map((p) => <circle cx={p.x} cy={p.y} r="3" class="point-acl" />)}
-    {emnlpLinePoints.map((p) => <circle cx={p.x} cy={p.y} r="3" class="point-emnlp" />)}
-
-    {aclLabelPoints.map((p) => (
-      <g transform={`translate(${p.x - 24}, ${p.y - 16})`}>
-        <rect x="-19" y="-11" width="38" height="18" rx="4" class="pct-label-box pct-label-acl" />
-        <text y="2.5" text-anchor="middle" class="pct-label-text pct-label-text-acl">{adoptionPct(p.row).toFixed(1)}%</text>
+        <!-- Line Dots -->
+        {aclLinePoints.map((p) => {
+          const tooltipPayload = JSON.stringify({
+            venue: p.row.venue,
+            year: p.row.year,
+            total: p.row.totalPapers,
+            has: p.row.papersWithLimitations,
+            pct: p.pct.toFixed(1),
+            failure: p.row.extractionFailures,
+            missing: p.row.noExplicitLimitations,
+          });
+          return (
+            <circle
+              cx={p.x}
+              cy={p.y}
+              r="9"
+              fill={COLORS.aclDark}
+              class="chart-elem line-marker"
+              data-series="acl-line"
+              data-info={tooltipPayload}
+              tabindex="0"
+            />
+          );
+        })}
+        {emnlpLinePoints.map((p) => {
+          const tooltipPayload = JSON.stringify({
+            venue: p.row.venue,
+            year: p.row.year,
+            total: p.row.totalPapers,
+            has: p.row.papersWithLimitations,
+            pct: p.pct.toFixed(1),
+            failure: p.row.extractionFailures,
+            missing: p.row.noExplicitLimitations,
+          });
+          return (
+            <circle
+              cx={p.x}
+              cy={p.y}
+              r="9"
+              fill={COLORS.emnlpDark}
+              class="chart-elem line-marker"
+              data-series="emnlp-line"
+              data-info={tooltipPayload}
+              tabindex="0"
+            />
+          );
+        })}
       </g>
-    ))}
-    {emnlpLabelPoints.map((p) => (
-      <g transform={`translate(${p.x + 24}, ${p.y - 16})`}>
-        <rect x="-19" y="-11" width="38" height="18" rx="4" class="pct-label-box pct-label-emnlp" />
-        <text y="2.5" text-anchor="middle" class="pct-label-text pct-label-text-emnlp">{adoptionPct(p.row).toFixed(1)}%</text>
-      </g>
-    ))}
-  </svg>
 
-  <div class="presence-legend">
-    <span class="legend-item"><span class="swatch" style={`background:${COLORS.aclDark}`}></span>ACL — Has Limitations Section</span>
-    <span class="legend-item"><span class="swatch" style={`background:${COLORS.emnlpDark}`}></span>EMNLP — Has Limitations Section</span>
-    <span class="legend-item"><span class="swatch" style={`background:${COLORS.aclLight}`}></span>ACL — No Limitations Section</span>
-    <span class="legend-item"><span class="swatch" style={`background:${COLORS.emnlpLight}`}></span>EMNLP — No Limitations Section</span>
-    <span class="legend-item"><span class="swatch swatch-line" style={`background:${COLORS.aclDark}`}></span>ACL — % Adoption</span>
-    <span class="legend-item"><span class="swatch swatch-line" style={`background:${COLORS.emnlpDark}`}></span>EMNLP — % Adoption</span>
+      <!-- Top Callout Boxes (Sharp 3px borders matching PDF) -->
+      <g class="callouts-layer">
+        {topCallouts.map((c) => (
+          <g class="chart-elem callout-group" data-series={c.series} transform={`translate(${c.cx}, 0)`}>
+            <rect
+              x={-c.width / 2}
+              y={c.y}
+              width={c.width}
+              height="48"
+              fill="#ffffff"
+              stroke={c.color}
+              stroke-width="3"
+              rx="0"
+            />
+            <text
+              x="0"
+              y={c.y + 33}
+              text-anchor="middle"
+              class="callout-txt"
+              fill={c.color}
+            >
+              {c.text}
+            </text>
+          </g>
+        ))}
+
+        <!-- Bottom Callout Boxes (Pre-mandate years) -->
+        {bottomCallouts.map((c) => (
+          <g class="chart-elem callout-group" data-series={c.series} transform={`translate(${c.cx}, 0)`}>
+            <rect
+              x={-c.width / 2}
+              y={c.y}
+              width={c.width}
+              height="48"
+              fill="#ffffff"
+              stroke={c.color}
+              stroke-width="3"
+              rx="0"
+            />
+            <text
+              x="0"
+              y={c.y + 33}
+              text-anchor="middle"
+              class="callout-txt"
+              fill={c.color}
+            >
+              {c.text}
+            </text>
+          </g>
+        ))}
+      </g>
+
+      <!-- Interactive 3-Row Legend Matching Paper Figure 2 Exactly -->
+      <!-- Clicking any legend button toggles its series visibility -->
+      <g class="chart-legend-svg" transform="translate(0, 1140)">
+        <!-- Column 1: ACL Series (x=410) -->
+        <!-- Row 1: ACL Has Limitations -->
+        <g class="legend-item" data-series-id="acl-has" transform="translate(410, 0)" tabindex="0" role="button" aria-label="Toggle ACL Has Limitations">
+          <rect x="-10" y="-8" width="500" height="44" fill="transparent" cursor="pointer" />
+          <rect x="0" y="0" width="30" height="30" fill={COLORS.aclDark} class="legend-icon" />
+          <text x="46" y="23" class="legend-txt">ACL &mdash; Has Limitations Section</text>
+        </g>
+        <!-- Row 2: ACL No Limitations -->
+        <g class="legend-item" data-series-id="acl-no" transform="translate(410, 52)" tabindex="0" role="button" aria-label="Toggle ACL No Limitations">
+          <rect x="-10" y="-8" width="500" height="44" fill="transparent" cursor="pointer" />
+          <rect x="0" y="0" width="30" height="30" fill={COLORS.aclLight} class="legend-icon" />
+          <text x="46" y="23" class="legend-txt">ACL &mdash; No Limitations Section</text>
+        </g>
+        <!-- Row 3: ACL % Adoption -->
+        <g class="legend-item" data-series-id="acl-line" transform="translate(410, 104)" tabindex="0" role="button" aria-label="Toggle ACL % Adoption">
+          <rect x="-10" y="-8" width="500" height="44" fill="transparent" cursor="pointer" />
+          <line x1="0" y1="15" x2="36" y2="15" stroke={COLORS.aclDark} stroke-width="5" class="legend-line" />
+          <circle cx="18" cy="15" r="9" fill={COLORS.aclDark} class="legend-dot" />
+          <text x="50" y="23" class="legend-txt">ACL &mdash; % Adoption</text>
+        </g>
+
+        <!-- Column 2: EMNLP Series (x=1150) -->
+        <!-- Row 1: EMNLP Has Limitations -->
+        <g class="legend-item" data-series-id="emnlp-has" transform="translate(1150, 0)" tabindex="0" role="button" aria-label="Toggle EMNLP Has Limitations">
+          <rect x="-10" y="-8" width="500" height="44" fill="transparent" cursor="pointer" />
+          <rect x="0" y="0" width="30" height="30" fill={COLORS.emnlpDark} class="legend-icon" />
+          <text x="46" y="23" class="legend-txt">EMNLP &mdash; Has Limitations Section</text>
+        </g>
+        <!-- Row 2: EMNLP No Limitations -->
+        <g class="legend-item" data-series-id="emnlp-no" transform="translate(1150, 52)" tabindex="0" role="button" aria-label="Toggle EMNLP No Limitations">
+          <rect x="-10" y="-8" width="500" height="44" fill="transparent" cursor="pointer" />
+          <rect x="0" y="0" width="30" height="30" fill={COLORS.emnlpLight} class="legend-icon" />
+          <text x="46" y="23" class="legend-txt">EMNLP &mdash; No Limitations Section</text>
+        </g>
+        <!-- Row 3: EMNLP % Adoption -->
+        <g class="legend-item" data-series-id="emnlp-line" transform="translate(1150, 104)" tabindex="0" role="button" aria-label="Toggle EMNLP % Adoption">
+          <rect x="-10" y="-8" width="500" height="44" fill="transparent" cursor="pointer" />
+          <line x1="0" y1="15" x2="36" y2="15" stroke={COLORS.emnlpDark} stroke-width="5" class="legend-line" />
+          <circle cx="18" cy="15" r="9" fill={COLORS.emnlpDark} class="legend-dot" />
+          <text x="50" y="23" class="legend-txt">EMNLP &mdash; % Adoption</text>
+        </g>
+      </g>
+    </svg>
+
+    <!-- Floating Interactive Data Readout Tooltip -->
+    <div id="chart-floating-tooltip" class="chart-floating-tooltip" role="tooltip" aria-hidden="true" style="display: none;">
+      <div class="tooltip-header">
+        <span class="tooltip-venue-badge" id="tt-badge"></span>
+        <span class="tooltip-pct" id="tt-pct"></span>
+      </div>
+      <div class="tooltip-body">
+        <div class="tt-row"><span class="tt-lbl">Total Papers:</span><strong id="tt-total"></strong></div>
+        <div class="tt-row"><span class="tt-lbl">Has Limitations:</span><strong id="tt-has" class="text-blue"></strong></div>
+        <div class="tt-row"><span class="tt-lbl">No Limitations:</span><strong id="tt-no"></strong></div>
+        <div class="tt-subrow" id="tt-breakdown"></div>
+      </div>
+      <div class="tooltip-cta">Click bar to browse papers &rarr;</div>
+    </div>
   </div>
 
   <p class="presence-caption">
-    Click a bar to see that year's papers. From EMNLP 2022 onward, the %
-    adoption line doesn't count pipeline extraction failures against
-    adoption — a failed extraction is inconclusive, not evidence the section
-    is missing; only papers confirmed to have no explicit section count as
-    non-adopters. (Bar segments use raw has/doesn't-have counts.)
+    <strong>Interactive Tip:</strong> Click any item in the legend below to toggle that bar segment or line on/off. Hover over a legend item to isolate that specific data stream. From EMNLP 2022 onward, the % adoption line reflects policy adoption (&ldquo;pipeline failures&rdquo; are inconclusive and not counted as non-adopters).
   </p>
 
   <details class="presence-table-details">
-    <summary>View exact counts</summary>
+    <summary>View exact counts table</summary>
     <table class="presence-table">
       <thead>
         <tr>
@@ -159,80 +460,497 @@ function exploreUrl(year: number, venue: string) {
       <tbody>
         {presenceRows.map((row) => (
           <tr>
-            <td>{row.venue}</td>
+            <td><strong>{row.venue}</strong></td>
             <td>{row.year}</td>
             <td>{row.totalPapers.toLocaleString()}</td>
             <td>{row.papersWithLimitations.toLocaleString()}</td>
             <td>{row.extractionFailures === null ? "—" : row.extractionFailures.toLocaleString()}</td>
             <td>{row.noExplicitLimitations === null ? "—" : row.noExplicitLimitations.toLocaleString()}</td>
-            <td>{adoptionPct(row).toFixed(1)}%</td>
+            <td><strong>{adoptionPct(row).toFixed(1)}%</strong></td>
           </tr>
         ))}
       </tbody>
     </table>
     <p class="presence-table-note">
-      "Pipeline failure" = the extraction pipeline couldn't process the paper
-      (inconclusive - the paper may or may not actually have a Limitations
-      section). "Truly missing" = manually verified to genuinely lack one.
-      Only available from EMNLP 2022 onward, when this breakdown was tracked
-      ("—" = not tracked for that year). From the paper's own reported
-      figures (Section 4.1 / Table 3).
+      &ldquo;Pipeline failure&rdquo; = extraction pipeline could not parse PDF (inconclusive). &ldquo;Truly missing&rdquo; = verified to lack a section. Only tracked from EMNLP 2022 onward. From paper Section 4.1 / Table 3.
     </p>
   </details>
 </div>
 
-<style>
-  .presence-chart { margin: 1rem 0; }
-  svg { width: 100%; height: auto; max-width: 720px; display: block; }
+<script>
+  function initPresenceChartInteractivity() {
+    const root = document.getElementById("presence-chart-root");
+    if (!root) return;
 
-  .gridline { stroke: var(--color-border); stroke-width: 1; }
-  .axis-label { fill: var(--color-muted); font-size: 10px; }
-  .axis-title { fill: var(--color-muted); font-size: 10px; }
+    const svg = root.querySelector(".presence-svg");
+    const tooltip = document.getElementById("chart-floating-tooltip");
+    const ttBadge = document.getElementById("tt-badge");
+    const ttPct = document.getElementById("tt-pct");
+    const ttTotal = document.getElementById("tt-total");
+    const ttHas = document.getElementById("tt-has");
+    const ttNo = document.getElementById("tt-no");
+    const ttBreakdown = document.getElementById("tt-breakdown");
+    const presetButtons = root.querySelectorAll(".preset-btn");
+    const legendItems = root.querySelectorAll(".legend-item");
+    const chartElems = root.querySelectorAll(".chart-elem");
 
-  .bar-link { cursor: pointer; }
-  .bar-seg { transition: opacity 0.1s ease; }
-  .bar-link:hover .bar-seg,
-  .bar-link:focus-visible .bar-seg { opacity: 0.75; }
-  .bar-link:focus-visible { outline: 2px solid var(--color-text); }
+    // State of active series
+    const activeSeries: Record<string, boolean> = {
+      "acl-has": true,
+      "acl-no": true,
+      "acl-line": true,
+      "emnlp-has": true,
+      "emnlp-no": true,
+      "emnlp-line": true,
+    };
 
-  .line-acl { stroke: #0072b2; stroke-width: 2; }
-  .line-emnlp { stroke: #e69f00; stroke-width: 2; }
-  .point-acl { fill: #0072b2; }
-  .point-emnlp { fill: #e69f00; }
+    function updateSeriesVisibility() {
+      chartElems.forEach((el) => {
+        const series = el.getAttribute("data-series");
+        if (!series) return;
+        const isVisible = activeSeries[series] !== false;
+        el.classList.toggle("is-hidden", !isVisible);
+      });
 
-  .pct-label-box { fill: var(--color-bg); stroke-width: 1.5; }
-  .pct-label-acl { stroke: #0072b2; }
-  .pct-label-emnlp { stroke: #e69f00; }
-  .pct-label-text { font-size: 10px; font-weight: 700; }
-  .pct-label-text-acl { fill: #0072b2; }
-  .pct-label-text-emnlp { fill: #e69f00; }
+      legendItems.forEach((item) => {
+        const sId = item.getAttribute("data-series-id");
+        if (!sId) return;
+        const isVisible = activeSeries[sId] !== false;
+        item.classList.toggle("is-disabled", !isVisible);
+      });
+    }
 
-  .presence-legend {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: 1.25rem;
-    row-gap: 0.35rem;
-    font-size: 0.78rem;
-    color: var(--color-muted);
-    margin-top: 0.5rem;
+    // Legend Click Toggle
+    legendItems.forEach((item) => {
+      const sId = item.getAttribute("data-series-id");
+      if (!sId) return;
+
+      const toggle = () => {
+        activeSeries[sId] = !activeSeries[sId];
+        // clear preset active state
+        presetButtons.forEach((b) => b.classList.remove("active"));
+        updateSeriesVisibility();
+      };
+
+      item.addEventListener("click", toggle);
+      item.addEventListener("keydown", (e: any) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggle();
+        }
+      });
+
+      // Legend Hover Spotlight / Focus Isolation
+      item.addEventListener("mouseenter", () => {
+        if (!activeSeries[sId]) return;
+        chartElems.forEach((el) => {
+          const s = el.getAttribute("data-series");
+          if (s && s !== sId) {
+            el.classList.add("is-dimmed");
+          }
+        });
+      });
+
+      item.addEventListener("mouseleave", () => {
+        chartElems.forEach((el) => el.classList.remove("is-dimmed"));
+      });
+    });
+
+    // Preset Filter Views
+    presetButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        presetButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const preset = btn.getAttribute("data-preset");
+
+        if (preset === "all") {
+          Object.keys(activeSeries).forEach((k) => (activeSeries[k] = true));
+        } else if (preset === "lines-only") {
+          activeSeries["acl-has"] = false;
+          activeSeries["acl-no"] = false;
+          activeSeries["emnlp-has"] = false;
+          activeSeries["emnlp-no"] = false;
+          activeSeries["acl-line"] = true;
+          activeSeries["emnlp-line"] = true;
+        } else if (preset === "bars-only") {
+          activeSeries["acl-has"] = true;
+          activeSeries["acl-no"] = true;
+          activeSeries["emnlp-has"] = true;
+          activeSeries["emnlp-no"] = true;
+          activeSeries["acl-line"] = false;
+          activeSeries["emnlp-line"] = false;
+        } else if (preset === "acl-only") {
+          activeSeries["acl-has"] = true;
+          activeSeries["acl-no"] = true;
+          activeSeries["acl-line"] = true;
+          activeSeries["emnlp-has"] = false;
+          activeSeries["emnlp-no"] = false;
+          activeSeries["emnlp-line"] = false;
+        } else if (preset === "emnlp-only") {
+          activeSeries["acl-has"] = false;
+          activeSeries["acl-no"] = false;
+          activeSeries["acl-line"] = false;
+          activeSeries["emnlp-has"] = true;
+          activeSeries["emnlp-no"] = true;
+          activeSeries["emnlp-line"] = true;
+        }
+
+        updateSeriesVisibility();
+      });
+    });
+
+    // Interactive Hover Tooltip for Bars & Points
+    const interactiveTargets = root.querySelectorAll("[data-info]");
+    const container = root.querySelector(".svg-container") as HTMLElement;
+
+    function showTooltip(el: Element) {
+      const raw = el.getAttribute("data-info");
+      if (!raw || !tooltip || !container) return;
+
+      try {
+        const d = JSON.parse(raw);
+        if (ttBadge) {
+          ttBadge.textContent = `${d.venue} ${d.year}`;
+          ttBadge.style.backgroundColor = d.venue === "ACL" ? "#0072b2" : "#e69f00";
+        }
+        if (ttPct) ttPct.textContent = `${d.pct}% adopted`;
+        if (ttTotal) ttTotal.textContent = Number(d.total).toLocaleString();
+        if (ttHas) ttHas.textContent = Number(d.has).toLocaleString();
+        if (ttNo) ttNo.textContent = Number(d.no).toLocaleString();
+
+        if (ttBreakdown) {
+          if (d.failure !== null && d.missing !== null && d.failure !== undefined) {
+            ttBreakdown.innerHTML = `(incl. ${Number(d.failure).toLocaleString()} extraction failures &bull; ${Number(d.missing).toLocaleString()} truly missing)`;
+          } else {
+            ttBreakdown.innerHTML = "";
+          }
+        }
+
+        const cRect = container.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+
+        const x = elRect.left - cRect.left + elRect.width / 2;
+        const y = elRect.top - cRect.top;
+
+        const clampedX = Math.max(140, Math.min(cRect.width - 140, x));
+        tooltip.style.left = `${clampedX}px`;
+
+        if (y < 160) {
+          tooltip.style.top = `${elRect.bottom - cRect.top + 12}px`;
+          tooltip.classList.add("flipped-below");
+        } else {
+          tooltip.style.top = `${y - 12}px`;
+          tooltip.classList.remove("flipped-below");
+        }
+
+        tooltip.style.display = "block";
+        tooltip.classList.add("is-visible");
+        tooltip.setAttribute("aria-hidden", "false");
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function hideTooltip() {
+      if (!tooltip) return;
+      tooltip.classList.remove("is-visible");
+      tooltip.style.display = "none";
+      tooltip.setAttribute("aria-hidden", "true");
+    }
+
+    if (svg) {
+      svg.addEventListener("pointerover", (e: any) => {
+        const target = e.target?.closest?.("[data-info]");
+        if (target) showTooltip(target);
+      });
+      svg.addEventListener("pointerout", (e: any) => {
+        const related = e.relatedTarget as Element | null;
+        if (!related || !related.closest?.("[data-info]")) {
+          hideTooltip();
+        }
+      });
+    }
+
+    interactiveTargets.forEach((t) => {
+      t.addEventListener("focusin", () => showTooltip(t));
+      t.addEventListener("focusout", hideTooltip);
+    });
+
+    updateSeriesVisibility();
   }
-  .legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
-  .swatch { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 2px; }
-  .swatch-line { width: 1.1rem; height: 0.2rem; border-radius: 1px; }
 
-  .presence-caption { font-size: 0.8rem; color: var(--color-muted); margin-top: 0.6rem; }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initPresenceChartInteractivity);
+  } else {
+    initPresenceChartInteractivity();
+  }
+  document.addEventListener("astro:page-load", initPresenceChartInteractivity);
+</script>
 
-  .presence-table-details { margin-top: 0.5rem; font-size: 0.85rem; }
-  .presence-table { border-collapse: collapse; margin-top: 0.5rem; }
-  .presence-table th, .presence-table td {
-    padding: 0.3rem 0.7rem;
+<style>
+  .presence-chart-wrapper {
+    margin: 1.75rem 0;
+    position: relative;
+  }
+
+  /* Preset Toolbar */
+  .chart-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+    flex-wrap: wrap;
+  }
+  .toolbar-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+  .preset-buttons {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .preset-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.2;
+    border: 1px solid var(--color-border);
+    background: #ffffff;
+    color: var(--color-text);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all 0.15s ease;
+    font-family: inherit;
+  }
+  .preset-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: #f8fafc;
+  }
+  .preset-btn.active {
+    background: var(--color-accent);
+    color: #ffffff;
+    border-color: var(--color-accent);
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0, 102, 204, 0.25);
+  }
+
+  /* SVG Container & Border */
+  .svg-container {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: visible;
+  }
+  .presence-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+
+  /* Typography matching paper PDF */
+  .axis-num {
+    fill: #374151;
+    font-size: 27px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .axis-year {
+    fill: #111827;
+    font-size: 32px;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .axis-title {
+    fill: #111827;
+    font-size: 32px;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .callout-txt {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 25px;
+    font-weight: 700;
+  }
+
+  /* Bars & Transitions */
+  .bar-seg {
+    cursor: pointer;
+    transition: opacity 0.2s ease, filter 0.15s ease;
+  }
+  .bar-seg:hover,
+  .bar-seg:focus-visible {
+    filter: brightness(1.08) drop-shadow(0 0 8px rgba(0, 0, 0, 0.25));
+    outline: none;
+  }
+
+  /* Line Markers */
+  .line-marker {
+    cursor: pointer;
+    transition: transform 0.15s ease, r 0.15s ease, filter 0.15s ease;
+  }
+  .line-marker:hover,
+  .line-marker:focus-visible {
+    r: 12px;
+    filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.4));
+    outline: none;
+  }
+
+  /* Series Elements State */
+  .chart-elem {
+    transition: opacity 0.25s ease, filter 0.2s ease;
+  }
+  .chart-elem.is-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  .chart-elem.is-dimmed {
+    opacity: 0.15 !important;
+  }
+
+  /* Interactive Legend in SVG */
+  .legend-item {
+    cursor: pointer;
+    outline: none;
+    transition: opacity 0.2s ease;
+  }
+  .legend-item:hover .legend-txt {
+    fill: #000000;
+    font-weight: 700;
+  }
+  .legend-item:focus-visible {
+    outline: 2px dashed #0066cc;
+  }
+  .legend-item.is-disabled {
+    opacity: 0.35;
+  }
+  .legend-item.is-disabled .legend-txt {
+    text-decoration: line-through;
+    fill: #888888;
+  }
+  .legend-txt {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 26px;
+    fill: #222222;
+    font-weight: 500;
+  }
+
+  /* Floating HTML Tooltip */
+  .chart-floating-tooltip {
+    position: absolute;
+    pointer-events: none;
+    z-index: 99999;
+    background: #18181b;
+    color: #ffffff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 210px;
+    opacity: 0;
+    transform: translate(-50%, -100%);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .chart-floating-tooltip.is-visible {
+    opacity: 1;
+  }
+  .chart-floating-tooltip.flipped-below {
+    transform: translate(-50%, 0);
+  }
+  .tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+  }
+  .tooltip-venue-badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .tooltip-pct {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #38bdf8;
+  }
+  .tooltip-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.82rem;
+  }
+  .tt-row {
+    display: flex;
+    justify-content: space-between;
+  }
+  .tt-lbl {
+    color: #9ca3af;
+  }
+  .tt-subrow {
+    font-size: 0.72rem;
+    color: #9ca3af;
+    line-height: 1.3;
+    margin-top: 2px;
+  }
+  .text-blue {
+    color: #60a5fa;
+  }
+  .tooltip-cta {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.15);
+    font-size: 0.74rem;
+    color: #93c5fd;
+    text-align: right;
+  }
+
+  .presence-caption {
+    font-size: 0.84rem;
+    color: var(--color-muted);
+    margin-top: 0.75rem;
+    line-height: 1.5;
+  }
+  .presence-caption strong {
+    color: var(--color-text);
+  }
+
+  .presence-table-details {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+  }
+  .presence-table {
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+    width: 100%;
+    max-width: 46rem;
+  }
+  .presence-table th,
+  .presence-table td {
+    padding: 0.4rem 0.65rem;
     border: 1px solid var(--color-border);
     text-align: left;
+    font-size: 0.82rem;
   }
   .presence-table-note {
     font-size: 0.78rem;
     color: var(--color-muted);
     margin-top: 0.5rem;
-    max-width: 40rem;
+    max-width: 44rem;
+    line-height: 1.4;
   }
 </style>

@@ -1,10 +1,119 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import ComingSoon from "../components/ComingSoon.astro";
+import PrevalenceChart from "../components/PrevalenceChart.astro";
 ---
+
 <BaseLayout title="Results — What Limits Us?">
-  <ComingSoon
-    title="Results"
-    blurb="Interactive charts for code distribution, temporal trends, the field-wide homogeneity finding, and the full per-code inter-annotator-agreement breakdown. Headline numbers are already on the landing page."
-  />
+  <h1>Results &amp; Findings</h1>
+  <p class="intro">
+    Empirical findings from analyzing 16,047 ACL and EMNLP papers (2020–2025)
+    and their self-reported limitations using our iterative hybrid coding pipeline.
+  </p>
+
+  <section class="results-section">
+    <h2>Most common limitations</h2>
+    <p class="section-desc">
+      Distribution of limitation codes across all 16,047 papers. Authors frequently report
+      methodological constraints and scope limitations, but also use the section for rhetorical
+      purposes (e.g. framing future work or contextualizing achievements).
+    </p>
+    <PrevalenceChart />
+  </section>
+
+  <section class="results-section upcoming-section">
+    <h2>Temporal trends (RQ1)</h2>
+    <div class="card">
+      <span class="badge-upcoming">In preparation</span>
+      <h3>The 2022 Policy Divergence</h3>
+      <p>
+        Before late 2022, <em>Methodological Constraints</em> was the predominant code.
+        Following mandatory policy adoption at EMNLP 2022 and ACL 2023, <em>Scope Limitation</em>
+        surged past 65%, with the two codes swapping ranks almost exactly at the policy boundary.
+      </p>
+    </div>
+  </section>
+
+  <section class="results-section upcoming-section">
+    <h2>Track &amp; Affiliation Patterns (RQ2)</h2>
+    <div class="card">
+      <span class="badge-upcoming">In preparation</span>
+      <h3>Field-Wide Homogeneity &amp; Affiliation Differences</h3>
+      <p>
+        Despite diverse research areas, a chi-square test of homogeneity reveals that limitation reporting
+        is remarkably uniform across 29 tracks (&chi;&sup2;(1,092) = 2,872, p &lt; 0.001, Cram&eacute;r's V = 0.071).
+        Meanwhile, corporate vs. non-corporate affiliations show notable differences in resource constraint disclosures.
+      </p>
+    </div>
+  </section>
+
+  <section class="results-section upcoming-section">
+    <h2>Inter-annotator Agreement</h2>
+    <div class="card">
+      <span class="badge-upcoming">In preparation</span>
+      <h3>Per-Code Reliability Breakdown</h3>
+      <p>
+        Full per-code Krippendorff's &alpha; breakdown across all 50 codes on the 150-paper
+        human-annotated reference benchmark, comparing inter-human baseline with model-augmented consensus.
+      </p>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .intro {
+    color: var(--color-muted);
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+  }
+
+  .results-section {
+    margin: 2.5rem 0;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .results-section:last-of-type {
+    border-bottom: none;
+  }
+
+  .section-desc {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+  }
+
+  .upcoming-section .card {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    background: color-mix(in srgb, var(--color-border) 15%, transparent);
+    margin-top: 0.75rem;
+  }
+
+  .badge-upcoming {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    color: var(--color-muted);
+    background: color-mix(in srgb, var(--color-border) 40%, transparent);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+  }
+
+  .card h3 {
+    margin: 0.25rem 0 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .card p {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+</style>

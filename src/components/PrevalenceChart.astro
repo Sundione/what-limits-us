@@ -3,26 +3,42 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import type { GlobalIndex } from "../../scripts/types";
 
-// Resolved relative to the project root (where `astro build`/`astro dev` is
-// invoked, per package.json) rather than import.meta.url - Astro's Vite
-// pipeline doesn't guarantee the latter maps back to this file's real
-// on-disk location.
 const indexPath = path.resolve(process.cwd(), "public/data/index.json");
 
 interface Row {
   name: string;
   pct: number;
   barPct: number;
+  count: number;
+  definition?: string;
+  isNonLimitation: boolean;
 }
 
-function rankTop8(globalIndex: GlobalIndex, counts: Map<number, number>, totalPapers: number, includeNonLimitation: boolean): Row[] {
+const TOP_N = 12;
+
+function rankTopCodes(
+  globalIndex: GlobalIndex,
+  counts: Map<number, number>,
+  totalPapers: number,
+  includeNonLimitation: boolean
+): Row[] {
   const ranked = [...counts.entries()]
     .filter(([idx]) => includeNonLimitation || !globalIndex.codes[idx].startsWith("Non-Limitation"))
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([idx, count]) => ({ name: globalIndex.codes[idx], pct: (count / totalPapers) * 100 }));
-  const maxPct = Math.max(...ranked.map((r) => r.pct), 1);
-  return ranked.map((r) => ({ ...r, barPct: (r.pct / maxPct) * 100 }));
+    .slice(0, TOP_N)
+    .map(([idx, count]) => {
+      const name = globalIndex.codes[idx];
+      const pct = (count / totalPapers) * 100;
+      return {
+        name,
+        pct,
+        barPct: pct, // Absolute percentage (0–100%)
+        count,
+        definition: globalIndex.codeDefinitions ? globalIndex.codeDefinitions[String(idx)] : undefined,
+        isNonLimitation: name.startsWith("Non-Limitation"),
+      };
+    });
+  return ranked;
 }
 
 let limitationsOnly: Row[] = [];
@@ -36,58 +52,85 @@ if (existsSync(indexPath)) {
   for (const p of globalIndex.papers) {
     for (const c of p.codes) counts.set(c, (counts.get(c) ?? 0) + 1);
   }
-  limitationsOnly = rankTop8(globalIndex, counts, totalPapers, false);
-  allCodes = rankTop8(globalIndex, counts, totalPapers, true);
+  limitationsOnly = rankTopCodes(globalIndex, counts, totalPapers, false);
+  allCodes = rankTopCodes(globalIndex, counts, totalPapers, true);
 }
 ---
 {limitationsOnly.length > 0 && (
   <div class="prevalence-chart">
-    {/*
-      The radio inputs live as direct children of .prevalence-chart (not
-      nested inside .chart-toggle) so the `~` general-sibling selector below
-      can reach the panels - `~` only matches elements that share the same
-      parent. The <label for="..."> elements still work correctly regardless
-      of where they sit in the DOM.
-    */}
     <input type="radio" name="prevalence-view" id="view-limitations" class="chart-toggle-input" checked />
     <input type="radio" name="prevalence-view" id="view-all" class="chart-toggle-input" />
 
     <div class="chart-toggle">
       <label for="view-limitations">Limitations only</label>
-      <label for="view-all">All codes</label>
+      <label for="view-all">All codes (including non-limitations)</label>
+    </div>
+
+    <!-- Scale ticks header -->
+    <div class="prevalence-scale-header">
+      <span class="scale-label-placeholder"></span>
+      <div class="scale-ticks">
+        <span>0%</span>
+        <span>25%</span>
+        <span>50%</span>
+        <span>75%</span>
+        <span>100%</span>
+      </div>
+      <span class="scale-val-placeholder"></span>
     </div>
 
     <div class="chart-panel" id="panel-limitations">
       {limitationsOnly.map((c) => (
         <div class="prevalence-row">
-          <span class="prevalence-label">{c.name}</span>
-          <div class="prevalence-track">
-            <div class="prevalence-fill" style={`width: ${c.barPct}%`}></div>
+          <div class="prevalence-label-wrap">
+            <a
+              href={`${import.meta.env.BASE_URL}explore?code=${encodeURIComponent(c.name)}`}
+              class="prevalence-link"
+              title={c.definition ? `${c.name}: ${c.definition} (Click to see papers)` : `Filter explorer by ${c.name}`}
+            >
+              {c.name}
+            </a>
+          </div>
+          <div class="prevalence-track" title={`${c.count.toLocaleString()} papers (${c.pct.toFixed(1)}%)`}>
+            <div
+              class={`prevalence-fill ${c.isNonLimitation ? "fill-non-limitation" : "fill-limitation"}`}
+              style={`width: ${c.barPct}%`}
+            ></div>
           </div>
           <span class="prevalence-value">{c.pct.toFixed(1)}%</span>
         </div>
       ))}
       <p class="prevalence-caption">
         % of the {totalPapers.toLocaleString()} LLM-coded papers carrying each code
-        (top 8 of 50, excluding "Non-Limitation: *" codes — those mark sentences that
-        read like a limitation but aren't one, e.g. future-work mentions).
+        (top {TOP_N} of 50, excluding "Non-Limitation: *" codes). Click any code to view its papers and evidence spans in the Explorer.
       </p>
     </div>
 
     <div class="chart-panel" id="panel-all">
       {allCodes.map((c) => (
         <div class="prevalence-row">
-          <span class="prevalence-label">{c.name}</span>
-          <div class="prevalence-track">
-            <div class="prevalence-fill" style={`width: ${c.barPct}%`}></div>
+          <div class="prevalence-label-wrap">
+            <a
+              href={`${import.meta.env.BASE_URL}explore?code=${encodeURIComponent(c.name)}`}
+              class={`prevalence-link ${c.isNonLimitation ? "link-non-limitation" : ""}`}
+              title={c.definition ? `${c.name}: ${c.definition} (Click to see papers)` : `Filter explorer by ${c.name}`}
+            >
+              {c.name}
+            </a>
+            {c.isNonLimitation && <span class="badge-rhetoric">Rhetorical pattern</span>}
+          </div>
+          <div class="prevalence-track" title={`${c.count.toLocaleString()} papers (${c.pct.toFixed(1)}%)`}>
+            <div
+              class={`prevalence-fill ${c.isNonLimitation ? "fill-non-limitation" : "fill-limitation"}`}
+              style={`width: ${c.barPct}%`}
+            ></div>
           </div>
           <span class="prevalence-value">{c.pct.toFixed(1)}%</span>
         </div>
       ))}
       <p class="prevalence-caption">
         % of the {totalPapers.toLocaleString()} LLM-coded papers carrying each code
-        (top 8 of 50, all codes including "Non-Limitation: *" — sentences that read
-        like a limitation but were judged not to be one).
+        (top {TOP_N} of 50, including "Non-Limitation: *" rhetorical patterns — e.g. promising future work or highlighting method strengths). Click any code to explore.
       </p>
     </div>
   </div>
@@ -96,8 +139,6 @@ if (existsSync(indexPath)) {
 <style>
   .prevalence-chart { margin: 1rem 0; }
 
-  /* Visually hidden but still focusable/clickable-via-label (unlike
-     display:none, which would remove it from keyboard focus entirely). */
   .chart-toggle-input {
     position: absolute;
     width: 1px;
@@ -115,17 +156,16 @@ if (existsSync(indexPath)) {
     border: 1px solid var(--color-border);
     border-radius: 999px;
     padding: 0.15rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
   }
   .chart-toggle label {
-    padding: 0.3rem 0.8rem;
+    padding: 0.35rem 0.85rem;
     border-radius: 999px;
     font-size: 0.8rem;
     cursor: pointer;
     color: var(--color-muted);
+    transition: background 0.15s ease, color 0.15s ease;
   }
-  /* input and label aren't adjacent siblings (see markup note above), so the
-     active-state style is reached via input -> ~ -> .chart-toggle -> label. */
   #view-limitations:checked ~ .chart-toggle label[for="view-limitations"],
   #view-all:checked ~ .chart-toggle label[for="view-all"] {
     background: var(--color-accent);
@@ -141,41 +181,105 @@ if (existsSync(indexPath)) {
   #view-limitations:checked ~ #panel-limitations { display: block; }
   #view-all:checked ~ #panel-all { display: block; }
 
+  .prevalence-scale-header {
+    display: grid;
+    grid-template-columns: minmax(0, 18rem) 1fr 3.5rem;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--color-muted);
+  }
+  .scale-label-placeholder {
+    display: block;
+  }
+  .scale-ticks {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 1px;
+    font-size: 0.72rem;
+  }
+  .scale-val-placeholder {
+    display: block;
+  }
+
   .prevalence-row {
     display: grid;
-    grid-template-columns: minmax(0, 15rem) 1fr 3rem;
+    grid-template-columns: minmax(0, 18rem) 1fr 3.5rem;
     align-items: center;
-    gap: 0.6rem;
-    margin: 0.5rem 0;
+    gap: 0.75rem;
+    margin: 0.65rem 0;
   }
-  .prevalence-label {
-    font-size: 0.85rem;
-    line-height: 1.25;
+
+  .prevalence-label-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
   }
+
+  .prevalence-link {
+    font-size: 0.875rem;
+    line-height: 1.35;
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .prevalence-link:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .badge-rhetoric {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--color-llm);
+    background: var(--color-llm-bg);
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    margin-top: 0.1rem;
+  }
+
   .prevalence-track {
     background: var(--color-border);
     border-radius: 4px;
-    height: 0.6rem;
+    height: 0.75rem;
     overflow: hidden;
+    position: relative;
   }
+
   .prevalence-fill {
-    background: var(--color-accent);
     height: 100%;
     border-radius: 4px;
+    transition: width 0.3s ease;
   }
+  .fill-limitation {
+    background: var(--color-accent);
+  }
+  .fill-non-limitation {
+    background: var(--color-llm);
+  }
+
   .prevalence-value {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
     text-align: right;
   }
+
   .prevalence-caption {
     font-size: 0.8rem;
     color: var(--color-muted);
-    margin-top: 0.6rem;
+    margin-top: 1rem;
+    line-height: 1.4;
   }
 
-  @media (max-width: 520px) {
-    .prevalence-row { grid-template-columns: 1fr; row-gap: 0.2rem; }
+  @media (max-width: 600px) {
+    .prevalence-scale-header { display: none; }
+    .prevalence-row { grid-template-columns: 1fr; row-gap: 0.25rem; }
     .prevalence-value { text-align: left; }
   }
 </style>

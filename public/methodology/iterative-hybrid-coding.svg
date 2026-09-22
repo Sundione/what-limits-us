@@ -1,0 +1,223 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1691 672" width="1691" height="672">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1.2 L 8.5 5 L 0 8.8 z" fill="#000000" />
+    </marker>
+  </defs>
+
+  <style>
+    .bold-underlined { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 700; text-decoration: underline; fill: #000000; }
+    .title-lg { font-size: 20px; }
+    .title-md { font-size: 19px; }
+    .title-sm { font-size: 18px; }
+    .sub-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 15px; fill: #000000; }
+    .body-txt { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 15px; fill: #000000; }
+    .tab-txt { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 21px; font-weight: 700; fill: #ffffff; }
+    .table-cell-txt { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 15.5px; fill: #000000; }
+  </style>
+
+  <!-- Canvas background -->
+  <rect width="1691" height="672" fill="#ffffff" />
+
+  <!-- Container: Iteration t (#e6e6e6) -->
+  <rect x="272" y="10" width="143" height="47" rx="10" fill="#666666" />
+  <text x="343.5" y="41" text-anchor="middle" class="tab-txt">Iteration <tspan font-style="italic">t</tspan></text>
+  <rect x="272" y="57" width="1412" height="529" rx="18" fill="#e6e6e6" />
+
+  <!-- Container: Paper i (#cccccc) -->
+  <rect x="295" y="82" width="143" height="47" rx="10" fill="#666666" />
+  <text x="366.5" y="113" text-anchor="middle" class="tab-txt">Paper <tspan font-style="italic">i</tspan></text>
+  <!-- L-shaped Paper i body -->
+  <path d="M 313 129 L 1643 129 A 18 18 0 0 1 1661 147 L 1661 272 L 1145 272 L 1145 542 A 18 18 0 0 1 1127 560 L 313 560 A 18 18 0 0 1 295 542 L 295 147 A 18 18 0 0 1 313 129 Z" fill="#cccccc" />
+
+  <!-- Block 1: Limitations Section (folded doc) -->
+  <g id="limitations-section">
+    <!-- Dog-ear folded sheet -->
+    <path d="M 330 155 L 456 155 L 478 177 L 478 355 L 330 355 Z" fill="#ffffff" stroke="#000000" stroke-width="2.5" />
+    <path d="M 456 155 L 456 177 L 478 177 Z" fill="#ffffff" stroke="#000000" stroke-width="2.5" stroke-linejoin="round" />
+    <text x="404" y="208" text-anchor="middle" class="bold-underlined title-lg">Limitations</text>
+    <text x="404" y="234" text-anchor="middle" class="bold-underlined title-lg">Section</text>
+    <text x="404" y="285" text-anchor="middle" class="body-txt" font-size="16">"This study is</text>
+    <text x="404" y="310" text-anchor="middle" class="body-txt" font-size="16">limited by..."</text>
+  </g>
+
+  <!-- Block 2: Semantic Unit Segmentation -->
+  <g id="semantic-unit-segmentation">
+    <rect x="536" y="119" width="202" height="274" rx="24" fill="#ecf3fe" />
+    <text x="637" y="152" text-anchor="middle" class="bold-underlined title-md">Semantic Unit</text>
+    <text x="637" y="176" text-anchor="middle" class="bold-underlined title-md">Segmentation</text>
+    <!-- Pill 1: s1 -->
+    <rect x="554" y="195" width="166" height="66" rx="8" fill="#7db0ff" />
+    <text x="566" y="222" class="body-txt">s<tspan baseline-shift="sub" font-size="11">1</tspan> = "This study</text>
+    <text x="566" y="246" class="body-txt">is limited by ..."</text>
+    <!-- Pill 2: s2 -->
+    <rect x="554" y="275" width="166" height="66" rx="8" fill="#7db0ff" />
+    <text x="566" y="302" class="body-txt">s<tspan baseline-shift="sub" font-size="11">2</tspan> = "Moreover,</text>
+    <text x="566" y="326" class="body-txt">our model is ..."</text>
+  </g>
+
+  <!-- Block 3: Automatic Hybrid Coding -->
+  <g id="automatic-hybrid-coding">
+    <rect x="786" y="118" width="334" height="396" rx="24" fill="#d8e8d4" />
+    <text x="848" y="295" text-anchor="middle" class="bold-underlined title-lg">Automatic</text>
+    <text x="848" y="322" text-anchor="middle" class="bold-underlined title-lg">Hybrid</text>
+    <text x="848" y="349" text-anchor="middle" class="bold-underlined title-lg">Coding</text>
+
+    <!-- Branch lines to Deductive & Inductive -->
+    <polyline points="846,260 846,225 931,225" fill="none" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+    <polyline points="846,370 846,405 931,405" fill="none" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+
+    <!-- Deductive Box -->
+    <rect x="931" y="143" width="168" height="157" rx="16" fill="#a0cf76" />
+    <text x="1015" y="172" text-anchor="middle" class="bold-underlined title-md">Deductive</text>
+    <text x="1015" y="198" text-anchor="middle" class="sub-label">Assign existing</text>
+    <text x="1015" y="219" text-anchor="middle" class="sub-label">codes</text>
+    <text x="946" y="254" class="body-txt">s<tspan baseline-shift="sub" font-size="11">1</tspan> &#x2192; Code 1</text>
+    <text x="946" y="282" class="body-txt">s<tspan baseline-shift="sub" font-size="11">2</tspan> &#x2192; Code 3</text>
+
+    <!-- Inductive Box -->
+    <rect x="931" y="320" width="168" height="157" rx="16" fill="#a0cf76" />
+    <text x="1015" y="348" text-anchor="middle" class="bold-underlined title-md">Inductive</text>
+    <text x="1015" y="374" text-anchor="middle" class="sub-label">Assign new</text>
+    <text x="1015" y="395" text-anchor="middle" class="sub-label">codes</text>
+    <text x="946" y="438" class="body-txt">s<tspan baseline-shift="sub" font-size="11">1</tspan> &#x2192; Poor data</text>
+  </g>
+
+  <!-- Block 4: Annotated Data (top-right inside Paper i) -->
+  <g id="annotated-data">
+    <rect x="1406" y="118" width="240" height="132" rx="20" fill="#efd3d2" />
+    <text x="1526" y="152" text-anchor="middle" class="bold-underlined title-lg">Annotated Data</text>
+    <text x="1426" y="194" class="body-txt" font-size="16">s<tspan baseline-shift="sub" font-size="11">1</tspan> &#x2192; [Code 1, <tspan font-weight="700">Code 4</tspan>]</text>
+    <text x="1426" y="224" class="body-txt" font-size="16">s<tspan baseline-shift="sub" font-size="11">2</tspan> &#x2192; [Code 3]</text>
+  </g>
+
+  <!-- Block 5: Handling New Codes (bottom-right inside Iteration t) -->
+  <g id="handling-new-codes">
+    <rect x="1171" y="290" width="204" height="272" rx="20" fill="#fbeedc" />
+    <text x="1273" y="322" text-anchor="middle" class="bold-underlined title-md">Handling New</text>
+    <text x="1273" y="346" text-anchor="middle" class="bold-underlined title-md">Codes</text>
+
+    <!-- 4-row list -->
+    <rect x="1195" y="360" width="156" height="180" fill="#fbeedc" stroke="#cb8d59" stroke-width="1.5" />
+    <line x1="1195" y1="405" x2="1351" y2="405" stroke="#cb8d59" stroke-width="1.5" />
+    <line x1="1195" y1="450" x2="1351" y2="450" stroke="#cb8d59" stroke-width="1.5" />
+    <line x1="1195" y1="495" x2="1351" y2="495" stroke="#cb8d59" stroke-width="1.5" />
+    <text x="1273" y="389" text-anchor="middle" class="body-txt" font-size="16">Cluster</text>
+    <text x="1273" y="434" text-anchor="middle" class="body-txt" font-size="16">Recommend</text>
+    <text x="1273" y="479" text-anchor="middle" class="body-txt" font-size="16">Human Review</text>
+    <text x="1273" y="524" text-anchor="middle" class="body-txt" font-size="16">Apply</text>
+
+    <!-- Person Icon for Human Review -->
+    <g transform="translate(1168, 458)">
+      <circle cx="13" cy="7" r="6.5" fill="#fdf3cc" stroke="#f1912a" stroke-width="2.5" />
+      <path d="M 1 27 C 1 17 5 14 13 14 C 21 14 25 17 25 27 Z" fill="#fdf3cc" stroke="#f1912a" stroke-width="2.5" stroke-linejoin="round" />
+    </g>
+  </g>
+
+  <!-- Block 6: Codebook Tables -->
+  <!-- Table 1: Initial Codebook: C_0 -->
+  <g id="initial-codebook">
+    <text x="16" y="398" class="bold-underlined title-sm">Initial Codebook: <tspan font-style="italic">C</tspan><tspan font-style="italic" font-size="13" dy="4">0</tspan></text>
+    <g transform="translate(16, 412)">
+      <!-- Row 1 -->
+      <rect x="0" y="0" width="88" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <rect x="88" y="0" width="88" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <text x="44" y="20" text-anchor="middle" class="table-cell-txt">Code 1</text>
+      <text x="132" y="20" text-anchor="middle" class="table-cell-txt">Defn. 1</text>
+      <!-- Row 2 -->
+      <rect x="0" y="29" width="88" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <rect x="88" y="29" width="88" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <text x="44" y="49" text-anchor="middle" class="table-cell-txt">Code 2</text>
+      <text x="132" y="49" text-anchor="middle" class="table-cell-txt">Defn. 2</text>
+      <!-- Row 3 -->
+      <rect x="0" y="58" width="88" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <rect x="88" y="58" width="88" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <text x="44" y="78" text-anchor="middle" class="table-cell-txt">Code 3</text>
+      <text x="132" y="78" text-anchor="middle" class="table-cell-txt">Defn. 3</text>
+    </g>
+    <!-- Person Icon for Initial Codebook -->
+    <g transform="translate(178, 478)">
+      <circle cx="13" cy="7" r="6.5" fill="#fdf3cc" stroke="#f1912a" stroke-width="2.5" />
+      <path d="M 1 27 C 1 17 5 14 13 14 C 21 14 25 17 25 27 Z" fill="#fdf3cc" stroke="#f1912a" stroke-width="2.5" stroke-linejoin="round" />
+    </g>
+  </g>
+
+  <!-- Table 2: Codebook: C_{t-1} -->
+  <g id="codebook-prev">
+    <text x="320" y="398" class="bold-underlined title-sm">Codebook: <tspan font-style="italic">C</tspan><tspan font-style="italic" font-size="13" dy="4">t-1</tspan></text>
+    <g transform="translate(320, 412)">
+      <!-- Row 1 -->
+      <rect x="0" y="0" width="88" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <rect x="88" y="0" width="88" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <text x="44" y="20" text-anchor="middle" class="table-cell-txt">Code 1</text>
+      <text x="132" y="20" text-anchor="middle" class="table-cell-txt">Defn. 1</text>
+      <!-- Row 2 -->
+      <rect x="0" y="29" width="88" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <rect x="88" y="29" width="88" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <text x="44" y="49" text-anchor="middle" class="table-cell-txt">Code 2</text>
+      <text x="132" y="49" text-anchor="middle" class="table-cell-txt">Defn. 2</text>
+      <!-- Row 3 -->
+      <rect x="0" y="58" width="88" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <rect x="88" y="58" width="88" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <text x="44" y="78" text-anchor="middle" class="table-cell-txt">Code 3</text>
+      <text x="132" y="78" text-anchor="middle" class="table-cell-txt">Defn. 3</text>
+    </g>
+  </g>
+
+  <!-- Table 3: Updated Codebook: C_t -->
+  <g id="updated-codebook">
+    <text x="1440" y="398" class="bold-underlined title-sm">Updated Codebook: <tspan font-style="italic">C</tspan><tspan font-style="italic" font-size="13" dy="4">t</tspan></text>
+    <g transform="translate(1440, 412)">
+      <!-- Row 1 -->
+      <rect x="0" y="0" width="93" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <rect x="93" y="0" width="93" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <text x="46.5" y="20" text-anchor="middle" class="table-cell-txt">Code 1</text>
+      <text x="139.5" y="20" text-anchor="middle" class="table-cell-txt">Defn. 1</text>
+      <!-- Row 2 -->
+      <rect x="0" y="29" width="93" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <rect x="93" y="29" width="93" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <text x="46.5" y="49" text-anchor="middle" class="table-cell-txt">Code 2</text>
+      <text x="139.5" y="49" text-anchor="middle" class="table-cell-txt">Defn. 2</text>
+      <!-- Row 3 -->
+      <rect x="0" y="58" width="93" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <rect x="93" y="58" width="93" height="29" fill="#ffffff" stroke="#000000" stroke-width="2" />
+      <text x="46.5" y="78" text-anchor="middle" class="table-cell-txt">Code 3</text>
+      <text x="139.5" y="78" text-anchor="middle" class="table-cell-txt">Defn. 3</text>
+      <!-- Row 4 (highlighted) -->
+      <rect x="0" y="87" width="93" height="29" fill="#f49fcd" stroke="#000000" stroke-width="2" />
+      <rect x="93" y="87" width="93" height="29" fill="#f9cee7" stroke="#000000" stroke-width="2" />
+      <text x="46.5" y="107" text-anchor="middle" class="table-cell-txt" font-weight="500">Code 4</text>
+      <text x="139.5" y="107" text-anchor="middle" class="table-cell-txt" font-weight="500">Defn. 4</text>
+    </g>
+  </g>
+
+  <!-- Block 7: Loopback "Used in the next iteration" -->
+  <g id="loopback">
+    <rect x="660" y="608" width="530" height="50" rx="16" fill="#ffffff" stroke="#000000" stroke-width="3" stroke-dasharray="3,3" />
+    <text x="925" y="641" text-anchor="middle" class="body-txt" font-size="20">Used in the next iteration</text>
+    <!-- Line from Updated Codebook to loopback pill -->
+    <polyline points="1533,528 1533,633 1190,633" fill="none" stroke="#000000" stroke-width="2.5" />
+    <!-- Line from loopback pill to Codebook C_{t-1} -->
+    <polyline points="660,633 402,633 402,499" fill="none" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+  </g>
+
+  <!-- All Inter-Block Connecting Arrows -->
+  <g id="arrows">
+    <!-- Initial Codebook -> Codebook C_{t-1} -->
+    <line x1="192" y1="462.5" x2="320" y2="462.5" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+    <!-- Codebook C_{t-1} -> Automatic Hybrid Coding -->
+    <line x1="496" y1="462.5" x2="786" y2="462.5" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+    <!-- Limitations Doc -> Semantic Unit Segmentation -->
+    <line x1="478" y1="266.5" x2="536" y2="266.5" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+    <!-- Semantic Unit Segmentation -> Automatic Hybrid Coding -->
+    <line x1="738" y1="262.5" x2="786" y2="262.5" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+    <!-- Deductive -> Annotated Data (straight line above Handling New Codes) -->
+    <line x1="1099" y1="183" x2="1406" y2="183" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+    <!-- Inductive -> Handling New Codes -->
+    <line x1="1099" y1="410" x2="1171" y2="410" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+    <!-- Handling New Codes -> Annotated Data (right then up) -->
+    <polyline points="1375,343 1530,343 1530,250" fill="none" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+    <!-- Handling New Codes -> Updated Codebook C_t -->
+    <line x1="1375" y1="489" x2="1440" y2="489" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+  </g>
+</svg>

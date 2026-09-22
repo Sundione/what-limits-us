@@ -3,7 +3,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import LinkBar from "../components/LinkBar.astro";
 import BibtexBlock from "../components/BibtexBlock.astro";
 import MethodologyFigure from "../components/MethodologyFigure.astro";
-import PrevalenceChart from "../components/PrevalenceChart.astro";
 import LimitationPresenceChart from "../components/LimitationPresenceChart.astro";
 import { authors, affiliations, paper } from "../data/paper";
 ---
@@ -88,11 +87,8 @@ import { authors, affiliations, paper } from "../data/paper";
   </p>
   <LimitationPresenceChart />
 
-  <h3>Most common limitations</h3>
-  <p>Which limitations come up most often across the 16,047 LLM-coded papers:</p>
-  <PrevalenceChart />
   <p class="section-cta">
-    <a href={`${import.meta.env.BASE_URL}results`}>Full results: temporal trends &amp; the homogeneity finding &rarr;</a>
+    <a href={`${import.meta.env.BASE_URL}results`}>Full results: most common limitations, temporal trends &amp; homogeneity &rarr;</a>
   </p>
 
   <BibtexBlock />

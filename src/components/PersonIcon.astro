@@ -1,12 +1,13 @@
 ---
 interface Props {
-  color: string;
+  color?: string;
+  fill?: string;
   size?: number;
 }
-const { color, size = 26 } = Astro.props;
+const { color = "#f1912a", fill = "#fdf3cc", size = 26 } = Astro.props;
 const scale = size / 26;
 ---
 <g transform={`scale(${scale})`}>
-  <circle cx="13" cy="7" r="6" fill={color} />
-  <path d="M2,26 C2,17 6,14 13,14 C20,14 24,17 24,26 Z" fill={color} />
+  <circle cx="13" cy="7" r="6.5" fill={fill} stroke={color} stroke-width="2.5" />
+  <path d="M 1 27 C 1 17 5 14 13 14 C 21 14 25 17 25 27 Z" fill={fill} stroke={color} stroke-width="2.5" stroke-linejoin="round" />
 </g>
