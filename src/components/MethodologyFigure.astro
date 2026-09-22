@@ -2,44 +2,93 @@
 // Full SVG vector recreation of sources/visualizations/hybrid/Iterative_Hybrid_Coding_2.png
 // (= Figure 1 in the paper).
 // Rebuilt as clean, standalone vector shapes matching the exact paper geometry,
-// with interactive hover highlights and tooltips for web companion exploration.
+// with interactive hover highlights, theme-aligned colors, and click navigation.
 import PersonIcon from "./PersonIcon.astro";
 
 interface Component {
   id: string;
   label: string;
   detail: string;
+  action?: string;
 }
 
 const components: Component[] = [
-  { id: "limitations", label: "Limitations Section", detail: "Input: the raw text of a paper's Limitations section, e.g. “This study is limited by …”" },
-  { id: "segmentation", label: "Semantic Unit Segmentation", detail: "Gemini 2.5 Flash splits the section into individual sentences (s₁, s₂, …), each coded independently next." },
-  { id: "deductive", label: "Deductive coding", detail: "Gemini 3.1 Pro assigns existing codes from the current codebook Cₜ₋₁ (e.g. s₁ → Code 1, s₂ → Code 3)." },
-  { id: "inductive", label: "Inductive coding", detail: "Where no existing code fits, the model proposes a new one (e.g. s₁ → “Poor data”) instead of forcing a bad match." },
-  { id: "handling", label: "Handling New Codes", detail: "Inductively-proposed codes are clustered, a definition is recommended, a researcher reviews it, then applies it to the codebook — the only step with a human in the loop." },
-  { id: "annotated", label: "Annotated Data", detail: "Output: each sentence's final code list, e.g. s₁ → [Code 1, Code 4], s₂ → [Code 3]." },
-  { id: "updated-codebook", label: "Updated Codebook", detail: "The codebook after this paper's new code (Code 4) is applied — this becomes Cₜ₋₁ for the next paper/iteration." },
+  {
+    id: "limitations",
+    label: "Limitations Section",
+    detail: "Input: raw text of a paper's Limitations section extracted from PDF/HTML, e.g. “This study is limited by …”"
+  },
+  {
+    id: "segmentation",
+    label: "Semantic Unit Segmentation",
+    detail: "Gemini 2.5 Flash segments the section into distinct sentences (s₁, s₂, …), each evaluated as an independent unit."
+  },
+  {
+    id: "deductive",
+    label: "Deductive Coding",
+    detail: "Gemini 3.1 Pro matches sentences against the existing codebook Cₜ₋₁ (e.g. s₁ → Code 1, s₂ → Code 3) using rich contextual definitions."
+  },
+  {
+    id: "inductive",
+    label: "Inductive Coding",
+    detail: "When no existing category adequately fits, the LLM proposes a new candidate code (e.g. s₁ → “Poor data”) instead of forcing a false match."
+  },
+  {
+    id: "handling",
+    label: "Handling New Codes (Human-in-the-Loop)",
+    detail: "Proposed inductive codes are clustered, synthesized into recommended definitions, reviewed by an expert human researcher, and formally adopted."
+  },
+  {
+    id: "initial-codebook",
+    label: "Initial Codebook (C₀)",
+    detail: "Starts with 25 seed codes derived from ACL author guidelines and literature. Human-curated before processing the corpus.",
+    action: "Click node to open Codebook →"
+  },
+  {
+    id: "codebook-prev",
+    label: "Prior Codebook (Cₜ₋₁)",
+    detail: "The cumulative set of established codes available at the start of paper i's coding pass."
+  },
+  {
+    id: "updated-codebook",
+    label: "Updated Codebook (Cₜ)",
+    detail: "The expanded codebook after newly verified codes are integrated. Grew across 4 iteration cycles to 50 comprehensive codes.",
+    action: "Click node to open Codebook →"
+  },
+  {
+    id: "loopback",
+    label: "Iteration Cycle (t → t+1)",
+    detail: "The pipeline ran across 4 temporal rounds: 2020–2022, 2023, 2024, and 2025. Each round propagated expanded codes into subsequent papers."
+  },
+  {
+    id: "annotated",
+    label: "Annotated Dataset",
+    detail: "Output: 1,029 papers with 3,118 sentence-level annotations, code tags, and rationale justifications across 5 thematic categories.",
+    action: "Click node to open Dataset Explorer →"
+  },
 ];
 const byId = Object.fromEntries(components.map((c) => [c.id, c])) as Record<string, Component>;
 
 const C = {
   canvasBg: "#ffffff",
-  outerPanel: "#e6e6e6",
-  innerPanel: "#cccccc",
-  tab: "#666666",
-  seg: "#ecf3fe",
-  segInner: "#7db0ff",
-  hybrid: "#d8e8d4",
-  hybridInner: "#a0cf76",
-  handling: "#fbeedc",
-  handlingTableBorder: "#cb8d59",
-  annotated: "#efd3d2",
-  code4Bg1: "#f49fcd",
-  code4Bg2: "#f9cee7",
-  personStroke: "#f1912a",
-  personFill: "#fdf3cc",
-  border: "#000000",
-  text: "#000000",
+  outerPanel: "#f8fafc",
+  innerPanel: "#f1f5f9",
+  tab: "#475569",
+  seg: "#eff6ff",
+  segInner: "#bfdbfe",
+  hybrid: "#f0fdf4",
+  hybridInner: "#bbf7d0",
+  deductiveInner: "#dbeafe",
+  inductiveInner: "#ffe4e6",
+  handling: "#fef3c7",
+  handlingTableBorder: "#f59e0b",
+  annotated: "#f3e8ff",
+  code4Bg1: "#fbcfe8",
+  code4Bg2: "#fdf2f8",
+  personStroke: "#d97706",
+  personFill: "#fef3c7",
+  border: "#334155",
+  text: "#0f172a",
 };
 ---
 <div class="methodology-figure-wrap">
@@ -47,22 +96,22 @@ const C = {
     <title id="methodology-svg-title">Iterative Hybrid Coding pipeline diagram</title>
     <defs>
       <marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-        <path d="M 0 1.2 L 8.5 5 L 0 8.8 z" fill="#000000" />
+        <path d="M 0 1.2 L 8.5 5 L 0 8.8 z" fill="#334155" />
       </marker>
     </defs>
 
     <!-- Canvas background -->
     <rect width="1691" height="672" fill={C.canvasBg} />
 
-    <!-- Container: Iteration t (#e6e6e6) -->
+    <!-- Container: Iteration t (#f8fafc) -->
     <rect x="272" y="10" width="143" height="47" rx="10" fill={C.tab} />
     <text x="343.5" y="41" text-anchor="middle" class="tab-txt">Iteration <tspan font-style="italic">t</tspan></text>
-    <rect x="272" y="57" width="1412" height="529" rx="18" fill={C.outerPanel} />
+    <rect x="272" y="57" width="1412" height="529" rx="18" fill={C.outerPanel} stroke="#cbd5e1" stroke-width="1.5" />
 
-    <!-- Container: Paper i (#cccccc) - L-shaped body -->
+    <!-- Container: Paper i (#f1f5f9) - L-shaped body -->
     <rect x="295" y="82" width="143" height="47" rx="10" fill={C.tab} />
     <text x="366.5" y="113" text-anchor="middle" class="tab-txt">Paper <tspan font-style="italic">i</tspan></text>
-    <path d="M 313 129 L 1643 129 A 18 18 0 0 1 1661 147 L 1661 272 L 1145 272 L 1145 542 A 18 18 0 0 1 1127 560 L 313 560 A 18 18 0 0 1 295 542 L 295 147 A 18 18 0 0 1 313 129 Z" fill={C.innerPanel} />
+    <path d="M 313 129 L 1643 129 A 18 18 0 0 1 1661 147 L 1661 272 L 1145 272 L 1145 542 A 18 18 0 0 1 1127 560 L 313 560 A 18 18 0 0 1 295 542 L 295 147 A 18 18 0 0 1 313 129 Z" fill={C.innerPanel} stroke="#cbd5e1" stroke-width="1.5" />
 
     <!-- Block 1: Limitations Section (folded doc) -->
     <g class="interactive-stage" data-stage-id="limitations">
@@ -81,7 +130,7 @@ const C = {
     <g class="interactive-stage" data-stage-id="segmentation">
       <rect class="zone-hit" tabindex="0" role="button" aria-label={`${byId.segmentation.label}: ${byId.segmentation.detail}`} x="532" y="115" width="210" height="282" fill="#000000" opacity="0.0001" />
       <g class="zone-visual">
-        <rect x="536" y="119" width="202" height="274" rx="24" fill={C.seg} />
+        <rect x="536" y="119" width="202" height="274" rx="24" fill={C.seg} stroke="#93c5fd" stroke-width="1.5" />
         <text x="637" y="152" text-anchor="middle" class="bold-underlined title-md">Semantic Unit</text>
         <text x="637" y="176" text-anchor="middle" class="bold-underlined title-md">Segmentation</text>
         <!-- Pill 1: s1 -->
@@ -96,20 +145,20 @@ const C = {
     </g>
 
     <!-- Block 3: Automatic Hybrid Coding Container -->
-    <rect x="786" y="118" width="334" height="396" rx="24" fill={C.hybrid} />
+    <rect x="786" y="118" width="334" height="396" rx="24" fill={C.hybrid} stroke="#86efac" stroke-width="1.5" />
     <text x="848" y="295" text-anchor="middle" class="bold-underlined title-lg">Automatic</text>
     <text x="848" y="322" text-anchor="middle" class="bold-underlined title-lg">Hybrid</text>
     <text x="848" y="349" text-anchor="middle" class="bold-underlined title-lg">Coding</text>
 
     <!-- Branch lines to Deductive & Inductive -->
-    <polyline points="846,260 846,225 931,225" fill="none" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
-    <polyline points="846,370 846,405 931,405" fill="none" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+    <polyline points="846,260 846,225 931,225" fill="none" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)" />
+    <polyline points="846,370 846,405 931,405" fill="none" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)" />
 
     <!-- Deductive Box (interactive) -->
     <g class="interactive-stage" data-stage-id="deductive">
       <rect class="zone-hit" tabindex="0" role="button" aria-label={`${byId.deductive.label}: ${byId.deductive.detail}`} x="927" y="139" width="176" height="165" fill="#000000" opacity="0.0001" />
       <g class="zone-visual">
-        <rect x="931" y="143" width="168" height="157" rx="16" fill={C.hybridInner} />
+        <rect x="931" y="143" width="168" height="157" rx="16" fill={C.deductiveInner} stroke="#93c5fd" stroke-width="1.5" />
         <text x="1015" y="172" text-anchor="middle" class="bold-underlined title-md">Deductive</text>
         <text x="1015" y="198" text-anchor="middle" class="sub-label">Assign existing</text>
         <text x="1015" y="219" text-anchor="middle" class="sub-label">codes</text>
@@ -122,7 +171,7 @@ const C = {
     <g class="interactive-stage" data-stage-id="inductive">
       <rect class="zone-hit" tabindex="0" role="button" aria-label={`${byId.inductive.label}: ${byId.inductive.detail}`} x="927" y="316" width="176" height="165" fill="#000000" opacity="0.0001" />
       <g class="zone-visual">
-        <rect x="931" y="320" width="168" height="157" rx="16" fill={C.hybridInner} />
+        <rect x="931" y="320" width="168" height="157" rx="16" fill={C.inductiveInner} stroke="#fca5a5" stroke-width="1.5" />
         <text x="1015" y="348" text-anchor="middle" class="bold-underlined title-md">Inductive</text>
         <text x="1015" y="374" text-anchor="middle" class="sub-label">Assign new</text>
         <text x="1015" y="395" text-anchor="middle" class="sub-label">codes</text>
@@ -130,11 +179,11 @@ const C = {
       </g>
     </g>
 
-    <!-- Block 4: Annotated Data (interactive) -->
-    <g class="interactive-stage" data-stage-id="annotated">
-      <rect class="zone-hit" tabindex="0" role="button" aria-label={`${byId.annotated.label}: ${byId.annotated.detail}`} x="1402" y="114" width="248" height="140" fill="#000000" opacity="0.0001" />
+    <!-- Block 4: Annotated Data (interactive with link to explore) -->
+    <g class="interactive-stage" data-stage-id="annotated" data-link={`${import.meta.env.BASE_URL}explore`}>
+      <rect class="zone-hit" tabindex="0" role="button" aria-label={`${byId.annotated.label}: ${byId.annotated.detail}`} x="1402" y="110" width="248" height="145" fill="#000000" opacity="0.0001" />
       <g class="zone-visual">
-        <rect x="1406" y="118" width="240" height="132" rx="20" fill={C.annotated} />
+        <rect x="1406" y="118" width="240" height="132" rx="20" fill={C.annotated} stroke="#c084fc" stroke-width="2" />
         <text x="1526" y="152" text-anchor="middle" class="bold-underlined title-lg">Annotated Data</text>
         <text x="1426" y="194" class="body-txt" font-size="16">s<tspan baseline-shift="sub" font-size="11">1</tspan> → [Code 1, <tspan font-weight="700">Code 4</tspan>]</text>
         <text x="1426" y="224" class="body-txt" font-size="16">s<tspan baseline-shift="sub" font-size="11">2</tspan> → [Code 3]</text>
@@ -145,18 +194,18 @@ const C = {
     <g class="interactive-stage" data-stage-id="handling">
       <rect class="zone-hit" tabindex="0" role="button" aria-label={`${byId.handling.label}: ${byId.handling.detail}`} x="1165" y="285" width="216" height="282" fill="#000000" opacity="0.0001" />
       <g class="zone-visual">
-        <rect x="1171" y="290" width="204" height="272" rx="20" fill={C.handling} />
+        <rect x="1171" y="290" width="204" height="272" rx="20" fill={C.handling} stroke={C.handlingTableBorder} stroke-width="2" />
         <text x="1273" y="322" text-anchor="middle" class="bold-underlined title-md">Handling New</text>
         <text x="1273" y="346" text-anchor="middle" class="bold-underlined title-md">Codes</text>
 
         <!-- 4-row list -->
-        <rect x="1195" y="360" width="156" height="180" fill={C.handling} stroke={C.handlingTableBorder} stroke-width="1.5" />
+        <rect x="1195" y="360" width="156" height="180" fill="#ffffff" stroke={C.handlingTableBorder} stroke-width="1.5" />
         <line x1="1195" y1="405" x2="1351" y2="405" stroke={C.handlingTableBorder} stroke-width="1.5" />
         <line x1="1195" y1="450" x2="1351" y2="450" stroke={C.handlingTableBorder} stroke-width="1.5" />
         <line x1="1195" y1="495" x2="1351" y2="495" stroke={C.handlingTableBorder} stroke-width="1.5" />
         <text x="1273" y="389" text-anchor="middle" class="body-txt" font-size="16">Cluster</text>
         <text x="1273" y="434" text-anchor="middle" class="body-txt" font-size="16">Recommend</text>
-        <text x="1273" y="479" text-anchor="middle" class="body-txt" font-size="16">Human Review</text>
+        <text x="1273" y="479" text-anchor="middle" class="body-txt" font-size="16" font-weight="700">Human Review</text>
         <text x="1273" y="524" text-anchor="middle" class="body-txt" font-size="16">Apply</text>
 
         <!-- Person Icon for Human Review -->
@@ -167,55 +216,61 @@ const C = {
     </g>
 
     <!-- Block 6: Codebook Tables -->
-    <!-- Table 1: Initial Codebook: C_0 -->
-    <g id="initial-codebook">
-      <text x="16" y="398" class="bold-underlined title-sm">Initial Codebook: <tspan font-style="italic">C</tspan><tspan font-style="italic" font-size="13" dy="4">0</tspan></text>
-      <g transform="translate(16, 412)">
-        <rect x="0" y="0" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
-        <rect x="88" y="0" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
-        <text x="44" y="20" text-anchor="middle" class="table-cell-txt">Code 1</text>
-        <text x="132" y="20" text-anchor="middle" class="table-cell-txt">Defn. 1</text>
+    <!-- Table 1: Initial Codebook: C_0 (interactive with link to codebook) -->
+    <g class="interactive-stage" data-stage-id="initial-codebook" data-link={`${import.meta.env.BASE_URL}codebook`}>
+      <rect class="zone-hit" tabindex="0" role="button" aria-label={`${byId["initial-codebook"].label}: ${byId["initial-codebook"].detail}`} x="10" y="375" width="200" height="140" fill="#000000" opacity="0.0001" />
+      <g class="zone-visual">
+        <text x="16" y="398" class="bold-underlined title-sm">Initial Codebook: <tspan font-style="italic">C</tspan><tspan font-style="italic" font-size="13" dy="4">0</tspan></text>
+        <g transform="translate(16, 412)">
+          <rect x="0" y="0" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
+          <rect x="88" y="0" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
+          <text x="44" y="20" text-anchor="middle" class="table-cell-txt">Code 1</text>
+          <text x="132" y="20" text-anchor="middle" class="table-cell-txt">Defn. 1</text>
 
-        <rect x="0" y="29" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
-        <rect x="88" y="29" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
-        <text x="44" y="49" text-anchor="middle" class="table-cell-txt">Code 2</text>
-        <text x="132" y="49" text-anchor="middle" class="table-cell-txt">Defn. 2</text>
+          <rect x="0" y="29" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
+          <rect x="88" y="29" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
+          <text x="44" y="49" text-anchor="middle" class="table-cell-txt">Code 2</text>
+          <text x="132" y="49" text-anchor="middle" class="table-cell-txt">Defn. 2</text>
 
-        <rect x="0" y="58" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
-        <rect x="88" y="58" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
-        <text x="44" y="78" text-anchor="middle" class="table-cell-txt">Code 3</text>
-        <text x="132" y="78" text-anchor="middle" class="table-cell-txt">Defn. 3</text>
-      </g>
-      <!-- Person Icon for Initial Codebook -->
-      <g transform="translate(178, 478)">
-        <PersonIcon color={C.personStroke} fill={C.personFill} />
+          <rect x="0" y="58" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
+          <rect x="88" y="58" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
+          <text x="44" y="78" text-anchor="middle" class="table-cell-txt">Code 3</text>
+          <text x="132" y="78" text-anchor="middle" class="table-cell-txt">Defn. 3</text>
+        </g>
+        <!-- Person Icon for Initial Codebook -->
+        <g transform="translate(178, 478)">
+          <PersonIcon color={C.personStroke} fill={C.personFill} />
+        </g>
       </g>
     </g>
 
     <!-- Table 2: Codebook: C_{t-1} -->
-    <g id="codebook-prev">
-      <text x="320" y="398" class="bold-underlined title-sm">Codebook: <tspan font-style="italic">C</tspan><tspan font-style="italic" font-size="13" dy="4">t-1</tspan></text>
-      <g transform="translate(320, 412)">
-        <rect x="0" y="0" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
-        <rect x="88" y="0" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
-        <text x="44" y="20" text-anchor="middle" class="table-cell-txt">Code 1</text>
-        <text x="132" y="20" text-anchor="middle" class="table-cell-txt">Defn. 1</text>
+    <g class="interactive-stage" data-stage-id="codebook-prev" id="codebook-prev">
+      <rect class="zone-hit" tabindex="0" role="button" aria-label={`${byId["codebook-prev"].label}: ${byId["codebook-prev"].detail}`} x="315" y="380" width="180" height="135" fill="#000000" opacity="0.0001" />
+      <g class="zone-visual">
+        <text x="320" y="398" class="bold-underlined title-sm">Codebook: <tspan font-style="italic">C</tspan><tspan font-style="italic" font-size="13" dy="4">t-1</tspan></text>
+        <g transform="translate(320, 412)">
+          <rect x="0" y="0" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
+          <rect x="88" y="0" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
+          <text x="44" y="20" text-anchor="middle" class="table-cell-txt">Code 1</text>
+          <text x="132" y="20" text-anchor="middle" class="table-cell-txt">Defn. 1</text>
 
-        <rect x="0" y="29" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
-        <rect x="88" y="29" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
-        <text x="44" y="49" text-anchor="middle" class="table-cell-txt">Code 2</text>
-        <text x="132" y="49" text-anchor="middle" class="table-cell-txt">Defn. 2</text>
+          <rect x="0" y="29" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
+          <rect x="88" y="29" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
+          <text x="44" y="49" text-anchor="middle" class="table-cell-txt">Code 2</text>
+          <text x="132" y="49" text-anchor="middle" class="table-cell-txt">Defn. 2</text>
 
-        <rect x="0" y="58" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
-        <rect x="88" y="58" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
-        <text x="44" y="78" text-anchor="middle" class="table-cell-txt">Code 3</text>
-        <text x="132" y="78" text-anchor="middle" class="table-cell-txt">Defn. 3</text>
+          <rect x="0" y="58" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
+          <rect x="88" y="58" width="88" height="29" fill="#ffffff" stroke={C.border} stroke-width="2" />
+          <text x="44" y="78" text-anchor="middle" class="table-cell-txt">Code 3</text>
+          <text x="132" y="78" text-anchor="middle" class="table-cell-txt">Defn. 3</text>
+        </g>
       </g>
     </g>
 
-    <!-- Table 3: Updated Codebook: C_t (interactive) -->
-    <g class="interactive-stage" data-stage-id="updated-codebook">
-      <rect class="zone-hit" tabindex="0" role="button" aria-label={`${byId["updated-codebook"].label}: ${byId["updated-codebook"].detail}`} x="1435" y="390" width="196" height="142" fill="#000000" opacity="0.0001" />
+    <!-- Table 3: Updated Codebook: C_t (interactive with link to codebook) -->
+    <g class="interactive-stage" data-stage-id="updated-codebook" data-link={`${import.meta.env.BASE_URL}codebook`}>
+      <rect class="zone-hit" tabindex="0" role="button" aria-label={`${byId["updated-codebook"].label}: ${byId["updated-codebook"].detail}`} x="1435" y="375" width="200" height="160" fill="#000000" opacity="0.0001" />
       <g class="zone-visual">
         <text x="1440" y="398" class="bold-underlined title-sm">Updated Codebook: <tspan font-style="italic">C</tspan><tspan font-style="italic" font-size="13" dy="4">t</tspan></text>
         <g transform="translate(1440, 412)">
@@ -237,40 +292,43 @@ const C = {
           <!-- Row 4 (highlighted new code) -->
           <rect x="0" y="87" width="93" height="29" fill={C.code4Bg1} stroke={C.border} stroke-width="2" />
           <rect x="93" y="87" width="93" height="29" fill={C.code4Bg2} stroke={C.border} stroke-width="2" />
-          <text x="46.5" y="107" text-anchor="middle" class="table-cell-txt" font-weight="500">Code 4</text>
-          <text x="139.5" y="107" text-anchor="middle" class="table-cell-txt" font-weight="500">Defn. 4</text>
+          <text x="46.5" y="107" text-anchor="middle" class="table-cell-txt" font-weight="700">Code 4</text>
+          <text x="139.5" y="107" text-anchor="middle" class="table-cell-txt" font-weight="700">Defn. 4</text>
         </g>
       </g>
     </g>
 
-    <!-- Block 7: Loopback "Used in the next iteration" -->
-    <g id="loopback">
-      <rect x="660" y="608" width="530" height="50" rx="16" fill="#ffffff" stroke="#000000" stroke-width="3" stroke-dasharray="3,3" />
-      <text x="925" y="641" text-anchor="middle" class="body-txt" font-size="20">Used in the next iteration</text>
+    <!-- Block 7: Loopback "Used in the next iteration" (interactive) -->
+    <g class="interactive-stage" data-stage-id="loopback" id="loopback">
+      <rect class="zone-hit" tabindex="0" role="button" aria-label={`${byId.loopback.label}: ${byId.loopback.detail}`} x="650" y="598" width="550" height="70" fill="#000000" opacity="0.0001" />
+      <g class="zone-visual">
+        <rect x="660" y="608" width="530" height="50" rx="16" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5" stroke-dasharray="6,4" />
+        <text x="925" y="640" text-anchor="middle" class="body-txt" font-size="19" font-weight="600" fill="#1e3a8a">Used in the next iteration (4 Rounds: 2020 → 2025)</text>
+      </g>
       <!-- Line from Updated Codebook to loopback pill -->
-      <polyline points="1533,528 1533,633 1190,633" fill="none" stroke="#000000" stroke-width="2.5" />
+      <polyline points="1533,546 1533,633 1190,633" fill="none" stroke="#2563eb" stroke-width="2.5" />
       <!-- Line from loopback pill to Codebook C_{t-1} -->
-      <polyline points="660,633 402,633 402,499" fill="none" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+      <polyline points="660,633 402,633 402,499" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow)" />
     </g>
 
     <!-- All Inter-Block Connecting Arrows -->
     <g class="arrows">
       <!-- Initial Codebook -> Codebook C_{t-1} -->
-      <line x1="192" y1="462.5" x2="320" y2="462.5" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+      <line x1="192" y1="462.5" x2="320" y2="462.5" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)" />
       <!-- Codebook C_{t-1} -> Automatic Hybrid Coding -->
-      <line x1="496" y1="462.5" x2="786" y2="462.5" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+      <line x1="496" y1="462.5" x2="786" y2="462.5" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)" />
       <!-- Limitations Doc -> Semantic Unit Segmentation -->
-      <line x1="478" y1="266.5" x2="536" y2="266.5" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+      <line x1="478" y1="266.5" x2="536" y2="266.5" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)" />
       <!-- Semantic Unit Segmentation -> Automatic Hybrid Coding -->
-      <line x1="738" y1="262.5" x2="786" y2="262.5" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+      <line x1="738" y1="262.5" x2="786" y2="262.5" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)" />
       <!-- Deductive -> Annotated Data (straight line above Handling New Codes) -->
-      <line x1="1099" y1="183" x2="1406" y2="183" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+      <line x1="1099" y1="183" x2="1406" y2="183" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)" />
       <!-- Inductive -> Handling New Codes -->
-      <line x1="1099" y1="410" x2="1171" y2="410" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+      <line x1="1099" y1="410" x2="1171" y2="410" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)" />
       <!-- Handling New Codes -> Annotated Data (right then up) -->
-      <polyline points="1375,343 1530,343 1530,250" fill="none" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+      <polyline points="1375,343 1530,343 1530,250" fill="none" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)" />
       <!-- Handling New Codes -> Updated Codebook C_t -->
-      <line x1="1375" y1="489" x2="1440" y2="489" stroke="#000000" stroke-width="2.5" marker-end="url(#arrow)" />
+      <line x1="1375" y1="489" x2="1440" y2="489" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)" />
     </g>
   </svg>
 
@@ -278,12 +336,20 @@ const C = {
   <div id="methodology-tooltip" class="methodology-html-tooltip" role="tooltip" aria-hidden="true" style="display: none;">
     <div class="methodology-tooltip-title" id="methodology-tooltip-title"></div>
     <div class="methodology-tooltip-detail" id="methodology-tooltip-detail"></div>
+    <div class="methodology-tooltip-action" id="methodology-tooltip-action" style="display: none;"></div>
   </div>
 
   <script type="application/json" id="methodology-data" set:html={JSON.stringify(byId)} />
 </div>
 
-<p class="methodology-hint">Hover or tap a stage of the diagram for details.</p>
+<p class="methodology-hint">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px; display: inline-block;">
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="12" y1="16" x2="12" y2="12"></line>
+    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+  </svg>
+  Hover or tap stages for methodology details. Click any Codebook or Annotated Data stage to open its full page.
+</p>
 
 <script>
   function initMethodologyTooltips() {
@@ -291,10 +357,11 @@ const C = {
     const tooltip = document.getElementById('methodology-tooltip');
     const titleEl = document.getElementById('methodology-tooltip-title');
     const detailEl = document.getElementById('methodology-tooltip-detail');
+    const actionEl = document.getElementById('methodology-tooltip-action');
     const dataEl = document.getElementById('methodology-data');
     if (!wrap || !tooltip || !titleEl || !detailEl || !dataEl) return;
 
-    let stageData: Record<string, { label: string; detail: string }> = {};
+    let stageData: Record<string, { label: string; detail: string; action?: string }> = {};
     try {
       stageData = JSON.parse(dataEl.textContent || '{}');
     } catch (e) {
@@ -307,9 +374,18 @@ const C = {
       const stageId = stage.getAttribute('data-stage-id');
       if (!stageId || !stageData[stageId] || !tooltip || !titleEl || !detailEl || !wrap) return;
 
-      const { label, detail } = stageData[stageId];
+      const { label, detail, action } = stageData[stageId];
       titleEl.textContent = label;
       detailEl.textContent = detail;
+
+      if (actionEl) {
+        if (action) {
+          actionEl.textContent = action;
+          actionEl.style.display = 'block';
+        } else {
+          actionEl.style.display = 'none';
+        }
+      }
 
       const wrapRect = wrap.getBoundingClientRect();
       const hit = stage.querySelector('.zone-hit') || stage;
@@ -349,6 +425,14 @@ const C = {
       stage.addEventListener('pointerleave', hideTooltip);
       stage.addEventListener('focusin', () => showTooltip(stage));
       stage.addEventListener('focusout', hideTooltip);
+
+      // Navigate if node has data-link
+      stage.addEventListener('click', () => {
+        const link = stage.getAttribute('data-link');
+        if (link) {
+          window.location.href = link;
+        }
+      });
     });
   }
 
@@ -362,16 +446,15 @@ const C = {
 
 <style>
   .methodology-figure-wrap {
-    width: min(1320px, calc(100vw - 2rem));
+    width: 100%;
+    max-width: 100%;
     position: relative;
-    left: 50%;
-    transform: translateX(-50%);
     margin: 1.5rem 0 0.4rem;
     border: 1px solid var(--color-border);
-    border-radius: 10px;
-    padding: 0.75rem;
+    border-radius: 12px;
+    padding: 0.85rem;
     background: #ffffff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     overflow: visible;
   }
   .methodology-svg {
@@ -387,7 +470,7 @@ const C = {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-weight: 700;
     text-decoration: underline;
-    fill: #000000;
+    fill: #0f172a;
   }
   .title-lg { font-size: 20px; }
   .title-md { font-size: 19px; }
@@ -395,12 +478,12 @@ const C = {
   .sub-label {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 15px;
-    fill: #000000;
+    fill: #334155;
   }
   .body-txt {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 15px;
-    fill: #000000;
+    fill: #0f172a;
   }
   .tab-txt {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -411,7 +494,7 @@ const C = {
   .table-cell-txt {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 15.5px;
-    fill: #000000;
+    fill: #0f172a;
   }
 
   /* Interactive stages */
@@ -429,11 +512,14 @@ const C = {
     pointer-events: all;
   }
   .zone-visual {
-    transition: filter 0.15s ease;
+    transition: filter 0.15s ease, transform 0.15s ease;
   }
   .interactive-stage:hover .zone-visual,
   .interactive-stage:focus-within .zone-visual {
-    filter: drop-shadow(0 0 10px rgba(0, 102, 204, 0.65));
+    filter: drop-shadow(0 0 10px rgba(37, 99, 235, 0.45));
+  }
+  .interactive-stage[data-link]:hover .zone-visual {
+    filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.55));
   }
 
   /* Floating HTML tooltip - completely above SVG DOM layers */
@@ -441,14 +527,14 @@ const C = {
     position: absolute;
     pointer-events: none;
     z-index: 99999;
-    background: #18181b;
+    background: #0f172a;
     color: #ffffff;
     padding: 10px 14px;
     border-radius: 8px;
     font-size: 0.88rem;
-    line-height: 1.4;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    line-height: 1.45;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
     width: max-content;
     max-width: 320px;
     opacity: 0;
@@ -469,13 +555,25 @@ const C = {
     margin-bottom: 3px;
   }
   .methodology-tooltip-detail {
-    color: #f3f4f6;
+    color: #f1f5f9;
     font-size: 0.84rem;
+  }
+  .methodology-tooltip-action {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.2);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #6ee7b7;
+    letter-spacing: 0.01em;
   }
 
   .methodology-hint {
     font-size: 0.82rem;
     color: var(--color-muted);
-    margin-top: 0.4rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
   }
 </style>

@@ -157,13 +157,29 @@ function exploreUrl(year: number, venue: string) {
 <div class="presence-chart-wrapper" id="presence-chart-root">
   <!-- Interactive View Rotation Toolbar -->
   <div class="chart-toolbar" role="toolbar" aria-label="Interactive chart view options">
-    <span class="toolbar-label">Quick Views:</span>
-    <div class="preset-buttons">
-      <button type="button" class="preset-btn active" data-preset="all">Show All</button>
-      <button type="button" class="preset-btn" data-preset="lines-only">Adoption Rates Only</button>
-      <button type="button" class="preset-btn" data-preset="bars-only">Paper Volumes Only</button>
-      <button type="button" class="preset-btn" data-preset="acl-only">ACL Only</button>
-      <button type="button" class="preset-btn" data-preset="emnlp-only">EMNLP Only</button>
+    <div class="toolbar-section">
+      <span class="toolbar-label">Quick Views:</span>
+      <div class="preset-buttons">
+        <button type="button" class="preset-btn active" data-preset="all">Show All</button>
+        <button type="button" class="preset-btn" data-preset="lines-only">Adoption Rates Only</button>
+        <button type="button" class="preset-btn" data-preset="bars-only">Paper Volumes Only</button>
+      </div>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="toolbar-section">
+      <span class="toolbar-label">Conferences (Click to Toggle):</span>
+      <div class="conf-toggles">
+        <button type="button" class="conf-toggle-btn active" data-conf="acl" title="Toggle ACL bars and adoption line">
+          <span class="conf-bullet" style="background-color: #0072b2;"></span>
+          <span>ACL</span>
+        </button>
+        <button type="button" class="conf-toggle-btn active" data-conf="emnlp" title="Toggle EMNLP bars and adoption line">
+          <span class="conf-bullet" style="background-color: #e69f00;"></span>
+          <span>EMNLP</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -217,39 +233,40 @@ function exploreUrl(year: number, venue: string) {
             pct: bar.pct.toFixed(1),
             failure: bar.row.extractionFailures,
             missing: bar.row.noExplicitLimitations,
+            exploreUrl: exploreUrl(bar.year, bar.venue.toLowerCase()),
           });
           return (
             <g class="bar-group" data-year={bar.year} data-venue={bar.venue}>
               <!-- Has Limitations (dark lower segment) -->
-              <a href={exploreUrl(bar.year, bar.venue.toLowerCase())} class="bar-seg-link" data-series={bar.hasSeries}>
+              <g class="chart-elem bar-seg-interactive" data-series={bar.hasSeries} data-venue={bar.venue.toLowerCase()}>
                 <rect
                   x={bar.x}
                   y={bar.hasY}
                   width={barW}
                   height={bar.hasH}
                   fill={bar.venue === "ACL" ? COLORS.aclDark : COLORS.emnlpDark}
-                  class="chart-elem bar-seg has-seg"
+                  class="bar-seg has-seg"
                   data-info={tooltipPayload}
                   tabindex="0"
                   role="button"
-                  aria-label={`${bar.venue} ${bar.year}: ${bar.row.papersWithLimitations.toLocaleString()} papers with Limitations (${bar.pct.toFixed(1)}% adopted)`}
+                  aria-label={`${bar.venue} ${bar.year}: ${bar.row.papersWithLimitations.toLocaleString()} papers with Limitations (${bar.pct.toFixed(1)}% adopted). Click to toggle ${bar.venue}.`}
                 />
-              </a>
+              </g>
               <!-- No Limitations (light upper segment) -->
-              <a href={exploreUrl(bar.year, bar.venue.toLowerCase())} class="bar-seg-link" data-series={bar.noSeries}>
+              <g class="chart-elem bar-seg-interactive" data-series={bar.noSeries} data-venue={bar.venue.toLowerCase()}>
                 <rect
                   x={bar.x}
                   y={bar.noY}
                   width={barW}
                   height={bar.noH}
                   fill={bar.venue === "ACL" ? COLORS.aclLight : COLORS.emnlpLight}
-                  class="chart-elem bar-seg no-seg"
+                  class="bar-seg no-seg"
                   data-info={tooltipPayload}
                   tabindex="0"
                   role="button"
-                  aria-label={`${bar.venue} ${bar.year}: ${(bar.row.totalPapers - bar.row.papersWithLimitations).toLocaleString()} papers without Limitations`}
+                  aria-label={`${bar.venue} ${bar.year}: ${(bar.row.totalPapers - bar.row.papersWithLimitations).toLocaleString()} papers without Limitations. Click to toggle ${bar.venue}.`}
                 />
-              </a>
+              </g>
             </g>
           );
         })}
@@ -520,6 +537,63 @@ function exploreUrl(year: number, venue: string) {
       });
     }
 
+    const confButtons = root.querySelectorAll(".conf-toggle-btn");
+
+    function syncButtonsState() {
+      const aclActive = activeSeries["acl-has"] || activeSeries["acl-line"];
+      const emnlpActive = activeSeries["emnlp-has"] || activeSeries["emnlp-line"];
+
+      confButtons.forEach((btn) => {
+        const c = btn.getAttribute("data-conf");
+        if (c === "acl") btn.classList.toggle("active", Boolean(aclActive));
+        if (c === "emnlp") btn.classList.toggle("active", Boolean(emnlpActive));
+      });
+    }
+
+    function toggleConference(conf: "acl" | "emnlp") {
+      const isCurrentlyActive = conf === "acl"
+        ? (activeSeries["acl-has"] || activeSeries["acl-line"])
+        : (activeSeries["emnlp-has"] || activeSeries["emnlp-line"]);
+      const nextState = !isCurrentlyActive;
+
+      if (conf === "acl") {
+        activeSeries["acl-has"] = nextState;
+        activeSeries["acl-no"] = nextState;
+        activeSeries["acl-line"] = nextState;
+      } else {
+        activeSeries["emnlp-has"] = nextState;
+        activeSeries["emnlp-no"] = nextState;
+        activeSeries["emnlp-line"] = nextState;
+      }
+
+      // clear preset active state
+      presetButtons.forEach((b) => b.classList.remove("active"));
+      syncButtonsState();
+      updateSeriesVisibility();
+    }
+
+    confButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const conf = btn.getAttribute("data-conf") as "acl" | "emnlp";
+        if (conf) toggleConference(conf);
+      });
+    });
+
+    // Bar click toggle
+    const barElements = root.querySelectorAll(".bar-seg");
+    barElements.forEach((bar) => {
+      bar.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const dInfo = bar.getAttribute("data-info");
+        if (!dInfo) return;
+        try {
+          const d = JSON.parse(dInfo);
+          const v = d.venue.toLowerCase() as "acl" | "emnlp";
+          toggleConference(v);
+        } catch (err) {}
+      });
+    });
+
     // Legend Click Toggle
     legendItems.forEach((item) => {
       const sId = item.getAttribute("data-series-id");
@@ -527,8 +601,8 @@ function exploreUrl(year: number, venue: string) {
 
       const toggle = () => {
         activeSeries[sId] = !activeSeries[sId];
-        // clear preset active state
         presetButtons.forEach((b) => b.classList.remove("active"));
+        syncButtonsState();
         updateSeriesVisibility();
       };
 
@@ -579,22 +653,9 @@ function exploreUrl(year: number, venue: string) {
           activeSeries["emnlp-no"] = true;
           activeSeries["acl-line"] = false;
           activeSeries["emnlp-line"] = false;
-        } else if (preset === "acl-only") {
-          activeSeries["acl-has"] = true;
-          activeSeries["acl-no"] = true;
-          activeSeries["acl-line"] = true;
-          activeSeries["emnlp-has"] = false;
-          activeSeries["emnlp-no"] = false;
-          activeSeries["emnlp-line"] = false;
-        } else if (preset === "emnlp-only") {
-          activeSeries["acl-has"] = false;
-          activeSeries["acl-no"] = false;
-          activeSeries["acl-line"] = false;
-          activeSeries["emnlp-has"] = true;
-          activeSeries["emnlp-no"] = true;
-          activeSeries["emnlp-line"] = true;
         }
 
+        syncButtonsState();
         updateSeriesVisibility();
       });
     });
@@ -697,14 +758,32 @@ function exploreUrl(year: number, venue: string) {
   .chart-toolbar {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: space-between;
+    gap: 1rem;
     margin-bottom: 0.85rem;
     flex-wrap: wrap;
+    background: #f8fafc;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 0.55rem 0.9rem;
+  }
+  .toolbar-section {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--color-border);
   }
   .toolbar-label {
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 0.82rem;
+    font-weight: 700;
     color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
   .preset-buttons {
     display: flex;
@@ -717,30 +796,65 @@ function exploreUrl(year: number, venue: string) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.35rem 0.85rem;
+    padding: 0.3rem 0.75rem;
     border-radius: 999px;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: 500;
     line-height: 1.2;
     border: 1px solid var(--color-border);
     background: #ffffff;
     color: var(--color-text);
     cursor: pointer;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     transition: all 0.15s ease;
     font-family: inherit;
   }
   .preset-btn:hover {
     border-color: var(--color-accent);
     color: var(--color-accent);
-    background: #f8fafc;
+    background: #f1f5f9;
   }
   .preset-btn.active {
     background: var(--color-accent);
     color: #ffffff;
     border-color: var(--color-accent);
     font-weight: 600;
-    box-shadow: 0 1px 4px rgba(0, 102, 204, 0.25);
+  }
+
+  .conf-toggles {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .conf-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid var(--color-border);
+    background: #ffffff;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .conf-toggle-btn:hover {
+    background: #f1f5f9;
+  }
+  .conf-toggle-btn.active {
+    border-color: currentColor;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  .conf-toggle-btn:not(.active) {
+    opacity: 0.45;
+    text-decoration: line-through;
+  }
+  .conf-bullet {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
   }
 
   /* SVG Container & Border */
@@ -856,7 +970,7 @@ function exploreUrl(year: number, venue: string) {
     border-radius: 8px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    min-width: 210px;
+    min-width: 240px;
     opacity: 0;
     transform: translate(-50%, -100%);
     transition: opacity 0.15s ease, transform 0.15s ease;
@@ -872,6 +986,7 @@ function exploreUrl(year: number, venue: string) {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.18);
     padding-bottom: 6px;
     margin-bottom: 8px;
@@ -882,11 +997,15 @@ function exploreUrl(year: number, venue: string) {
     font-size: 0.76rem;
     font-weight: 700;
     color: #ffffff;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .tooltip-pct {
     font-size: 0.88rem;
     font-weight: 700;
     color: #38bdf8;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .tooltip-body {
     display: flex;
