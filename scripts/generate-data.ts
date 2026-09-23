@@ -31,7 +31,9 @@ const config: DatasetConfig = JSON.parse(readFileSync(path.join(REPO_ROOT, "data
 
 function resolveDatasetDir(): string {
   const override = process.env.DATASET_SOURCE_DIR;
-  const dir = override ?? path.join(REPO_ROOT, ".dataset-src");
+  const localSibling = path.join(REPO_ROOT, "..", "nlp-self-reported-limitations");
+  const defaultDir = existsSync(localSibling) ? localSibling : path.join(REPO_ROOT, ".dataset-src");
+  const dir = override ?? defaultDir;
   if (!existsSync(dir)) {
     throw new Error(
       `Dataset source directory not found: ${dir}\n` +
@@ -84,7 +86,7 @@ function buildLlmCoding(
   codebookVersion: CodebookVersion,
 ): { coding: LlmCoding; fallbackCount: number; totalSpans: number } {
   const sentences = toSentences(raw.segmented_text);
-  const codes: CodeAssignment[] = [];
+  const codeMap = new Map<string, { origin: "existing" | "new"; evidence: EvidenceSpan[] }>();
   let fallbackCount = 0;
   let totalSpans = 0;
 
@@ -98,15 +100,33 @@ function buildLlmCoding(
       );
     }
     for (const detail of details) {
-      const evidence = detail.evidence.map((ev) => {
+      const codeName = detail.code_name.trim();
+      const existing = codeMap.get(codeName) ?? { origin, evidence: [] };
+      const seenSpans = new Set<string>(
+        existing.evidence.map((ev) => `${ev.sentenceId}:${ev.start}:${ev.end}:${ev.highlightText}:${ev.justification}`),
+      );
+
+      for (const ev of detail.evidence) {
         totalSpans += 1;
         const resolved = resolveEvidence(ev, raw.segmented_text[ev.segmented_id]);
         if (!resolved.exact) fallbackCount += 1;
-        return resolved;
-      });
-      codes.push({ code: detail.code_name.trim(), origin, evidence });
+
+        const spanKey = `${resolved.sentenceId}:${resolved.start}:${resolved.end}:${resolved.highlightText}:${resolved.justification}`;
+        if (!seenSpans.has(spanKey)) {
+          seenSpans.add(spanKey);
+          existing.evidence.push(resolved);
+        }
+      }
+
+      codeMap.set(codeName, existing);
     }
   }
+
+  const codes: CodeAssignment[] = Array.from(codeMap.entries()).map(([code, { origin, evidence }]) => ({
+    code,
+    origin,
+    evidence,
+  }));
 
   return {
     coding: { codebookVersion, limitation: raw.limitation, sentences, codes },

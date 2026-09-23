@@ -248,8 +248,8 @@ function exploreUrl(year: number, venue: string) {
                   class="bar-seg has-seg"
                   data-info={tooltipPayload}
                   tabindex="0"
-                  role="button"
-                  aria-label={`${bar.venue} ${bar.year}: ${bar.row.papersWithLimitations.toLocaleString()} papers with Limitations (${bar.pct.toFixed(1)}% adopted). Click to toggle ${bar.venue}.`}
+                  role="link"
+                  aria-label={`${bar.venue} ${bar.year}: ${bar.row.papersWithLimitations.toLocaleString()} papers with Limitations (${bar.pct.toFixed(1)}% adopted). Click to explore in Corpus.`}
                 />
               </g>
               <!-- No Limitations (light upper segment) -->
@@ -263,8 +263,8 @@ function exploreUrl(year: number, venue: string) {
                   class="bar-seg no-seg"
                   data-info={tooltipPayload}
                   tabindex="0"
-                  role="button"
-                  aria-label={`${bar.venue} ${bar.year}: ${(bar.row.totalPapers - bar.row.papersWithLimitations).toLocaleString()} papers without Limitations. Click to toggle ${bar.venue}.`}
+                  role="link"
+                  aria-label={`${bar.venue} ${bar.year}: ${(bar.row.totalPapers - bar.row.papersWithLimitations).toLocaleString()} papers without Limitations. Click to explore in Corpus.`}
                 />
               </g>
             </g>
@@ -307,6 +307,7 @@ function exploreUrl(year: number, venue: string) {
             pct: p.pct.toFixed(1),
             failure: p.row.extractionFailures,
             missing: p.row.noExplicitLimitations,
+            exploreUrl: exploreUrl(p.row.year, "acl"),
           });
           return (
             <circle
@@ -318,6 +319,8 @@ function exploreUrl(year: number, venue: string) {
               data-series="acl-line"
               data-info={tooltipPayload}
               tabindex="0"
+              role="link"
+              aria-label={`ACL ${p.row.year}: ${p.pct.toFixed(1)}% adoption. Click to explore in Corpus.`}
             />
           );
         })}
@@ -330,6 +333,7 @@ function exploreUrl(year: number, venue: string) {
             pct: p.pct.toFixed(1),
             failure: p.row.extractionFailures,
             missing: p.row.noExplicitLimitations,
+            exploreUrl: exploreUrl(p.row.year, "emnlp"),
           });
           return (
             <circle
@@ -341,6 +345,8 @@ function exploreUrl(year: number, venue: string) {
               data-series="emnlp-line"
               data-info={tooltipPayload}
               tabindex="0"
+              role="link"
+              aria-label={`EMNLP ${p.row.year}: ${p.pct.toFixed(1)}% adoption. Click to explore in Corpus.`}
             />
           );
         })}
@@ -579,18 +585,25 @@ function exploreUrl(year: number, venue: string) {
       });
     });
 
-    // Bar click toggle
-    const barElements = root.querySelectorAll(".bar-seg");
-    barElements.forEach((bar) => {
-      bar.addEventListener("click", (e) => {
+    // Chart element click: Navigate to Explore corpus for that venue & year
+    const clickableChartElements = root.querySelectorAll(".bar-seg, .line-marker");
+    clickableChartElements.forEach((el) => {
+      el.addEventListener("click", (e) => {
         e.stopPropagation();
-        const dInfo = bar.getAttribute("data-info");
+        const dInfo = el.getAttribute("data-info");
         if (!dInfo) return;
         try {
           const d = JSON.parse(dInfo);
-          const v = d.venue.toLowerCase() as "acl" | "emnlp";
-          toggleConference(v);
+          if (d.exploreUrl) {
+            window.location.href = d.exploreUrl;
+          }
         } catch (err) {}
+      });
+      el.addEventListener("keydown", (e: any) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          el.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        }
       });
     });
 

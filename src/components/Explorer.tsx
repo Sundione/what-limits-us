@@ -148,7 +148,14 @@ export default function Explorer() {
       if (q && !p.title.toLowerCase().includes(q)) return false;
       if (year && p.year !== Number(year)) return false;
       if (venue && p.venue !== venue) return false;
-      if (track && p.track !== track) return false;
+      if (track) {
+        if (track === "main") {
+          // "main" matches all Main conference streams (main, long, short)
+          if (p.track === "findings") return false;
+        } else if (p.track !== track) {
+          return false;
+        }
+      }
       if (codeFilterIndex !== null && !p.codes.includes(codeFilterIndex)) return false;
       if (themeIndices && !p.codes.some((cIdx) => themeIndices.has(cIdx))) return false;
       return true;
@@ -316,13 +323,13 @@ export default function Explorer() {
                 setTrack(val);
                 pushParams({ track: val || null });
               }}
+              title="Filter by publication format / stream"
             >
-              <option value="">All tracks</option>
-              {facets.tracks.map((t) => (
-                <option key={t} value={t}>
-                  {t ? t.toUpperCase() : "(Core)"}
-                </option>
-              ))}
+              <option value="">All formats</option>
+              <option value="main">Main Conference (all)</option>
+              <option value="findings">Findings</option>
+              <option value="long">Main — Long</option>
+              <option value="short">Main — Short</option>
             </select>
 
             {/* Direct Code Selector */}
@@ -430,7 +437,16 @@ export default function Explorer() {
               )}
               {track && (
                 <span class="filter-chip">
-                  Track: {track.toUpperCase()}
+                  Format:{" "}
+                  {track === "main"
+                    ? "Main Conference"
+                    : track === "findings"
+                    ? "Findings"
+                    : track === "long"
+                    ? "Main (Long)"
+                    : track === "short"
+                    ? "Main (Short)"
+                    : track.toUpperCase()}
                   <button type="button" onClick={() => setTrack("")}>
                     ×
                   </button>
@@ -479,7 +495,17 @@ export default function Explorer() {
                         <div class="paper-card-header">
                           <span class={`venue-badge badge-${p.venue}`}>{p.venue.toUpperCase()}</span>
                           <span class="year-badge">{p.year}</span>
-                          {p.track && <span class="track-badge">{p.track.toUpperCase()}</span>}
+                          {p.track && (
+                            <span class={`track-badge track-${p.track}`}>
+                              {p.track === "long"
+                                ? "LONG"
+                                : p.track === "short"
+                                ? "SHORT"
+                                : p.track === "findings"
+                                ? "FINDINGS"
+                                : "MAIN"}
+                            </span>
+                          )}
                         </div>
 
                         <h3 class="paper-card-title">{p.title}</h3>
@@ -719,7 +745,15 @@ function PaperDetailInspector({
           {detail.track && (
             <>
               <span class="meta-sep">·</span>
-              <span class="meta-item track-text">{detail.track.toUpperCase()}</span>
+              <span class="meta-item track-text">
+                {detail.track === "long"
+                  ? "Main (Long Paper)"
+                  : detail.track === "short"
+                  ? "Main (Short Paper)"
+                  : detail.track === "findings"
+                  ? "Findings"
+                  : "Main Conference"}
+              </span>
             </>
           )}
           <span class="meta-sep">·</span>
@@ -845,64 +879,80 @@ function PaperDetailInspector({
                 <div class="sentence-content">
                   <p class="sentence-text">{renderThematicSentence(s.text, marks, activeHoverCode)}</p>
 
-                  {/* Code Badges for this sentence */}
-                  {marks.length > 0 && (
-                    <div class="sentence-chips-row">
-                      {marks.map((m) => {
-                        const isChipActive = activeHoverCode === m.code;
-                        const isBoxOpen = openJustification === `${s.id}:${m.code}`;
+                  {/* Code Badges for this sentence (Deduplicated per code) */}
+                  {(() => {
+                    const uniqueCodeMarks = new Map<string, (typeof marks)[0]>();
+                    for (const m of marks) {
+                      if (!uniqueCodeMarks.has(m.code)) {
+                        uniqueCodeMarks.set(m.code, m);
+                      }
+                    }
+                    const distinctMarks = Array.from(uniqueCodeMarks.values());
+                    if (distinctMarks.length === 0) return null;
 
-                        return (
-                          <div key={m.code} class="code-chip-wrapper">
-                            <button
-                              type="button"
-                              class={`thematic-code-chip ${isChipActive ? "chip-active" : ""}`}
-                              style={{
-                                "--chip-color": m.theme.color,
-                                "--chip-bg": m.theme.bgLight,
-                                "--chip-border": m.theme.borderColor,
-                              }}
-                              onMouseEnter={() => setActiveHoverCode(m.code)}
-                              onMouseLeave={() => setActiveHoverCode(null)}
-                              onClick={() => setOpenJustification(isBoxOpen ? null : `${s.id}:${m.code}`)}
-                            >
-                              <span class="chip-theme-bullet" style={{ backgroundColor: m.theme.color }}></span>
-                              <span class="chip-code-name">{m.code}</span>
-                              {m.origin === "new" && <span class="new-origin-badge">inductive</span>}
-                              {!m.exact && <em class="approx-tag">(approx)</em>}
-                              <span class="expand-icon">{isBoxOpen ? "▲" : "▼"}</span>
-                            </button>
+                    return (
+                      <div class="sentence-chips-row">
+                        {distinctMarks.map((m) => {
+                          const isChipActive = activeHoverCode === m.code;
+                          const isBoxOpen = openJustification === `${s.id}:${m.code}`;
+                          const allCodeJustifications = Array.from(
+                            new Set(marks.filter((x) => x.code === m.code).map((x) => x.justification).filter(Boolean))
+                          );
 
-                            {/* Justification Box */}
-                            {isBoxOpen && (
-                              <div
-                                class="justification-card"
+                          return (
+                            <div key={m.code} class="code-chip-wrapper">
+                              <button
+                                type="button"
+                                class={`thematic-code-chip ${isChipActive ? "chip-active" : ""}`}
                                 style={{
-                                  borderLeftColor: m.theme.color,
+                                  "--chip-color": m.theme.color,
+                                  "--chip-bg": m.theme.bgLight,
+                                  "--chip-border": m.theme.borderColor,
                                 }}
+                                onMouseEnter={() => setActiveHoverCode(m.code)}
+                                onMouseLeave={() => setActiveHoverCode(null)}
+                                onClick={() => setOpenJustification(isBoxOpen ? null : `${s.id}:${m.code}`)}
                               >
-                                <div class="justification-header">
-                                  <span class="justification-theme-tag" style={{ color: m.theme.color }}>
-                                    {m.theme.name}
-                                  </span>
+                                <span class="chip-theme-bullet" style={{ backgroundColor: m.theme.color }}></span>
+                                <span class="chip-code-name">{m.code}</span>
+                                {m.origin === "new" && <span class="new-origin-badge">inductive</span>}
+                                {!m.exact && <em class="approx-tag">(approx)</em>}
+                                <span class="expand-icon">{isBoxOpen ? "▲" : "▼"}</span>
+                              </button>
+
+                              {/* Justification Box */}
+                              {isBoxOpen && (
+                                <div
+                                  class="justification-card"
+                                  style={{
+                                    borderLeftColor: m.theme.color,
+                                  }}
+                                >
+                                  <div class="justification-header">
+                                    <span class="justification-theme-tag" style={{ color: m.theme.color }}>
+                                      {m.theme.name}
+                                    </span>
+                                  </div>
+                                  {allCodeJustifications.map((just, jIdx) => (
+                                    <p key={jIdx} class="justification-text">{just}</p>
+                                  ))}
+                                  <div class="justification-footer">
+                                    <button
+                                      type="button"
+                                      class="link-action-btn"
+                                      onClick={() => onCodeClick(m.code)}
+                                    >
+                                      Filter all papers with "{m.code}" →
+                                    </button>
+                                  </div>
                                 </div>
-                                <p class="justification-text">{m.justification}</p>
-                                <div class="justification-footer">
-                                  <button
-                                    type="button"
-                                    class="link-action-btn"
-                                    onClick={() => onCodeClick(m.code)}
-                                  >
-                                    Filter all papers with "{m.code}" →
-                                  </button>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             );
