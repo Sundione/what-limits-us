@@ -1,11 +1,16 @@
 const PAPER_ID_RE = /^(\d{4})\.([^.]+)\.(\d+)$/;
 
 /**
- * ACL Anthology paper_id is `{year}.{venue-track}.{number}`. The middle token
- * itself is a hyphenated venue+track (e.g. "acl-long", "findings-emnlp",
- * "wassa-1") with no fixed enum across the dataset (15 distinct tokens
- * observed, including small workshop/demo tracks) - split generically on the
- * first hyphen rather than hardcoding a venue list.
+ * ACL Anthology paper_id is `{year}.{venue-track}.{number}`.
+ * The middle token identifies the conference venue and publication format/stream:
+ * - `findings-acl`   -> venue: "acl",   track: "findings"
+ * - `findings-emnlp` -> venue: "emnlp", track: "findings"
+ * - `acl-long`       -> venue: "acl",   track: "long"
+ * - `acl-short`      -> venue: "acl",   track: "short"
+ * - `acl-main`       -> venue: "acl",   track: "main"
+ * - `emnlp-main`     -> venue: "emnlp", track: "main"
+ *
+ * For any unexpected/workshop tokens, gracefully fall back to generic split.
  */
 export function deriveVenueTrack(paperId: string): { year: number; venue: string; track: string } {
   const match = PAPER_ID_RE.exec(paperId);
@@ -13,8 +18,25 @@ export function deriveVenueTrack(paperId: string): { year: number; venue: string
     throw new Error(`paper_id does not match expected ACL Anthology shape: ${paperId}`);
   }
   const [, yearStr, venueTrack] = match;
-  const hyphenIndex = venueTrack.indexOf("-");
-  const venue = hyphenIndex === -1 ? venueTrack : venueTrack.slice(0, hyphenIndex);
-  const track = hyphenIndex === -1 ? "" : venueTrack.slice(hyphenIndex + 1);
+  const token = venueTrack.toLowerCase();
+
+  let venue: string;
+  let track: string;
+
+  if (token.startsWith("findings-")) {
+    venue = token.slice("findings-".length);
+    track = "findings";
+  } else if (token.startsWith("acl-")) {
+    venue = "acl";
+    track = token.slice("acl-".length);
+  } else if (token.startsWith("emnlp-")) {
+    venue = "emnlp";
+    track = token.slice("emnlp-".length);
+  } else {
+    const hyphenIndex = token.indexOf("-");
+    venue = hyphenIndex === -1 ? token : token.slice(0, hyphenIndex);
+    track = hyphenIndex === -1 ? "" : token.slice(hyphenIndex + 1);
+  }
+
   return { year: Number(yearStr), venue, track };
 }

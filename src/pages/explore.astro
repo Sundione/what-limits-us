@@ -386,10 +386,22 @@ import { paper } from "../data/paper";
   }
   .track-badge {
     color: var(--color-muted);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
+    font-weight: 600;
     padding: 0.1rem 0.35rem;
     border-radius: 4px;
-    background: color-mix(in srgb, var(--color-border) 50%, transparent);
+    letter-spacing: 0.02em;
+    background: color-mix(in srgb, var(--color-border) 60%, transparent);
+  }
+  .track-badge.track-findings {
+    background: rgba(124, 58, 237, 0.1);
+    color: #7c3aed;
+  }
+  .track-badge.track-main,
+  .track-badge.track-long,
+  .track-badge.track-short {
+    background: rgba(30, 41, 59, 0.08);
+    color: var(--color-text);
   }
 
   .paper-card-title {

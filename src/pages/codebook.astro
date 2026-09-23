@@ -1,10 +1,78 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import ComingSoon from "../components/ComingSoon.astro";
+import CodebookExplorer from "../components/CodebookExplorer";
+import "../styles/codebook.css";
 ---
-<BaseLayout title="Codebook — NLP Limitations">
-  <ComingSoon
-    title="Codebook"
-    blurb="A browsable version-diff of all 50 limitation codes — which codes were added at each codebook version (25 → 47 → 48 → 50), with definitions and a real example evidence span for each."
-  />
+
+<BaseLayout
+  title="Codebook Taxonomy & Evolution — NLP Limitations"
+  description="Comprehensive browsable taxonomy of all 50 limitation and non-limitation codes across 4 iterative expansion rounds (25 → 47 → 47 → 48 → 50), with definitions, expansion highlights, and exemplary evidence units."
+>
+  <div class="codebook-page-header">
+    <div class="header-breadcrumbs">
+      <a href={import.meta.env.BASE_URL}>Overview</a>
+      <span class="sep">/</span>
+      <span class="current">Codebook</span>
+    </div>
+    <h1 class="page-title">Taxonomy &amp; Codebook Evolution</h1>
+    <p class="page-intro">
+      Our 50-code taxonomy was inductively developed through 4 corpus iterations on 16,047 ACL and EMNLP papers (2020–2025).
+      Explore the complete definitions, trace how and when clauses were additively integrated under the <em>Structured Expansion Principle</em>,
+      and inspect exemplary semantic units from published papers.
+    </p>
+  </div>
+
+  <CodebookExplorer client:load />
 </BaseLayout>
+
+<style>
+  .codebook-page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .header-breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .header-breadcrumbs a {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .header-breadcrumbs a:hover {
+    text-decoration: underline;
+  }
+
+  .header-breadcrumbs .sep {
+    color: #cbd5e1;
+  }
+
+  .header-breadcrumbs .current {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .page-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.75rem 0;
+    color: var(--color-text);
+  }
+
+  .page-intro {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+    margin: 0;
+    max-width: 900px;
+  }
+</style>
