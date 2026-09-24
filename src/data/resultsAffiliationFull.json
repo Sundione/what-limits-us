@@ -1,0 +1,727 @@
+[
+  {
+    "code": "Scope Limitation",
+    "largePct": 56.6,
+    "largeCi": [
+      52.8,
+      60.4
+    ],
+    "nonLargePct": 63.6,
+    "nonLargeCi": [
+      62.7,
+      64.5
+    ],
+    "diff": -6.963,
+    "oddsRatio": 0.748,
+    "adjP": 0.019,
+    "significant": true,
+    "category": "higher-in-academia",
+    "mixedPct": 61.6
+  },
+  {
+    "code": "High Time Consumption",
+    "largePct": 11.9,
+    "largeCi": [
+      9.6,
+      14.6
+    ],
+    "nonLargePct": 8.8,
+    "nonLargeCi": [
+      8.2,
+      9.3
+    ],
+    "diff": 3.103,
+    "oddsRatio": 1.402,
+    "adjP": 0.135,
+    "significant": false,
+    "category": "higher-in-bigtech",
+    "mixedPct": 9.4
+  },
+  {
+    "code": "Data Scarcity",
+    "largePct": 9.8,
+    "largeCi": [
+      7.8,
+      12.4
+    ],
+    "nonLargePct": 13.4,
+    "nonLargeCi": [
+      12.8,
+      14.1
+    ],
+    "diff": -3.593,
+    "oddsRatio": 0.703,
+    "adjP": 0.135,
+    "significant": false,
+    "category": "higher-in-academia",
+    "mixedPct": 10.6
+  },
+  {
+    "code": "Reliance on Automatic Metrics",
+    "largePct": 5.3,
+    "largeCi": [
+      3.8,
+      7.3
+    ],
+    "nonLargePct": 3.4,
+    "nonLargeCi": [
+      3.1,
+      3.7
+    ],
+    "diff": 1.914,
+    "oddsRatio": 1.596,
+    "adjP": 0.145,
+    "significant": false,
+    "category": "higher-in-bigtech"
+  },
+  {
+    "code": "Empirical Underperformance",
+    "largePct": 9.0,
+    "largeCi": [
+      7.1,
+      11.5
+    ],
+    "nonLargePct": 6.9,
+    "nonLargeCi": [
+      6.4,
+      7.3
+    ],
+    "diff": 2.188,
+    "oddsRatio": 1.351,
+    "adjP": 0.293,
+    "significant": false,
+    "category": "higher-in-bigtech",
+    "mixedPct": 7.5
+  },
+  {
+    "code": "Subjectivity in Evaluation/Annotation",
+    "largePct": 3.9,
+    "largeCi": [
+      2.7,
+      5.7
+    ],
+    "nonLargePct": 5.8,
+    "nonLargeCi": [
+      5.4,
+      6.3
+    ],
+    "diff": -1.939,
+    "oddsRatio": 0.655,
+    "adjP": 0.293,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Low Data Quality",
+    "largePct": 6.2,
+    "largeCi": [
+      4.6,
+      8.4
+    ],
+    "nonLargePct": 8.4,
+    "nonLargeCi": [
+      7.9,
+      8.9
+    ],
+    "diff": -2.117,
+    "oddsRatio": 0.73,
+    "adjP": 0.369,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Environmental Impact",
+    "largePct": 1.1,
+    "largeCi": [
+      0.5,
+      2.2
+    ],
+    "nonLargePct": 0.6,
+    "nonLargeCi": [
+      0.4,
+      0.7
+    ],
+    "diff": 0.52,
+    "oddsRatio": 1.918,
+    "adjP": 0.54,
+    "significant": false,
+    "category": "higher-in-bigtech"
+  },
+  {
+    "code": "Methodological Constraints",
+    "largePct": 42.9,
+    "largeCi": [
+      39.1,
+      46.8
+    ],
+    "nonLargePct": 39.9,
+    "nonLargeCi": [
+      39.0,
+      40.8
+    ],
+    "diff": 3.043,
+    "oddsRatio": 1.134,
+    "adjP": 0.571,
+    "significant": false,
+    "category": "higher-in-bigtech",
+    "mixedPct": 38.8
+  },
+  {
+    "code": "Hyperparameter Sensitivity",
+    "largePct": 3.6,
+    "largeCi": [
+      2.4,
+      5.3
+    ],
+    "nonLargePct": 2.7,
+    "nonLargeCi": [
+      2.4,
+      3.0
+    ],
+    "diff": 0.902,
+    "oddsRatio": 1.348,
+    "adjP": 0.571,
+    "significant": false,
+    "category": "higher-in-bigtech"
+  },
+  {
+    "code": "Model Reasoning and Generation Deficits",
+    "largePct": 3.3,
+    "largeCi": [
+      2.2,
+      5.0
+    ],
+    "nonLargePct": 4.5,
+    "nonLargeCi": [
+      4.1,
+      4.9
+    ],
+    "diff": -1.206,
+    "oddsRatio": 0.722,
+    "adjP": 0.571,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Dataset Bias/Imbalance",
+    "largePct": 9.2,
+    "largeCi": [
+      7.2,
+      11.7
+    ],
+    "nonLargePct": 11.0,
+    "nonLargeCi": [
+      10.4,
+      11.6
+    ],
+    "diff": -1.804,
+    "oddsRatio": 0.82,
+    "adjP": 0.571,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Dataset Task Mismatch",
+    "largePct": 0.2,
+    "largeCi": [
+      0.0,
+      0.9
+    ],
+    "nonLargePct": 0.0,
+    "nonLargeCi": [
+      0.0,
+      0.1
+    ],
+    "diff": 0.121,
+    "oddsRatio": 4.434,
+    "adjP": 0.574,
+    "significant": false,
+    "category": "higher-in-bigtech"
+  },
+  {
+    "code": "Temporal Degradation",
+    "largePct": 1.7,
+    "largeCi": [
+      1.0,
+      3.0
+    ],
+    "nonLargePct": 2.5,
+    "nonLargeCi": [
+      2.3,
+      2.8
+    ],
+    "diff": -0.82,
+    "oddsRatio": 0.671,
+    "adjP": 0.574,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Theoretical Gap",
+    "largePct": 3.6,
+    "largeCi": [
+      2.4,
+      5.3
+    ],
+    "nonLargePct": 4.6,
+    "nonLargeCi": [
+      4.3,
+      5.0
+    ],
+    "diff": -1.053,
+    "oddsRatio": 0.765,
+    "adjP": 0.574,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Resource Accessibility Barriers",
+    "largePct": 2.8,
+    "largeCi": [
+      1.8,
+      4.4
+    ],
+    "nonLargePct": 3.9,
+    "nonLargeCi": [
+      3.6,
+      4.3
+    ],
+    "diff": -1.093,
+    "oddsRatio": 0.712,
+    "adjP": 0.574,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Measurement Vulnerabilities",
+    "largePct": 5.3,
+    "largeCi": [
+      3.8,
+      7.3
+    ],
+    "nonLargePct": 6.6,
+    "nonLargeCi": [
+      6.2,
+      7.1
+    ],
+    "diff": -1.327,
+    "oddsRatio": 0.789,
+    "adjP": 0.574,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Lack of Reliable Evaluation Metrics or Benchmarks",
+    "largePct": 3.4,
+    "largeCi": [
+      2.3,
+      5.1
+    ],
+    "nonLargePct": 4.4,
+    "nonLargeCi": [
+      4.1,
+      4.8
+    ],
+    "diff": -1.006,
+    "oddsRatio": 0.765,
+    "adjP": 0.61,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "High Financial Cost",
+    "largePct": 7.2,
+    "largeCi": [
+      5.4,
+      9.4
+    ],
+    "nonLargePct": 6.2,
+    "nonLargeCi": [
+      5.8,
+      6.7
+    ],
+    "diff": 0.976,
+    "oddsRatio": 1.17,
+    "adjP": 0.622,
+    "significant": false,
+    "category": "higher-in-bigtech"
+  },
+  {
+    "code": "Performance Trade-off",
+    "largePct": 4.1,
+    "largeCi": [
+      2.8,
+      5.9
+    ],
+    "nonLargePct": 3.3,
+    "nonLargeCi": [
+      3.0,
+      3.6
+    ],
+    "diff": 0.754,
+    "oddsRatio": 1.238,
+    "adjP": 0.622,
+    "significant": false,
+    "category": "higher-in-bigtech"
+  },
+  {
+    "code": "Bias and Fairness Risks",
+    "largePct": 3.4,
+    "largeCi": [
+      2.3,
+      5.1
+    ],
+    "nonLargePct": 2.8,
+    "nonLargeCi": [
+      2.5,
+      3.1
+    ],
+    "diff": 0.64,
+    "oddsRatio": 1.238,
+    "adjP": 0.622,
+    "significant": false,
+    "category": "higher-in-bigtech"
+  },
+  {
+    "code": "Data Leakage/Contamination",
+    "largePct": 2.3,
+    "largeCi": [
+      1.4,
+      3.8
+    ],
+    "nonLargePct": 1.8,
+    "nonLargeCi": [
+      1.6,
+      2.1
+    ],
+    "diff": 0.508,
+    "oddsRatio": 1.284,
+    "adjP": 0.634,
+    "significant": false,
+    "category": "higher-in-bigtech"
+  },
+  {
+    "code": "Reliance on External Tools or Resources",
+    "largePct": 4.2,
+    "largeCi": [
+      2.9,
+      6.1
+    ],
+    "nonLargePct": 5.1,
+    "nonLargeCi": [
+      4.8,
+      5.6
+    ],
+    "diff": -0.931,
+    "oddsRatio": 0.811,
+    "adjP": 0.634,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "High Data Requirement",
+    "largePct": 1.7,
+    "largeCi": [
+      1.0,
+      3.0
+    ],
+    "nonLargePct": 1.4,
+    "nonLargeCi": [
+      1.2,
+      1.7
+    ],
+    "diff": 0.298,
+    "oddsRatio": 1.214,
+    "adjP": 0.774,
+    "significant": false,
+    "category": "higher-in-bigtech"
+  },
+  {
+    "code": "Real-World Deployment Barrier",
+    "largePct": 6.6,
+    "largeCi": [
+      4.9,
+      8.7
+    ],
+    "nonLargePct": 7.4,
+    "nonLargeCi": [
+      6.9,
+      7.9
+    ],
+    "diff": -0.863,
+    "oddsRatio": 0.876,
+    "adjP": 0.774,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Generalization Gap",
+    "largePct": 14.7,
+    "largeCi": [
+      12.1,
+      17.6
+    ],
+    "nonLargePct": 15.7,
+    "nonLargeCi": [
+      15.0,
+      16.4
+    ],
+    "diff": -1.038,
+    "oddsRatio": 0.923,
+    "adjP": 0.774,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Model Hallucination/Incoherence",
+    "largePct": 2.0,
+    "largeCi": [
+      1.2,
+      3.4
+    ],
+    "nonLargePct": 2.5,
+    "nonLargeCi": [
+      2.2,
+      2.8
+    ],
+    "diff": -0.447,
+    "oddsRatio": 0.816,
+    "adjP": 0.887,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Lack of Interpretability",
+    "largePct": 1.6,
+    "largeCi": [
+      0.8,
+      2.8
+    ],
+    "nonLargePct": 1.9,
+    "nonLargeCi": [
+      1.7,
+      2.2
+    ],
+    "diff": -0.342,
+    "oddsRatio": 0.817,
+    "adjP": 0.934,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Privacy and Security Risks",
+    "largePct": 1.2,
+    "largeCi": [
+      0.6,
+      2.4
+    ],
+    "nonLargePct": 1.1,
+    "nonLargeCi": [
+      0.9,
+      1.3
+    ],
+    "diff": 0.165,
+    "oddsRatio": 1.154,
+    "adjP": 0.957,
+    "significant": false,
+    "category": "higher-in-bigtech"
+  },
+  {
+    "code": "Reproducibility Gap",
+    "largePct": 1.2,
+    "largeCi": [
+      0.6,
+      2.4
+    ],
+    "nonLargePct": 1.2,
+    "nonLargeCi": [
+      1.0,
+      1.4
+    ],
+    "diff": 0.086,
+    "oddsRatio": 1.075,
+    "adjP": 0.958,
+    "significant": false,
+    "category": "equal"
+  },
+  {
+    "code": "Toxicity Risks",
+    "largePct": 0.8,
+    "largeCi": [
+      0.3,
+      1.8
+    ],
+    "nonLargePct": 0.7,
+    "nonLargeCi": [
+      0.6,
+      0.9
+    ],
+    "diff": 0.032,
+    "oddsRatio": 1.042,
+    "adjP": 0.958,
+    "significant": false,
+    "category": "equal"
+  },
+  {
+    "code": "Literature Coverage Gap",
+    "largePct": 0.5,
+    "largeCi": [
+      0.2,
+      1.4
+    ],
+    "nonLargePct": 0.6,
+    "nonLargeCi": [
+      0.5,
+      0.8
+    ],
+    "diff": -0.157,
+    "oddsRatio": 0.747,
+    "adjP": 0.958,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Prompt Sensitivity",
+    "largePct": 1.9,
+    "largeCi": [
+      1.1,
+      3.2
+    ],
+    "nonLargePct": 2.1,
+    "nonLargeCi": [
+      1.8,
+      2.3
+    ],
+    "diff": -0.18,
+    "oddsRatio": 0.911,
+    "adjP": 0.958,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Potential for Misuse",
+    "largePct": 1.4,
+    "largeCi": [
+      0.7,
+      2.6
+    ],
+    "nonLargePct": 1.6,
+    "nonLargeCi": [
+      1.4,
+      1.8
+    ],
+    "diff": -0.181,
+    "oddsRatio": 0.884,
+    "adjP": 0.958,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Societal and Ethical Risks",
+    "largePct": 1.2,
+    "largeCi": [
+      0.6,
+      2.4
+    ],
+    "nonLargePct": 1.5,
+    "nonLargeCi": [
+      1.3,
+      1.7
+    ],
+    "diff": -0.258,
+    "oddsRatio": 0.827,
+    "adjP": 0.958,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "High Resource Requirements",
+    "largePct": 19.3,
+    "largeCi": [
+      16.5,
+      22.6
+    ],
+    "nonLargePct": 19.7,
+    "nonLargeCi": [
+      19.0,
+      20.4
+    ],
+    "diff": -0.347,
+    "oddsRatio": 0.978,
+    "adjP": 0.958,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Human Labor and Annotation Bottleneck",
+    "largePct": 5.1,
+    "largeCi": [
+      3.7,
+      7.1
+    ],
+    "nonLargePct": 5.5,
+    "nonLargeCi": [
+      5.1,
+      5.9
+    ],
+    "diff": -0.356,
+    "oddsRatio": 0.932,
+    "adjP": 0.958,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Scalability Bottleneck",
+    "largePct": 4.4,
+    "largeCi": [
+      3.0,
+      6.2
+    ],
+    "nonLargePct": 4.6,
+    "nonLargeCi": [
+      4.2,
+      5.0
+    ],
+    "diff": -0.185,
+    "oddsRatio": 0.958,
+    "adjP": 0.971,
+    "significant": false,
+    "category": "higher-in-academia"
+  },
+  {
+    "code": "Dependency on Upstream Quality",
+    "largePct": 16.1,
+    "largeCi": [
+      13.4,
+      19.1
+    ],
+    "nonLargePct": 16.1,
+    "nonLargeCi": [
+      15.4,
+      16.8
+    ],
+    "diff": 0.005,
+    "oddsRatio": 1.0,
+    "adjP": 1.0,
+    "significant": false,
+    "category": "equal"
+  },
+  {
+    "code": "Sparse Data Sensitivity",
+    "largePct": 0.0,
+    "largeCi": [
+      0.0,
+      0.6
+    ],
+    "nonLargePct": 0.0,
+    "nonLargeCi": [
+      0.0,
+      0.1
+    ],
+    "diff": -0.018,
+    "oddsRatio": 0.0,
+    "adjP": 1.0,
+    "significant": false,
+    "category": "equal"
+  }
+]
