@@ -1,119 +1,130 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PrevalenceChart from "../components/PrevalenceChart.astro";
+import TemporalHeroChart from "../components/results/TemporalHeroChart";
+import AreaAndAffiliation from "../components/results/AreaAndAffiliation";
+import DiscursiveSandwich from "../components/results/DiscursiveSandwich";
+import "../styles/results.css";
 ---
 
-<BaseLayout title="Results — NLP Limitations">
-  <h1>Results &amp; Findings</h1>
-  <p class="intro">
-    Empirical findings from analyzing 16,047 ACL and EMNLP papers (2020–2025)
-    and their self-reported limitations using our iterative hybrid coding pipeline.
-  </p>
+<BaseLayout 
+  title="Results & Findings — NLP Limitations"
+  description="Empirical findings from analyzing 16,047 ACL and EMNLP papers (2020–2025): temporal trends, policy divergence, subfield homogeneity, and discursive patterns."
+>
+  {/* Sticky Sub-Navigation Stepper */}
+  <div class="results-subnav-sticky">
+    <div class="results-subnav-inner">
+      <div class="subnav-links" role="tablist">
+        <a href="#overview" class="subnav-link">
+          <span>Overview</span>
+        </a>
+        <a href="#temporal-rq1" class="subnav-link">
+          <span>RQ1: Temporal Trends</span>
+        </a>
+        <a href="#attributes-rq2" class="subnav-link">
+          <span>RQ2: Area &amp; Affiliation</span>
+        </a>
+        <a href="#discursive-rq3" class="subnav-link">
+          <span>RQ3: Discursive Patterns</span>
+        </a>
+      </div>
+      <span class="subnav-corpus-badge">16,047 Papers (2020–2025)</span>
+    </div>
+  </div>
 
-  <section class="results-section">
-    <h2>Most common limitations</h2>
-    <p class="section-desc">
-      Distribution of limitation codes across all 16,047 papers. Authors frequently report
-      methodological constraints and scope limitations, but also use the section for rhetorical
-      purposes (e.g. framing future work or contextualizing achievements).
-    </p>
-    <PrevalenceChart />
-  </section>
-
-  <section class="results-section upcoming-section">
-    <h2>Temporal trends (RQ1)</h2>
-    <div class="card">
-      <span class="badge-upcoming">In preparation</span>
-      <h3>The 2022 Policy Divergence</h3>
-      <p>
-        Before late 2022, <em>Methodological Constraints</em> was the predominant code.
-        Following mandatory policy adoption at EMNLP 2022 and ACL 2023, <em>Scope Limitation</em>
-        surged past 65%, with the two codes swapping ranks almost exactly at the policy boundary.
+  <div class="results-page-container">
+    {/* Page Header */}
+    <div class="page-intro-header">
+      <div class="section-tag-row">
+        <span class="section-kpi-badge">Empirical Findings</span>
+        <span class="section-corpus-pill">ACL &amp; EMNLP 2020–2025</span>
+      </div>
+      <h1 class="page-main-title">Results &amp; Findings</h1>
+      <p class="intro">
+        Empirical analysis of self-reported limitations across 16,047 papers from ACL and EMNLP (2020–2025). 
+        We investigate how publication policies shaped disclosure practices (RQ1), whether reported limitations 
+        correlate with paper attributes and affiliations (RQ2), and how researchers sequence and discursively frame their findings (RQ3).
       </p>
     </div>
-  </section>
 
-  <section class="results-section upcoming-section">
-    <h2>Track &amp; Affiliation Patterns (RQ2)</h2>
-    <div class="card">
-      <span class="badge-upcoming">In preparation</span>
-      <h3>Field-Wide Homogeneity &amp; Affiliation Differences</h3>
-      <p>
-        Despite diverse research areas, a chi-square test of homogeneity reveals that limitation reporting
-        is remarkably uniform across 29 tracks (&chi;&sup2;(1,092) = 2,872, p &lt; 0.001, Cram&eacute;r's V = 0.071).
-        Meanwhile, corporate vs. non-corporate affiliations show notable differences in resource constraint disclosures.
-      </p>
+    {/* KPI Summary Cards */}
+    <div class="results-kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-tag">Analyzed Corpus</span>
+        <span class="kpi-val">16,047</span>
+        <span class="kpi-sub">7,044 ACL &amp; 9,003 EMNLP papers analyzed across 4 iterative coding rounds</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-tag">Taxonomy Breadth</span>
+        <span class="kpi-val">50 Codes</span>
+        <span class="kpi-sub">40 Limitation codes across 5 themes + 10 Non-Limitation discursive codes</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-tag">Reporting Density</span>
+        <span class="kpi-val">1.63 &rarr; 3.02</span>
+        <span class="kpi-sub">Average codes per paper grew ~85% while median section length stabilized (~139 words)</span>
+      </div>
     </div>
-  </section>
 
-  <section class="results-section upcoming-section">
-    <h2>Inter-annotator Agreement</h2>
-    <div class="card">
-      <span class="badge-upcoming">In preparation</span>
-      <h3>Per-Code Reliability Breakdown</h3>
-      <p>
-        Full per-code Krippendorff's &alpha; breakdown across all 50 codes on the 150-paper
-        human-annotated reference benchmark, comparing inter-human baseline with model-augmented consensus.
-      </p>
-    </div>
-  </section>
+    {/* Section 1: Most Common Limitations (Corpus Baseline) */}
+    <section class="results-section" id="overview">
+      <div class="section-lead-header">
+        <div class="section-tag-row">
+          <span class="section-kpi-badge">Baseline Distribution</span>
+          <span class="section-corpus-pill">Corpus-Wide Prevalence</span>
+        </div>
+        <h2 class="results-subheading">Most Common Limitations Across the Corpus</h2>
+        <p class="section-desc">
+          Distribution of limitation codes across all 16,047 papers. Authors frequently report
+          methodological constraints and scope limitations, but also use the section for broader discursive
+          functions (e.g., framing future work or contextualizing achievements).
+        </p>
+      </div>
+      <PrevalenceChart />
+    </section>
+
+    {/* Section 2: RQ1 — Temporal Trends & The 2022 Policy Divergence */}
+    <section class="results-section" id="temporal-rq1">
+      <TemporalHeroChart client:load />
+    </section>
+
+    {/* Section 3: RQ2 — Area Homogeneity & Corporate Disclosures */}
+    <section class="results-section" id="attributes-rq2">
+      <AreaAndAffiliation client:visible />
+    </section>
+
+    {/* Section 4: RQ3 — Discursive Patterns & Contextual Sequencing */}
+    <section class="results-section" id="discursive-rq3">
+      <DiscursiveSandwich client:visible />
+    </section>
+  </div>
 </BaseLayout>
 
 <style>
-  .intro {
-    color: var(--color-muted);
-    font-size: 1.05rem;
-    line-height: 1.5;
+  .results-page-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding-bottom: 4rem;
+  }
+
+  .page-intro-header {
     margin-bottom: 2rem;
   }
 
-  .results-section {
-    margin: 2.5rem 0;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--color-border);
+  .page-main-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--color-text);
+    letter-spacing: -0.03em;
+    margin: 0.35rem 0 0.75rem;
+    line-height: 1.15;
   }
 
-  .results-section:last-of-type {
-    border-bottom: none;
-  }
-
-  .section-desc {
+  .intro {
     color: var(--color-muted);
-    font-size: 0.95rem;
-    line-height: 1.5;
-    margin-bottom: 1.25rem;
-  }
-
-  .upcoming-section .card {
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    padding: 1.25rem 1.5rem;
-    background: color-mix(in srgb, var(--color-border) 15%, transparent);
-    margin-top: 0.75rem;
-  }
-
-  .badge-upcoming {
-    display: inline-block;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 600;
-    color: var(--color-muted);
-    background: color-mix(in srgb, var(--color-border) 40%, transparent);
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-  }
-
-  .card h3 {
-    margin: 0.25rem 0 0.5rem;
-    font-size: 1.1rem;
-  }
-
-  .card p {
-    margin: 0;
-    color: var(--color-muted);
-    font-size: 0.9rem;
-    line-height: 1.5;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    max-width: 860px;
+    margin-bottom: 0;
   }
 </style>

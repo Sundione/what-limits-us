@@ -135,7 +135,13 @@ export default function Explorer() {
 
   const codeFilterIndex = useMemo(() => {
     if (!index || !codeFilter) return null;
-    const i = index.codes.indexOf(codeFilter);
+    let i = index.codes.indexOf(codeFilter);
+    if (i === -1) {
+      i = index.codes.indexOf(`Non-Limitation: ${codeFilter}`);
+    }
+    if (i === -1) {
+      i = index.codes.findIndex((c) => c.toLowerCase() === codeFilter.toLowerCase());
+    }
     return i === -1 ? null : i;
   }, [index, codeFilter]);
 
@@ -147,7 +153,7 @@ export default function Explorer() {
     return index.papers.filter((p) => {
       if (q && !p.title.toLowerCase().includes(q)) return false;
       if (year && p.year !== Number(year)) return false;
-      if (venue && p.venue !== venue) return false;
+      if (venue && p.venue.toLowerCase() !== venue.toLowerCase()) return false;
       if (track) {
         if (track === "main") {
           // "main" matches all Main conference streams (main, long, short)
