@@ -2,7 +2,6 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import LinkBar from "../components/LinkBar.astro";
 import BibtexBlock from "../components/BibtexBlock.astro";
-import MethodologyFigure from "../components/MethodologyFigure.astro";
 import LimitationPresenceChart from "../components/LimitationPresenceChart.astro";
 import LiveAnnotationDemo from "../components/LiveAnnotationDemo.astro";
 import { authors, affiliations, paper } from "../data/paper";
@@ -41,39 +40,86 @@ import { authors, affiliations, paper } from "../data/paper";
     <p class="tldr-text">
       This paper analyzed Limitations sections from <strong>16,067 ACL and EMNLP papers</strong> to understand their trends over time, their correlations with paper attributes, and the rhetorical strategies researchers use to present them.
     </p>
+    <details class="abstract-details">
+      <summary>Read the full abstract</summary>
+      <p>{paper.abstract}</p>
+    </details>
   </div>
 
-  <h2>Abstract</h2>
-  <p>{paper.abstract}</p>
+  <h2>What we found</h2>
+  <div class="findings-grid">
+    <article class="finding-card">
+      <span class="finding-rq">RQ1 · Over time</span>
+      <h3 class="finding-question">How have reported limitations changed?</h3>
+      <p class="finding-number">31% &rarr; 66%</p>
+      <p class="finding-answer">
+        <strong>Scope Limitation</strong> (explicitly bounding what a study covers) rose from 31% of papers in 2020
+        to 66% in 2025, overtaking Methodological Constraints around the time the section became mandatory.
+        This is a temporal association; the paper does not claim the policy caused it.
+      </p>
+      <div class="finding-links">
+        <a href={`${import.meta.env.BASE_URL}results#temporal-rq1`}>See the trend &rarr;</a>
+        <a href={`${import.meta.env.BASE_URL}explore?code=Scope%20Limitation&sort=newest`}>Read examples &rarr;</a>
+      </div>
+    </article>
 
-  <h2>Methodology</h2>
+    <article class="finding-card">
+      <span class="finding-rq">RQ2 · Across the field</span>
+      <h3 class="finding-question">Do subfields and institutions differ?</h3>
+      <p class="finding-number">~97% alike</p>
+      <p class="finding-answer">
+        Mostly not: about 97% of (research area, limitation) pairs match the field-wide average.
+        One clear difference: papers without large-company authors report Scope Limitation more often
+        (63.6% vs. 56.6%).
+      </p>
+      <div class="finding-links">
+        <a href={`${import.meta.env.BASE_URL}results#attributes-rq2`}>See the comparison &rarr;</a>
+      </div>
+    </article>
+
+    <article class="finding-card">
+      <span class="finding-rq">RQ3 · How it is written</span>
+      <h3 class="finding-question">How do authors frame a limitation?</h3>
+      <p class="finding-number">40% &rarr; future work</p>
+      <p class="finding-answer">
+        A limitation is often followed directly by future work (40.2% of transitions, vs. 32.8% expected by chance).
+        In 2025, 90 papers had a Limitations section with only non-limitation statements, such as future-work plans.
+      </p>
+      <div class="finding-links">
+        <a href={`${import.meta.env.BASE_URL}results#discursive-rq3`}>See the patterns &rarr;</a>
+        <a href={`${import.meta.env.BASE_URL}explore?after=Future%20Work`}>Read real examples &rarr;</a>
+      </div>
+    </article>
+  </div>
+
+  <form class="find-paper" action={`${import.meta.env.BASE_URL}explore`} method="get" role="search">
+    <label for="find-paper-q" class="find-paper-label">Published at ACL or EMNLP since 2020? See how your own Limitations section was coded.</label>
+    <div class="find-paper-row">
+      <input id="find-paper-q" name="q" type="search" placeholder="Paste your paper's title…" required />
+      <button type="submit">Find my paper</button>
+    </div>
+  </form>
+
+  <h2>Why there are 16,000 sections to study</h2>
   <p>
-    A human-AI pipeline alternates between an LLM proposing codes for each
-    sentence and a researcher reviewing any genuinely new category it
-    surfaces. Hover a stage of the actual pipeline figure for details:
+    A Limitations section was optional until EMNLP 2022 and ACL 2023 made it
+    mandatory. Adoption jumped almost immediately from single digits to
+    effectively 100%:
   </p>
-  <MethodologyFigure />
-  <p class="section-cta">
-    <a href={`${import.meta.env.BASE_URL}methodology`}>Full methodology walkthrough &rarr;</a>
+  <LimitationPresenceChart />
+
+  <h2>How we know</h2>
+  <p>
+    An LLM coded every sentence of all 16,047 sections against a shared codebook, proposing a new code whenever nothing fit;
+    researchers reviewed each proposal before it joined the codebook, which grew from 25 to 50 codes. Two real sentences from the dataset:
   </p>
 
   <LiveAnnotationDemo />
 
-  <h2>Dataset</h2>
+  <h3>Can we trust the LLM's coding?</h3>
   <p>
-    This site's <a href={`${import.meta.env.BASE_URL}explore`}>explorer</a> covers
-    the <strong>16,047-paper LLM-coded dataset</strong> — every ACL/EMNLP main and
-    Findings paper (2020–2025) with a Limitations section, coded with sentence-level
-    evidence spans and justifications.
-  </p>
-
-  <h3>Inter-annotator agreement</h3>
-  <p>
-    To make sure the LLM's coding is trustworthy, it was validated against a
-    separate <strong>150-paper reference set</strong> independently coded by
-    four expert human annotators (that reference set isn't separately
-    browsable here, since a few of its papers come from small workshop
-    tracks outside this site's ACL/EMNLP main+Findings scope).
+    It was checked against a separate <strong>150-paper reference set</strong> independently coded by
+    four expert human annotators. Adding the LLM as a fifth coder barely changes agreement:
   </p>
   <p class="iaa-numbers">
     <span class="badge badge-human">
@@ -97,34 +143,15 @@ import { authors, affiliations, paper } from "../data/paper";
     </span>
     <strong>α = 0.647</strong>
   </p>
-  <p>
-    Agreement barely changes when the LLM is added as a fifth coder — the
-    basis for treating its coding of the remaining ~16,000 papers as
-    reliable.
-  </p>
   <p class="section-cta">
-    <a href={`${import.meta.env.BASE_URL}results`}>See the full per-code agreement breakdown &rarr;</a>
+    <a href={`${import.meta.env.BASE_URL}methodology`}>The full pipeline, worked examples &amp; per-code agreement &rarr;</a>
   </p>
 
-  <h2>Results</h2>
-
-  <h3>Limitations section adoption</h3>
-  <p>
-    A Limitations section was optional until EMNLP 2022 and ACL 2023 made it
-    mandatory. Adoption jumped almost immediately from single digits to
-    effectively 100%:
-  </p>
-  <LimitationPresenceChart />
-
-  <p class="section-cta">
-    <a href={`${import.meta.env.BASE_URL}results`}>Full results: most common limitations, temporal trends &amp; homogeneity &rarr;</a>
-  </p>
-
-  <h2>Citation</h2>
+  <h2 id="citation">Citation</h2>
   <BibtexBlock />
 
   <p class="cta">
-    <a href={`${import.meta.env.BASE_URL}explore`}>Explore the dataset &rarr;</a>
+    <a class="cta-btn" href={`${import.meta.env.BASE_URL}explore`}>Explore all 16,047 papers &rarr;</a>
   </p>
 </BaseLayout>
 
@@ -240,4 +267,124 @@ import { authors, affiliations, paper } from "../data/paper";
   .iaa-arrow { color: var(--color-muted); }
   .section-cta { font-weight: 600; }
   .cta { margin-top: 2rem; font-size: 1.05rem; font-weight: 600; }
+
+  .abstract-details {
+    margin-top: 0.6rem;
+    font-size: 0.92rem;
+  }
+  .abstract-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #0369a1;
+  }
+  .abstract-details p {
+    margin: 0.6rem 0 0;
+    color: #1e293b;
+    line-height: 1.6;
+  }
+
+  .findings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0 1.5rem;
+  }
+  .finding-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.1rem 1.2rem;
+    border: 1px solid var(--color-border);
+    border-top: 4px solid #2563eb;
+    border-radius: 10px;
+    background: var(--color-bg);
+  }
+  .finding-rq {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #2563eb;
+  }
+  .finding-question {
+    margin: 0.35rem 0 0.4rem;
+    font-size: 1.05rem;
+  }
+  .finding-number {
+    margin: 0 0 0.4rem;
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+  }
+  .finding-answer {
+    margin: 0 0 0.8rem;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--color-muted);
+  }
+  .finding-links {
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+  .finding-links a {
+    text-decoration: none;
+  }
+  .finding-links a:hover {
+    text-decoration: underline;
+  }
+
+  .find-paper {
+    margin: 0 0 1rem;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+  }
+  .find-paper-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+  .find-paper-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .find-paper-row input {
+    flex: 1;
+    min-width: 0;
+    font: inherit;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    background: #ffffff;
+  }
+  .find-paper-row button {
+    font: inherit;
+    font-weight: 600;
+    padding: 0.55rem 1rem;
+    border: 0;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #ffffff;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .find-paper-row button:hover {
+    background: #1d4ed8;
+  }
+  .cta-btn {
+    display: inline-block;
+    padding: 0.65rem 1.2rem;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #ffffff;
+    text-decoration: none;
+  }
+  .cta-btn:hover {
+    background: #1d4ed8;
+  }
 </style>

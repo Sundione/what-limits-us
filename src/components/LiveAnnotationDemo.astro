@@ -23,7 +23,8 @@ import PersonIcon from "./PersonIcon.astro";
 
       <div class="sentence-box">
         <span class="box-label">Sentence from Paper:</span>
-        <p class="quote">“Our benchmark only covers English, leaving low-resource language generalization unmeasured.”</p>
+        <p class="quote">“MAVEN-ARG currently includes only English corpus, which limits its potential applications and coverage for diverse linguistic phenomena.”</p>
+        <a class="quote-source" href={`${import.meta.env.BASE_URL}explore?paper=2024.acl-long.224`}>MAVEN-ARG · ACL 2024 &rarr;</a>
       </div>
 
       <div class="flow-steps">
@@ -61,7 +62,8 @@ import PersonIcon from "./PersonIcon.astro";
 
       <div class="sentence-box">
         <span class="box-label">Sentence from Paper:</span>
-        <p class="quote">“Crowdsourced labels exhibited high noise, as annotators strongly disagreed on subjective sarcasm.”</p>
+        <p class="quote">“However, it is possible that some other relevant works were overlooked, potentially leading to inaccuracies in our analysis.”</p>
+        <a class="quote-source" href={`${import.meta.env.BASE_URL}explore?paper=2024.acl-long.599`}>LLM capabilities survey · ACL 2024 &rarr;</a>
       </div>
 
       <div class="flow-steps">
@@ -69,7 +71,7 @@ import PersonIcon from "./PersonIcon.astro";
           <span class="step-icon warning">&excl;</span>
           <div class="step-text">
             <strong>Check Codebook (Cₜ₋₁):</strong>
-            <span>No code fits (labor bottleneck &ne; noisy/subjective labels).</span>
+            <span>No existing code captures a gap in literature coverage.</span>
           </div>
         </div>
 
@@ -78,8 +80,8 @@ import PersonIcon from "./PersonIcon.astro";
         <div class="flow-step">
           <span class="step-icon spark">&bigstar;</span>
           <div class="step-text">
-            <strong>Model Proposes New Category:</strong>
-            <em>“Low Data Quality: Label Noise &amp; Disagreement”</em>
+            <strong>Model Proposes New Code:</strong>
+            <em>“Literature Coverage Gap”</em>
           </div>
         </div>
 
@@ -94,13 +96,13 @@ import PersonIcon from "./PersonIcon.astro";
           </span>
           <div class="step-text">
             <strong>Human Researcher Reviews &amp; Approves:</strong>
-            <span class="code-tag emerald">&plus; Code 4: Low Data Quality</span>
+            <span class="code-tag emerald">&plus; Literature Coverage Gap</span>
           </div>
         </div>
       </div>
 
       <div class="card-outcome new-outcome">
-        &bigstar; <strong>Outcome:</strong> Codebook expands from Cₜ₋₁ &rarr; Cₜ for subsequent papers.
+        &bigstar; <strong>Outcome:</strong> Codebook expands (C₂ &rarr; C₃) and the new code is used for the 2025 papers.
       </div>
     </div>
   </div>
@@ -264,6 +266,18 @@ import PersonIcon from "./PersonIcon.astro";
     line-height: 1.45;
     color: #0f172a;
     font-style: italic;
+  }
+
+  .quote-source {
+    display: inline-block;
+    margin-top: 0.4rem;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #2563eb;
+    text-decoration: none;
+  }
+  .quote-source:hover {
+    text-decoration: underline;
   }
 
   .flow-steps {

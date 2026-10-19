@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
 import type { ComponentChildren } from "preact";
-import type { GlobalIndex, IndexEntry, PaperDetail } from "../../scripts/types";
+import type { GlobalIndex, IndexEntry, PaperDetail, TransitionIndex } from "../../scripts/types";
+import { findTransitions, isLimitationCode, NL_PREFIX } from "../../scripts/lib/transitions";
 import { THEMES, getThemeByCode, type ThemeDefinition } from "../data/themes";
 
 const DATA_BASE = `${import.meta.env.BASE_URL}data/`;
@@ -16,7 +17,23 @@ function readParams() {
     venue: params.get("venue"),
     track: params.get("track"),
     q: params.get("q"),
+    after: params.get("after"),
+    before: params.get("before"),
+    sort: params.get("sort"),
+    implicit: params.get("implicit"),
   };
+}
+
+type SortKey = "id" | "newest" | "codes";
+
+/** Accepts "Future Work" or "Non-Limitation: Future Work" and returns the full code name. */
+function normalizeNlCode(code: string | null): string | null {
+  if (!code) return null;
+  return code.startsWith(NL_PREFIX) ? code : `${NL_PREFIX}${code}`;
+}
+
+function shortCode(code: string): string {
+  return code.startsWith(NL_PREFIX) ? code.slice(NL_PREFIX.length) : code;
 }
 
 function pushParams(next: {
@@ -27,9 +44,13 @@ function pushParams(next: {
   venue?: string | null;
   track?: string | null;
   q?: string | null;
+  after?: string | null;
+  before?: string | null;
+  sort?: string | null;
+  implicit?: string | null;
 }) {
   const params = new URLSearchParams(location.search);
-  for (const key of ["paper", "code", "theme", "year", "venue", "track", "q"] as const) {
+  for (const key of ["paper", "code", "theme", "year", "venue", "track", "q", "after", "before", "sort", "implicit"] as const) {
     if (key in next) {
       const value = next[key];
       if (value) params.set(key, value);
@@ -51,6 +72,12 @@ export default function Explorer() {
   const [codeFilter, setCodeFilter] = useState<string | null>(null);
   const [paperId, setPaperId] = useState<string | null>(null);
   const [page, setPage] = useState(0);
+  // Discourse-pattern filters: NL code right after (?after=) or right before (?before=) a limitation.
+  const [patternAfter, setPatternAfter] = useState<string | null>(null);
+  const [patternBefore, setPatternBefore] = useState<string | null>(null);
+  const [implicitOnly, setImplicitOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<SortKey>("id");
+  const [transitions, setTransitions] = useState<TransitionIndex | null>(null);
 
   const [detailCache, setDetailCache] = useState<Map<string, PaperDetail>>(new Map());
   const [detailLoading, setDetailLoading] = useState(false);
@@ -61,8 +88,12 @@ export default function Explorer() {
   // Initial state from URL, and keep in sync with back/forward navigation.
   useEffect(() => {
     const apply = () => {
-      const { paper, code, theme, year, venue, track, q } = readParams();
+      const { paper, code, theme, year, venue, track, q, after, before, sort, implicit } = readParams();
       setPaperId(paper);
+      setPatternAfter(normalizeNlCode(after));
+      setPatternBefore(normalizeNlCode(before));
+      setImplicitOnly(implicit === "1");
+      setSortBy(sort === "newest" || sort === "codes" ? sort : "id");
       setCodeFilter(code);
       setThemeFilter(theme);
       setYear(year ?? "");
@@ -84,6 +115,25 @@ export default function Explorer() {
       .then(setIndex)
       .catch((err) => setError(String(err)));
   }, []);
+
+  // "Find your own paper" links land on #search: focus the search box.
+  useEffect(() => {
+    if (index && location.hash === "#search") {
+      document.querySelector<HTMLInputElement>(".search-input-wrapper input")?.focus();
+    }
+  }, [index]);
+
+  // The transition index is only needed for pattern filters, so fetch it lazily.
+  useEffect(() => {
+    if (!(patternAfter || patternBefore) || transitions) return;
+    fetch(`${DATA_BASE}transitions.json`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        return res.json();
+      })
+      .then(setTransitions)
+      .catch((err) => setError(String(err)));
+  }, [patternAfter, patternBefore, transitions]);
 
   useEffect(() => {
     if (!paperId) return;
@@ -145,12 +195,30 @@ export default function Explorer() {
     return i === -1 ? null : i;
   }, [index, codeFilter]);
 
+  const nlCodeIndices = useMemo(() => {
+    if (!index) return new Set<number>();
+    return new Set(index.codes.flatMap((c, i) => (isLimitationCode(c) ? [] : [i])));
+  }, [index]);
+
+  const patternPaperIndices = useMemo(() => {
+    if (!transitions) return null;
+    const sets: Set<number>[] = [];
+    if (patternAfter) sets.push(new Set(transitions.after[patternAfter] ?? []));
+    if (patternBefore) sets.push(new Set(transitions.before[patternBefore] ?? []));
+    if (sets.length === 0) return null;
+    return sets.reduce((acc, set) => new Set([...acc].filter((i) => set.has(i))));
+  }, [transitions, patternAfter, patternBefore]);
+
+  const patternPending = Boolean(patternAfter || patternBefore) && !transitions;
+
   const filtered = useMemo<IndexEntry[]>(() => {
     if (!index) return [];
     const q = search.trim().toLowerCase();
     const themeIndices = themeFilter ? themeCodeIndicesMap.get(themeFilter) : null;
 
-    return index.papers.filter((p) => {
+    const rows = index.papers.filter((p, i) => {
+      if (patternPaperIndices && !patternPaperIndices.has(i)) return false;
+      if (implicitOnly && (p.codes.length === 0 || !p.codes.every((c) => nlCodeIndices.has(c)))) return false;
       if (q && !p.title.toLowerCase().includes(q)) return false;
       if (year && p.year !== Number(year)) return false;
       if (venue && p.venue.toLowerCase() !== venue.toLowerCase()) return false;
@@ -166,12 +234,15 @@ export default function Explorer() {
       if (themeIndices && !p.codes.some((cIdx) => themeIndices.has(cIdx))) return false;
       return true;
     });
-  }, [index, search, year, venue, track, codeFilterIndex, themeFilter, themeCodeIndicesMap]);
+    if (sortBy === "newest") return [...rows].sort((a, b) => b.year - a.year || a.id.localeCompare(b.id));
+    if (sortBy === "codes") return [...rows].sort((a, b) => b.codes.length - a.codes.length || b.year - a.year);
+    return rows;
+  }, [index, search, year, venue, track, codeFilterIndex, themeFilter, themeCodeIndicesMap, patternPaperIndices, implicitOnly, nlCodeIndices, sortBy]);
 
   // Reset page to 0 when search/filter inputs change
   useEffect(() => {
     setPage(0);
-  }, [search, year, venue, track, codeFilter, themeFilter]);
+  }, [search, year, venue, track, codeFilter, themeFilter, patternAfter, patternBefore, implicitOnly, sortBy]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const pagedPapers = useMemo(() => {
@@ -182,6 +253,10 @@ export default function Explorer() {
   function openPaper(id: string) {
     setPaperId(id);
     pushParams({ paper: id });
+    // Single-column layout: the detail pane sits above the list, so bring it into view.
+    if (matchMedia("(max-width: 860px)").matches) {
+      requestAnimationFrame(() => document.querySelector(".detail-pane")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
   }
 
   function closePaper() {
@@ -213,7 +288,38 @@ export default function Explorer() {
     setTrack("");
     setThemeFilter(null);
     setCodeFilter(null);
-    pushParams({ search: null, year: null, venue: null, track: null, theme: null, code: null });
+    setPatternAfter(null);
+    setPatternBefore(null);
+    setImplicitOnly(false);
+    pushParams({ q: null, year: null, venue: null, track: null, theme: null, code: null, after: null, before: null, implicit: null });
+  }
+
+  function clearPattern() {
+    setPatternAfter(null);
+    setPatternBefore(null);
+    pushParams({ after: null, before: null });
+  }
+
+  function changeSort(next: SortKey) {
+    setSortBy(next);
+    pushParams({ sort: next === "id" ? null : next });
+  }
+
+  /** Curated entry points shown before any filter is applied. */
+  function applyStarter(starter: "own" | "codes" | "srp" | "implicit") {
+    clearAllFilters();
+    if (starter === "own") {
+      document.querySelector<HTMLInputElement>(".search-input-wrapper input")?.focus();
+    } else if (starter === "codes") {
+      changeSort("codes");
+    } else if (starter === "srp") {
+      setPatternBefore(`${NL_PREFIX}Strong Reported Performance`);
+      pushParams({ before: "Strong Reported Performance" });
+    } else {
+      setImplicitOnly(true);
+      setYear("2025");
+      pushParams({ implicit: "1", year: "2025" });
+    }
   }
 
   function surpriseMe() {
@@ -243,7 +349,9 @@ export default function Explorer() {
     (venue ? 1 : 0) +
     (track ? 1 : 0) +
     (themeFilter ? 1 : 0) +
-    (codeFilter ? 1 : 0);
+    (codeFilter ? 1 : 0) +
+    (patternAfter || patternBefore ? 1 : 0) +
+    (implicitOnly ? 1 : 0);
 
   return (
     <div class="explorer-container">
@@ -399,6 +507,9 @@ export default function Explorer() {
 
         {/* Active Filters Summary Strip */}
         <div class="filters-status-row">
+          {patternPending ? (
+            <span class="result-count">Loading pattern index…</span>
+          ) : (
           <span class="result-count">
             Found <strong>{filtered.length.toLocaleString()}</strong> paper
             {filtered.length === 1 ? "" : "s"}
@@ -406,6 +517,16 @@ export default function Explorer() {
               ? ` (showing ${page * PAGE_SIZE + 1}–${Math.min((page + 1) * PAGE_SIZE, filtered.length)})`
               : ""}
           </span>
+          )}
+
+          <label class="sort-control">
+            Sort
+            <select value={sortBy} onChange={(e) => changeSort((e.target as HTMLSelectElement).value as SortKey)}>
+              <option value="id">Anthology ID</option>
+              <option value="newest">Newest first</option>
+              <option value="codes">Most codes</option>
+            </select>
+          </label>
 
           {activeFiltersCount > 0 && (
             <div class="active-chips-wrap">
@@ -425,10 +546,27 @@ export default function Explorer() {
                   </button>
                 </span>
               )}
+              {(patternAfter || patternBefore) && (
+                <span class="filter-chip pattern-chip">
+                  Pattern:{" "}
+                  {patternBefore ? `${shortCode(patternBefore)} → Limitation` : `Limitation → ${shortCode(patternAfter!)}`}
+                  <button type="button" onClick={clearPattern}>
+                    ×
+                  </button>
+                </span>
+              )}
+              {implicitOnly && (
+                <span class="filter-chip pattern-chip">
+                  Only non-limitation codes
+                  <button type="button" onClick={() => { setImplicitOnly(false); pushParams({ implicit: null }); }}>
+                    ×
+                  </button>
+                </span>
+              )}
               {year && (
                 <span class="filter-chip">
                   Year: {year}
-                  <button type="button" onClick={() => setYear("")}>
+                  <button type="button" onClick={() => { setYear(""); pushParams({ year: null }); }}>
                     ×
                   </button>
                 </span>
@@ -436,7 +574,7 @@ export default function Explorer() {
               {venue && (
                 <span class="filter-chip">
                   Venue: {venue.toUpperCase()}
-                  <button type="button" onClick={() => setVenue("")}>
+                  <button type="button" onClick={() => { setVenue(""); pushParams({ venue: null }); }}>
                     ×
                   </button>
                 </span>
@@ -453,7 +591,7 @@ export default function Explorer() {
                     : track === "short"
                     ? "Main (Short)"
                     : track.toUpperCase()}
-                  <button type="button" onClick={() => setTrack("")}>
+                  <button type="button" onClick={() => { setTrack(""); pushParams({ track: null }); }}>
                     ×
                   </button>
                 </span>
@@ -465,6 +603,25 @@ export default function Explorer() {
           )}
         </div>
       </div>
+
+      {/* Curated starting points for first-time visitors */}
+      {activeFiltersCount === 0 && sortBy === "id" && (
+        <div class="starter-strip">
+          <span class="starter-label">Not sure where to start?</span>
+          <button type="button" class="starter-btn" onClick={() => applyStarter("own")}>
+            🔎 Find your own paper
+          </button>
+          <button type="button" class="starter-btn" onClick={() => applyStarter("codes")}>
+            Most limitation codes in one section
+          </button>
+          <button type="button" class="starter-btn" onClick={() => applyStarter("srp")}>
+            Strong results stated right before a limitation
+          </button>
+          <button type="button" class="starter-btn" onClick={() => applyStarter("implicit")}>
+            2025 sections with no actual limitation
+          </button>
+        </div>
+      )}
 
       {/* Main Master-Detail Split Workspace */}
       <div class="explorer-workspace">
@@ -482,15 +639,6 @@ export default function Explorer() {
               <ul class="paper-list">
                 {pagedPapers.map((p) => {
                   const isSelected = p.id === paperId;
-                  const paperThemeMap = new Map<string, number>();
-                  for (const cIdx of p.codes) {
-                    const codeName = index.codes[cIdx];
-                    if (codeName) {
-                      const t = getThemeByCode(codeName);
-                      paperThemeMap.set(t.id, (paperThemeMap.get(t.id) ?? 0) + 1);
-                    }
-                  }
-
                   return (
                     <li key={p.id}>
                       <button
@@ -517,27 +665,38 @@ export default function Explorer() {
                         <h3 class="paper-card-title">{p.title}</h3>
 
                         <div class="paper-card-footer">
-                          {/* Mini Theme Dots Bar */}
+                          {/* First limitation codes by name (limitations before non-limitations) */}
                           <div class="paper-theme-dots">
-                            {THEMES.map((theme) => {
-                              const count = paperThemeMap.get(theme.id);
-                              if (!count) return null;
+                            {(() => {
+                              const names = p.codes
+                                .map((cIdx) => index.codes[cIdx])
+                                .filter(Boolean)
+                                .sort((a, b) => Number(!isLimitationCode(a)) - Number(!isLimitationCode(b)));
+                              const shown = names.slice(0, 2);
                               return (
-                                <span
-                                  key={theme.id}
-                                  class="theme-mini-tag"
-                                  style={{
-                                    backgroundColor: theme.bgLight,
-                                    borderColor: theme.borderColor,
-                                    color: theme.color,
-                                  }}
-                                  title={`${theme.shortTitle}: ${count} code(s)`}
-                                >
-                                  <span class="dot" style={{ backgroundColor: theme.color }}></span>
-                                  {count}
-                                </span>
+                                <>
+                                  {shown.map((name) => {
+                                    const theme = getThemeByCode(name);
+                                    return (
+                                      <span
+                                        key={name}
+                                        class="theme-mini-tag"
+                                        style={{ backgroundColor: theme.bgLight, borderColor: theme.borderColor, color: theme.color }}
+                                        title={`${name} (${theme.shortTitle})`}
+                                      >
+                                        <span class="dot" style={{ backgroundColor: theme.color }}></span>
+                                        {shortCode(name)}
+                                      </span>
+                                    );
+                                  })}
+                                  {names.length > shown.length && (
+                                    <span class="more-codes-tag" title={names.slice(2).join(", ")}>
+                                      +{names.length - shown.length}
+                                    </span>
+                                  )}
+                                </>
                               );
-                            })}
+                            })()}
                           </div>
 
                           <span class="total-codes-text">
@@ -579,7 +738,7 @@ export default function Explorer() {
         </div>
 
         {/* Right Pane: Paper Inspector / Detail View */}
-        <div class="detail-pane">
+        <div class={`detail-pane ${paperId ? "" : "is-empty"}`}>
           {!paperId ? (
             <div class="detail-placeholder">
               <div class="placeholder-icon">
@@ -616,6 +775,14 @@ export default function Explorer() {
             <PaperDetailInspector
               detail={detail}
               codes={index.codes}
+              codeDefinitions={index.codeDefinitions}
+              pattern={
+                patternBefore
+                  ? { dir: "before", code: patternBefore }
+                  : patternAfter
+                  ? { dir: "after", code: patternAfter }
+                  : null
+              }
               onCodeClick={handleSelectCode}
               onClose={closePaper}
               activeHoverCode={activeHoverCode}
@@ -638,6 +805,8 @@ export default function Explorer() {
 function PaperDetailInspector({
   detail,
   codes,
+  codeDefinitions,
+  pattern,
   onCodeClick,
   onClose,
   activeHoverCode,
@@ -645,6 +814,8 @@ function PaperDetailInspector({
 }: {
   detail: PaperDetail;
   codes: string[];
+  codeDefinitions: (string | null)[];
+  pattern: { dir: "after" | "before"; code: string } | null;
   onCodeClick: (code: string) => void;
   onClose: () => void;
   activeHoverCode: string | null;
@@ -688,6 +859,19 @@ function PaperDetailInspector({
     }
     return map;
   }, [detail]);
+
+  // Sentences forming the active discourse pattern (e.g. limitation -> Future Work).
+  const patternSentences = useMemo(() => {
+    const roles = new Map<string, "limitation" | "pattern-nl">();
+    if (!pattern) return roles;
+    for (const t of findTransitions(detail.llm)) {
+      if (t.dir !== pattern.dir || t.nlCode !== pattern.code) continue;
+      const [limId, nlId] = t.dir === "after" ? [t.from, t.to] : [t.to, t.from];
+      roles.set(limId, "limitation");
+      roles.set(nlId, "pattern-nl");
+    }
+    return roles;
+  }, [detail, pattern]);
 
   // Aggregate paper theme distribution profile
   const themeProfile = useMemo(() => {
@@ -864,24 +1048,41 @@ function PaperDetailInspector({
         <p class="limitations-subheading">
           Hover over any code badge to illuminate its evidence span. Click a code to review the LLM's justification.
         </p>
+        {pattern && patternSentences.size > 0 && (
+          <p class="pattern-legend">
+            Pattern highlighted:{" "}
+            <strong>
+              {pattern.dir === "before"
+                ? `${shortCode(pattern.code)} → Limitation`
+                : `Limitation → ${shortCode(pattern.code)}`}
+            </strong>{" "}
+            (outlined sentence pairs below)
+          </p>
+        )}
 
         <div class="sentences-flow">
           {detail.llm.sentences.map((s, idx) => {
             const marks = (sentenceCodes.get(s.id) ?? []).slice().sort((a, b) => (a.start ?? 0) - (b.start ?? 0));
             const primaryTheme = marks.length > 0 ? marks[0].theme : null;
             const isHoveredSentence = marks.some((m) => m.code === activeHoverCode);
+            const patternRole = patternSentences.get(s.id);
 
             return (
               <div
                 key={s.id}
-                class={`sentence-block ${primaryTheme ? "has-marks" : ""} ${isHoveredSentence ? "sentence-highlight-active" : ""}`}
+                class={`sentence-block ${primaryTheme ? "has-marks" : ""} ${isHoveredSentence ? "sentence-highlight-active" : ""} ${patternRole ? "pattern-hit" : ""}`}
                 style={{
                   "--sentence-theme-bg": primaryTheme ? primaryTheme.bgLight : "transparent",
                   "--sentence-theme-border": primaryTheme ? primaryTheme.borderColor : "transparent",
                   "--sentence-theme-color": primaryTheme ? primaryTheme.color : "inherit",
                 }}
               >
-                <span class="sentence-index">S{idx + 1}</span>
+                <span class="sentence-index">
+                  S{idx + 1}
+                  {patternRole && (
+                    <span class="pattern-role">{patternRole === "limitation" ? "LIM" : "NL"}</span>
+                  )}
+                </span>
                 <div class="sentence-content">
                   <p class="sentence-text">{renderThematicSentence(s.text, marks, activeHoverCode)}</p>
 
@@ -942,6 +1143,11 @@ function PaperDetailInspector({
                                   {allCodeJustifications.map((just, jIdx) => (
                                     <p key={jIdx} class="justification-text">{just}</p>
                                   ))}
+                                  {codeDefinitions[codes.indexOf(m.code)] && (
+                                    <p class="justification-definition">
+                                      <strong>Codebook definition:</strong> {codeDefinitions[codes.indexOf(m.code)]}
+                                    </p>
+                                  )}
                                   <div class="justification-footer">
                                     <button
                                       type="button"
@@ -950,6 +1156,12 @@ function PaperDetailInspector({
                                     >
                                       Filter all papers with "{m.code}" →
                                     </button>
+                                    <a
+                                      class="link-action-btn"
+                                      href={`${import.meta.env.BASE_URL}codebook?code=${encodeURIComponent(m.code)}`}
+                                    >
+                                      Open in codebook →
+                                    </a>
                                   </div>
                                 </div>
                               )}

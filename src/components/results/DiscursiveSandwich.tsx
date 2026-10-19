@@ -17,56 +17,42 @@ export default function DiscursiveSandwich() {
   return (
     <div class="discursive-section" id="discursive-rq3">
       {/* Section Lead Header */}
-      <div class="section-lead-header">
-        <div class="section-tag-row">
-          <span class="section-kpi-badge">RQ3 · Discursive Patterns</span>
-          <span class="section-corpus-pill">Within-Paper Permutation Null (N = 1,000)</span>
-        </div>
-        <h2 class="results-subheading">Discursive Transitions &amp; Contextual Sequencing</h2>
-        <p class="section-desc">
-          How do authors sequence limitation discussions within paper texts? Testing sentence-level transitions against 
-          a within-paper permutation null distribution (1,000 randomized permutations per paper) reveals systematic, 
-          non-random discursive structures: authors frequently establish strong benchmark performance before acknowledging 
-          weaknesses, and transition immediately into proactive mitigations or future work projections.
-        </p>
-      </div>
-
       {/* Plain-Language Intuitive Takeaways for First-Time Readers */}
       <div class="rq-intuitive-lead-box">
         <div class="lead-box-header">
-          <span class="lead-box-icon">🥪</span>
+          <span class="lead-box-icon" aria-hidden="true">↕</span>
           <div class="lead-box-title-wrap">
-            <h4 class="lead-box-title">The "Discursive Sandwich" · Rhetorical Framing in Practice</h4>
-            <p class="lead-box-sub">How do NLP researchers sequence their limitation statements? Why are technical shortcomings almost never acknowledged in isolation?</p>
+            <h3 class="lead-box-title">Preemptive buffers and soft landings</h3>
+            <p class="lead-box-sub">How do NLP researchers sequence their limitation statements, and what tends to sit right before and after them?</p>
           </div>
         </div>
         <div class="lead-sandwich-visual">
           <div class="sandwich-slice slice-top">
-            <div class="slice-badge">1. Top Bread (Preceding Boundary)</div>
+            <div class="slice-badge">1. Before: preemptive buffer</div>
             <strong class="slice-title">Strong Reported Performance Premise</strong>
             <p class="slice-desc">
-              Before admitting any technical shortfall, authors first establish an empirical high ground—e.g., <em>"While our model achieves SOTA on Benchmark X..."</em> (preceding underperformance at 2.56&times; null expectation).
+              Some limitations are preceded by a statement of strong results—e.g., <em>"While our model achieves SOTA on Benchmark X..."</em>. Empirical Underperformance is preceded this way at 2.56&times; the null expectation.
             </p>
           </div>
           <div class="sandwich-slice slice-middle">
-            <div class="slice-badge">2. Sandwich Filling (Core Admission)</div>
+            <div class="slice-badge">2. The limitation</div>
             <strong class="slice-title">Core Technical Limitation</strong>
             <p class="slice-desc">
               Conceding the actual constraint: resource footprints, compute bounds, model scale, or dataset biases (Empirical Underperformance, Leakage, Incompleteness).
             </p>
           </div>
           <div class="sandwich-slice slice-bottom">
-            <div class="slice-badge">3. Bottom Bread (Following Buffer)</div>
-            <strong class="slice-title">Immediate Mitigation or Future Work Buffer</strong>
+            <div class="slice-badge">3. After: soft landing</div>
+            <strong class="slice-title">Future Work, Justification or Mitigation</strong>
             <p class="slice-desc">
-              Authors rarely leave a limitation unbuffered. Weaknesses are immediately softened by <strong>Conducted Mitigation (24.1% of sentences)</strong> or deferred into <strong>Future Work (40.2% observed vs 32.8% null, z = +30.05)</strong>.
+              Limitations are often followed by <strong>Conducted Mitigation (24.1% of sentences)</strong> or by <strong>Future Work (40.2% observed vs 32.8% null, z = +30.05)</strong>.
             </p>
           </div>
         </div>
         <div class="implicit-note-banner">
           <span class="implicit-icon">🔎</span>
           <p>
-            <strong>Notable Finding (Implicit Limitations):</strong> Exactly <strong>90 papers (1.4% in 2025)</strong> feature a mandatory Limitations section that contains <strong>zero actual limitation statements</strong>. Instead, these sections consist entirely of future work proposals or methodological clarifications to satisfy compliance checklists without disclosing vulnerabilities.
+            <strong>Notable Finding (Implicit Limitations):</strong> <strong>90 papers (1.4% in 2025)</strong> have a Limitations section containing <strong>only non-limitation codes</strong>. A manual review found the limitation often appears only as proposed future work (e.g., <em>"Expanding beyond A and B remains an area for future exploration"</em>) without being formally declared, which risks important limitations being overlooked.
           </p>
         </div>
       </div>
@@ -166,7 +152,7 @@ export default function DiscursiveSandwich() {
               </button>
             </div>
             <div class="transition-method-badge">
-              <span>Baseline: Within-Paper Permutation Null (1,000 runs)</span>
+              <span>Baseline: Within-Paper Permutation Null (2,000 permutations)</span>
             </div>
           </div>
 
@@ -185,7 +171,7 @@ export default function DiscursiveSandwich() {
                   <div class="t-row-left">
                     <div class="t-code-title">
                       <a
-                        href={`${import.meta.env.BASE_URL}explore?code=${encodeURIComponent(item.code)}`}
+                        href={`${import.meta.env.BASE_URL}explore?${transitionDir}=${encodeURIComponent(item.code)}`}
                         class="t-code-link"
                         title={`Click to explore papers featuring ${item.code} in Explorer`}
                       >
@@ -244,9 +230,9 @@ export default function DiscursiveSandwich() {
                       <strong class="p-num">{item.adjP}</strong>
                     </div>
                     <a
-                      href={`${import.meta.env.BASE_URL}explore?code=${encodeURIComponent(item.code)}`}
+                      href={`${import.meta.env.BASE_URL}explore?${transitionDir}=${encodeURIComponent(item.code)}`}
                       class="t-explore-mini-btn"
-                      title={`Explore papers with ${item.code} in Explorer`}
+                      title={transitionDir === "after" ? `Papers where a limitation is followed by ${item.code}` : `Papers where ${item.code} comes right before a limitation`}
                     >
                       Explore Papers ↗
                     </a>
@@ -259,9 +245,9 @@ export default function DiscursiveSandwich() {
           <div class="transitions-footer-note">
             <span class="info-icon">ℹ️</span>
             <p>
-              In Table 4 of the paper, transitions were calculated from consecutive code annotations in the same paragraph. 
-              The within-paper permutation null preserves each paper's code set and paragraph length while randomly shuffling 
-              sentence order. Click any code or explore link to view papers and sentences exhibiting these patterns.
+              As in Table 6 of the paper, each rate counts the non-limitation codes that immediately precede or follow a limitation code. 
+              The null shuffles the code sequence within each paper 2,000 times, keeping each paper's marginal code frequencies. 
+              Click "Explore Papers" to read real papers where that exact transition occurs, with the sentence pair highlighted.
             </p>
           </div>
         </div>
@@ -307,7 +293,7 @@ export default function DiscursiveSandwich() {
                   <div key={item.targetCode} class="pairing-card">
                     <div class="p-card-top">
                       <a
-                        href={`${import.meta.env.BASE_URL}explore?code=${encodeURIComponent(item.targetCode)}`}
+                        href={`${import.meta.env.BASE_URL}explore?before=Strong%20Reported%20Performance&code=${encodeURIComponent(item.targetCode)}`}
                         class="p-card-link"
                         title={`Filter explorer by ${item.targetCode}`}
                       >
@@ -345,7 +331,7 @@ export default function DiscursiveSandwich() {
                         <span class="p-highlight-tag">Highest Enrichment in Corpus</span>
                       )}
                       <a
-                        href={`${import.meta.env.BASE_URL}explore?code=${encodeURIComponent(item.targetCode)}`}
+                        href={`${import.meta.env.BASE_URL}explore?before=Strong%20Reported%20Performance&code=${encodeURIComponent(item.targetCode)}`}
                         class="p-explore-action-btn"
                         title={`Explore papers with ${item.targetCode}`}
                       >
@@ -357,10 +343,14 @@ export default function DiscursiveSandwich() {
               </div>
 
               <div class="pairing-insight-quote">
-                <span class="quote-tag">Representative Contextual Transition:</span>
+                <span class="quote-tag">Real example (DCG-SQL, ACL 2025):</span>
                 <p class="quote-body">
-                  <em>“While our model achieves state-of-the-art results on GLUE [<a href={`${import.meta.env.BASE_URL}explore?code=Strong%20Reported%20Performance`} class="quote-pattern-link">Strong Reported Performance ↗</a>], its accuracy drops substantially on out-of-domain dialect tests [<a href={`${import.meta.env.BASE_URL}explore?code=Empirical%20Underperformance`} class="quote-pattern-link">Empirical Underperformance ↗</a>].”</em>
+                  <em>“Under the same LLM models, our method outperforms the existing SOTA.”</em> [Strong Reported Performance]{" "}
+                  <em>“Our method has shown highly effective in improving performance with small LLMs, however, there is still a performance gap between the use of hyper-scaled LLMs and small LLMs.”</em> [Empirical Underperformance]
                 </p>
+                <a href={`${import.meta.env.BASE_URL}explore?paper=2025.acl-long.748&before=Strong%20Reported%20Performance`} class="quote-pattern-link">
+                  Read it in the explorer with the pattern highlighted ↗
+                </a>
               </div>
             </div>
           )}
@@ -381,7 +371,7 @@ export default function DiscursiveSandwich() {
                   <div key={item.code} class="pairing-card">
                     <div class="p-card-top">
                       <a
-                        href={`${import.meta.env.BASE_URL}explore?code=${encodeURIComponent(item.code)}`}
+                        href={`${import.meta.env.BASE_URL}explore?after=Conducted%20Mitigation&code=${encodeURIComponent(item.code)}`}
                         class="p-card-link"
                         title={`Filter explorer by ${item.code}`}
                       >
@@ -414,9 +404,9 @@ export default function DiscursiveSandwich() {
                     </div>
 
                     <div class="p-card-footer">
-                      <span class="p-signif">FDR adj. p = {item.adjP}</span>
+                      <span class="p-signif">FDR adj. p {String(item.adjP).trim().startsWith("<") ? item.adjP : `= ${item.adjP}`}</span>
                       <a
-                        href={`${import.meta.env.BASE_URL}explore?code=${encodeURIComponent(item.code)}`}
+                        href={`${import.meta.env.BASE_URL}explore?after=Conducted%20Mitigation&code=${encodeURIComponent(item.code)}`}
                         class="p-explore-action-btn"
                         title={`Explore papers with ${item.code}`}
                       >
@@ -428,10 +418,14 @@ export default function DiscursiveSandwich() {
               </div>
 
               <div class="pairing-insight-quote">
-                <span class="quote-tag">Representative Mitigation Pairing:</span>
+                <span class="quote-tag">Real example (Easy as PIE?, EMNLP 2025):</span>
                 <p class="quote-body">
-                  <em>“Due to potential pre-training data contamination [<a href={`${import.meta.env.BASE_URL}explore?code=Data%20Leakage%2FContamination`} class="quote-pattern-link">Data Leakage ↗</a>], we re-evaluated all models on an unseen temporal holdout split created after the training cutoff [<a href={`${import.meta.env.BASE_URL}explore?code=Conducted%20Mitigation`} class="quote-pattern-link">Conducted Mitigation ↗</a>].”</em>
+                  <em>“A potential concern with using LLMs on existing, publicly available tasks is that the models may have been exposed to the data during training.”</em> [Data Leakage/Contamination]{" "}
+                  <em>“To partially address this, we include several different LLMs in our evaluation.”</em> [Conducted Mitigation]
                 </p>
+                <a href={`${import.meta.env.BASE_URL}explore?paper=2025.emnlp-main.1213&after=Conducted%20Mitigation`} class="quote-pattern-link">
+                  Read it in the explorer with the pattern highlighted ↗
+                </a>
               </div>
             </div>
           )}
@@ -445,9 +439,13 @@ export default function DiscursiveSandwich() {
         <div class="d-tab-panel">
           <div class="annotated-container">
             <div class="annotated-header">
-              <h4 class="annotated-title">Discursive Flow in Actual NLP Publications</h4>
+              <h4 class="annotated-title">One Real Limitations Section, Three Consecutive Moves</h4>
               <p class="annotated-desc">
-                The diagram below demonstrates how the three sequential discursive moves unfold in a single cohesive paragraph:
+                Three consecutive sentences from{" "}
+                <a href={`${import.meta.env.BASE_URL}explore?paper=2025.findings-acl.482&before=Strong%20Reported%20Performance`}>
+                  BadWindtunnel (Findings of ACL 2025)
+                </a>
+                , with the codes the LLM assigned to each:
               </p>
             </div>
 
@@ -461,17 +459,17 @@ export default function DiscursiveSandwich() {
                   <span class="f-step-tag tag-green">Strong Reported Performance</span>
                 </div>
                 <blockquote class="f-step-quote">
-                  “Our proposed sparse attention mechanism achieves competitive accuracy compared to full-rank baselines on 6 standard benchmark datasets while achieving a 2.4&times; inference speedup...”
+                  “As shown in Section 4.3, BadWindtunnel maintains optimal performance under most attacks when the attack rate is 10%.”
                 </blockquote>
                 <p class="f-step-desc">
                   <strong>Empirical premise:</strong> Establishes core validity and performance claims before opening discussion of boundaries.
                 </p>
                 <a
-                  href={`${import.meta.env.BASE_URL}explore?code=Strong%20Reported%20Performance`}
+                  href={`${import.meta.env.BASE_URL}explore?before=Strong%20Reported%20Performance`}
                   class="flow-step-explore-btn"
-                  title="Explore papers featuring Strong Reported Performance in Explorer"
+                  title="Papers where Strong Reported Performance comes right before a limitation"
                 >
-                  Explore Strong Reported Performance papers ↗
+                  Papers with strong results right before a limitation ↗
                 </a>
               </div>
 
@@ -483,7 +481,7 @@ export default function DiscursiveSandwich() {
                   <span class="f-step-tag tag-rose">Empirical Underperformance</span>
                 </div>
                 <blockquote class="f-step-quote">
-                  “...however, when sequence length exceeds 8k tokens or on out-of-domain conversational datasets, retrieval recall drops by 14.2%...”
+                  “However, its performance starts to decrease for semantic invariant attacks like Synbkd.”
                 </blockquote>
                 <p class="f-step-desc">
                   <strong>Direct vulnerability disclosure:</strong> The specific empirical constraint is formally stated.
@@ -502,30 +500,21 @@ export default function DiscursiveSandwich() {
                 <div class="f-step-head">
                   <span class="f-step-num">Step 3</span>
                   <span class="f-step-category">Resolution &amp; Outlook (Successor)</span>
-                  <span class="f-step-tag tag-blue">Conducted Mitigation + Future Work</span>
+                  <span class="f-step-tag tag-blue">Future Work</span>
                 </div>
                 <blockquote class="f-step-quote">
-                  “...which we partially addressed via chunk-level positional caching [Conducted Mitigation]; extending this approach to arbitrary context windows remains an active direction for future work [Future Work].”
+                  “Given this limitation, future research could explore further ways to magnify the differences in learnability.”
                 </blockquote>
                 <p class="f-step-desc">
-                  <strong>Forward-looking resolution:</strong> Clarifies existing interventions and directs future research horizons.
+                  <strong>Forward-looking move:</strong> The limitation is immediately turned into a direction for future research.
                 </p>
-                <div class="flow-explore-dual-row">
-                  <a
-                    href={`${import.meta.env.BASE_URL}explore?code=Conducted%20Mitigation`}
-                    class="flow-step-explore-btn"
-                    title="Explore Conducted Mitigation in Explorer"
-                  >
-                    Explore Conducted Mitigation ↗
-                  </a>
-                  <a
-                    href={`${import.meta.env.BASE_URL}explore?code=Future%20Work`}
-                    class="flow-step-explore-btn"
-                    title="Explore Future Work in Explorer"
-                  >
-                    Explore Future Work ↗
-                  </a>
-                </div>
+                <a
+                  href={`${import.meta.env.BASE_URL}explore?after=Future%20Work`}
+                  class="flow-step-explore-btn"
+                  title="Papers where a limitation is followed by Future Work"
+                >
+                  Papers where a limitation is followed by Future Work ↗
+                </a>
               </div>
             </div>
 
@@ -537,16 +526,16 @@ export default function DiscursiveSandwich() {
               </div>
               <p class="ir-text">
                 In 2025, <strong>90 papers</strong> contained <em>only</em> Non-Limitation discursive codes. In these cases, 
-                limitations were discussed strictly through future exploration projections (e.g. <em>“Extending our methodology to non-English languages is an important avenue for future work”</em>) 
-                without an explicit acknowledgement that the current study was English-only.
+                limitations were discussed strictly through future exploration projections (e.g. <em>“Expanding beyond A and B remains an area for future exploration”</em>, the paper's own illustration) 
+                without explicitly acknowledging that the current study was limited to A and B.
               </p>
               <div class="ir-action-row">
                 <a
-                  href={`${import.meta.env.BASE_URL}explore?theme=non-limitation&year=2025`}
+                  href={`${import.meta.env.BASE_URL}explore?implicit=1&year=2025`}
                   class="ir-explore-cta"
-                  title="Explore 2025 papers carrying Non-Limitation codes in Explorer"
+                  title="2025 papers whose Limitations section carries only non-limitation codes"
                 >
-                  Explore 2025 Non-Limitation Papers (90 Papers) in Explorer ↗
+                  Read these 2025 sections in the explorer ↗
                 </a>
               </div>
             </div>

@@ -21,6 +21,19 @@ export interface IndexEntry {
   codes: number[];
 }
 
+/**
+ * Papers in which a non-limitation (NL) code sits directly next to a
+ * limitation code, keyed by the NL code name. Values are indices into
+ * GlobalIndex.papers. "after": a limitation sentence is immediately followed
+ * by a sentence carrying the NL code; "before": the NL sentence immediately
+ * precedes a limitation sentence. Adjacency is between consecutive *coded*
+ * sentences, mirroring the paper's Table 6 transitions.
+ */
+export interface TransitionIndex {
+  after: Record<string, number[]>;
+  before: Record<string, number[]>;
+}
+
 export interface PaperDetail {
   id: string;
   title: string;

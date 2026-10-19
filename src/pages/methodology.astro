@@ -1,10 +1,189 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import ComingSoon from "../components/ComingSoon.astro";
+import MethodologyFigure from "../components/MethodologyFigure.astro";
+import CodeConsolidationDiagram from "../components/methodology/CodeConsolidationDiagram.astro";
+import WorkedExample from "../components/methodology/WorkedExample";
+import EvaluationSection from "../components/methodology/EvaluationSection";
+import PaperTrace from "../components/methodology/PaperTrace.astro";
+import "../styles/methodology.css";
 ---
-<BaseLayout title="Methodology — NLP Limitations">
-  <ComingSoon
-    title="Methodology"
-    blurb="A full walkthrough of the iterative hybrid coding pipeline — corpus collection, semantic unit segmentation, deductive/inductive coding, and codebook updates — with a real worked example from the dataset. A condensed preview is already on the landing page."
-  />
+
+<BaseLayout 
+  title="Methodology — NLP Limitations"
+  description="Iterative hybrid qualitative coding pipeline: corpus collection, semantic unit segmentation, deductive/inductive coding, human-in-the-loop review, real worked example, and inter-annotator agreement evaluation."
+>
+  {/* Sticky Sub-Navigation Stepper */}
+  <div class="methodology-subnav-sticky">
+    <div class="methodology-subnav-inner">
+      <div class="subnav-links">
+        <a href="#overview" class="subnav-link">
+          <span>Overview &amp; Architecture</span>
+        </a>
+        <a href="#paper-trace" class="subnav-link">
+          <span>1. One Paper, End to End</span>
+        </a>
+        <a href="#coding-walkthrough" class="subnav-link">
+          <span>2. Deductive &amp; Inductive Coding</span>
+        </a>
+        <a href="#consolidation-diagram" class="subnav-link">
+          <span>3. Code Consolidation</span>
+        </a>
+        <a href="#evaluation" class="subnav-link">
+          <span>4. Can We Trust It?</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="methodology-page-container">
+    {/* Page Header */}
+    <div class="page-intro-header" id="overview">
+      <div class="section-tag-row">
+        <span class="section-kpi-badge">Methodology</span>
+        <span class="section-corpus-pill">Iterative Qualitative Coding</span>
+      </div>
+      <h1 class="page-main-title">How We Built the Dataset</h1>
+      <p class="intro">
+        How do you read and analyze the <strong>Limitations Section</strong> of over 16,000 research papers?
+        <br/><br/>
+        Doing it purely by hand is impossible, but trusting an AI to do it completely automatically often misses the nuanced, evolving nature of scientific research. To solve this, we designed a <strong>Human-AI Hybrid Pipeline</strong>. The AI acts as a tireless assistant that reads every sentence and proposes codes, while a team of expert human researchers review, consolidate, and finalize the codebook.
+      </p>
+    </div>
+
+    {/* Plain-language version of the pipeline, before any numbers or notation */}
+    <section class="plain-steps" aria-labelledby="plain-steps-title">
+      <h2 id="plain-steps-title" class="plain-steps-title">The pipeline in four plain steps</h2>
+      <ol class="plain-steps-list">
+        <li>
+          <strong>Split.</strong> Each Limitations section is cut into short, self-contained statements, keeping the authors' exact words.
+        </li>
+        <li>
+          <strong>Label.</strong> An LLM tags each statement with codes from the current codebook, or proposes a new code when none fits, quoting the words that justify it.
+        </li>
+        <li>
+          <strong>Review.</strong> After each round (2020–22, 2023, 2024, 2025), researchers review the proposed codes and decide whether to add them, fold them into an existing code, or drop them.
+        </li>
+        <li>
+          <strong>Repeat.</strong> The updated codebook is used for the next round. Over four rounds it grew from 25 to 50 codes.
+        </li>
+      </ol>
+      <details class="glossary">
+        <summary>Key terms used on this page</summary>
+        <dl>
+          <dt>Semantic unit (s₁, s₂, …)</dt>
+          <dd>One self-contained statement from a Limitations section, usually a sentence. Codes are assigned per unit.</dd>
+          <dt>Code / codebook</dt>
+          <dd>A code is a named category of limitation (e.g. <em>Scope Limitation</em>) with a written definition; the codebook is the full list.</dd>
+          <dt>Cₜ₋₁ and Cₜ</dt>
+          <dd>The codebook before and after round <em>t</em>. C₀ is the initial 25-code codebook; C₄ is the final 50-code one.</dd>
+          <dt>Deductive coding</dt>
+          <dd>Assigning a code that already exists in the codebook.</dd>
+          <dt>Inductive coding</dt>
+          <dd>Proposing a new code because no existing one fits. Proposals only enter the codebook after human review.</dd>
+          <dt>Non-limitation code</dt>
+          <dd>A label for statements that sit in the section but are not limitations, such as future work or a strong result.</dd>
+          <dt>Krippendorff's α</dt>
+          <dd>An agreement score between coders: 1 is perfect agreement, 0 is no better than chance.</dd>
+          <dt>Precision, recall, F1</dt>
+          <dd>How the LLM's codes compare with the human consensus: precision is the share of its codes that are correct, recall the share of human codes it found, and F1 balances the two.</dd>
+        </dl>
+      </details>
+    </section>
+
+    {/* KPI Summary Cards */}
+    <div class="methodology-kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-tag">Corpus Scale</span>
+        <span class="kpi-val">16,047</span>
+        <span class="kpi-sub">ACL &amp; EMNLP papers (2020–2025) extracted with Docling PDF parser</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-tag">Evidence Tracing</span>
+        <span class="kpi-val">131,166</span>
+        <span class="kpi-sub">Sentence-level evidence spans with character offsets and reasoning justifications</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-tag">Taxonomy Evolution</span>
+        <span class="kpi-val">25 &rarr; 50</span>
+        <span class="kpi-sub">Codebook expanded additively across 4 iterative waves with human approval</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-tag">Reliability (IAA)</span>
+        <span class="kpi-val">&alpha; = 0.647</span>
+        <span class="kpi-sub">Validated against 150-paper human reference standard (Human baseline: &alpha; = 0.644)</span>
+      </div>
+    </div>
+
+    {/* Section 1: Architecture Diagram */}
+    <section class="methodology-section">
+      <div class="section-lead-header">
+        <div class="section-tag-row">
+          <span class="section-kpi-badge">System Architecture</span>
+          <span class="section-corpus-pill">Figure 1 in Published Paper</span>
+        </div>
+        <h2 class="methodology-subheading">Pipeline Architecture &amp; Feedback Loop</h2>
+        <p class="section-desc">
+          The pipeline executes in sequential passes: raw text is parsed into semantic units, coded deductively and inductively by Gemini 3.1 Pro, consolidated into candidate master codes, reviewed by expert human annotators, and fed back into subsequent temporal rounds. Hover or tap any stage in the diagram below to see what it does.
+        </p>
+      </div>
+
+      <div class="figure-wrapper-card">
+        <MethodologyFigure />
+        <div class="figure-caption-box">
+          <span><strong>Figure 1:</strong> Overview of the iterative hybrid coding architecture with human-in-the-loop codebook refinement.</span>
+          <a href={`${import.meta.env.BASE_URL}codebook`} class="subnav-link">Explore the 50-Code Codebook &rarr;</a>
+        </div>
+      </div>
+    </section>
+
+    {/* Section 1b: One real paper through every stage */}
+    <section class="methodology-section" id="paper-trace">
+      <div class="section-lead-header">
+        <div class="section-tag-row">
+          <span class="section-kpi-badge">Real Example</span>
+          <span class="section-corpus-pill">From the released dataset</span>
+        </div>
+        <h2 class="methodology-subheading">One Paper, End to End</h2>
+        <p class="section-desc">
+          Here is what the pipeline actually did with one short Limitations section from ACL 2024: every unit, every code, and the model's own justification, exactly as stored in the dataset.
+        </p>
+      </div>
+      <PaperTrace />
+    </section>
+
+    {/* Section 2: Sentence-Level Coding (Deductive vs. Inductive) */}
+    <section class="methodology-section" id="coding-walkthrough">
+      <div class="section-lead-header">
+        <div class="section-tag-row">
+          <span class="section-kpi-badge">Sentence-Level Coding</span>
+          <span class="section-corpus-pill">Figure 1 Walkthrough</span>
+        </div>
+        <h2 class="methodology-subheading">Sentence-Level Coding: Deductive vs. Inductive Modes</h2>
+        <p class="section-desc">
+          As illustrated in Figure 1, the pipeline parses paper limitations into individual semantic units. Each unit is then coded in one of two ways: <strong>Deductive Coding</strong>, matching it to a code already in the codebook (C<sub>t-1</sub>, the version before this round), or <strong>Inductive Coding</strong>, proposing a new candidate code when no existing one fits. Two more real sentences:
+        </p>
+      </div>
+
+      <WorkedExample client:visible />
+    </section>
+
+    {/* Section 3: Consolidation Diagram */}
+    <CodeConsolidationDiagram />
+
+    {/* Section 4: Evaluation & Inter-Annotator Agreement */}
+    <section class="methodology-section" id="evaluation">
+      <div class="section-lead-header">
+        <div class="section-tag-row">
+          <span class="section-kpi-badge">Methodological Validation</span>
+          <span class="section-corpus-pill">Human Consensus Benchmark</span>
+        </div>
+        <h2 class="methodology-subheading">Can We Trust the LLM's Coding?</h2>
+        <p class="section-desc">
+          Before trusting the LLM with 16,047 papers, its coding was compared with a 150-paper reference set coded independently by expert human annotators. The question: does adding the LLM as one more coder change how much the coders agree? Then, which codes are easy to agree on, and which are hard even for humans?
+        </p>
+      </div>
+
+      <EvaluationSection client:visible />
+    </section>
+  </div>
 </BaseLayout>

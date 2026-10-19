@@ -7,7 +7,7 @@ import { paper } from "../data/paper";
   <div class="explore-page-header">
     <h1>Explore the Dataset</h1>
     <p class="intro">
-      Audit and search all 16,047 LLM-coded papers across ACL and EMNLP (2016–2025). 
+      Audit and search all 16,047 LLM-coded papers across ACL and EMNLP (2020–2025). 
       Click any paper to inspect its original Limitations section with <strong>sentence-level thematic highlighting</strong>, 
       view the author's abstract, or filter papers by the 5 Thematic Limitation Groups.
     </p>
@@ -305,6 +305,27 @@ import { paper } from "../data/paper";
     .explorer-workspace {
       grid-template-columns: 1fr;
     }
+    /* Single column: an open paper goes above the list; the empty
+       "select a paper" placeholder is hidden. */
+    .detail-pane {
+      order: -1;
+      position: static;
+      height: auto;
+      max-height: none;
+      scroll-margin-top: calc(var(--header-h) + 0.75rem);
+    }
+    .detail-pane.is-empty {
+      display: none;
+    }
+    .master-pane {
+      height: 640px;
+    }
+    .theme-pills-bar {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      overflow-x: visible;
+    }
   }
 
   /* ---------------- Left Pane: Master Paper List ---------------- */
@@ -497,7 +518,7 @@ import { paper } from "../data/paper";
     height: 760px;
     overflow-y: auto;
     position: sticky;
-    top: 1rem;
+    top: calc(var(--header-h) + 1rem);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     display: flex;
     flex-direction: column;
@@ -932,5 +953,108 @@ import { paper } from "../data/paper";
   }
   .link-action-btn:hover {
     color: var(--color-text);
+  }
+
+  /* ---------------- Sort, starters, readable code tags ---------------- */
+  .sort-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    margin-left: auto;
+  }
+  .sort-control select {
+    font: inherit;
+    font-weight: 500;
+    color: var(--color-text);
+    padding: 0.2rem 0.4rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-bg);
+  }
+  .starter-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+  }
+  .starter-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    margin-right: 0.25rem;
+  }
+  .starter-btn {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #1d4ed8;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    padding: 0.32rem 0.8rem;
+    cursor: pointer;
+  }
+  .starter-btn:hover {
+    background: #dbeafe;
+  }
+  .pattern-chip {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  .theme-mini-tag {
+    max-width: 11rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+  .more-codes-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    padding: 0.05rem 0.3rem;
+  }
+
+  /* ---------------- Discourse-pattern sentence pairs ---------------- */
+  .pattern-legend {
+    margin: -0.25rem 0 0.75rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.82rem;
+    color: #92400e;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 6px;
+  }
+  .sentence-block.pattern-hit {
+    outline: 2px dashed #d97706;
+    outline-offset: 2px;
+  }
+  .pattern-role {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #b45309;
+  }
+  .justification-definition {
+    margin: 0.5rem 0 0;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--color-border);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+  .justification-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+  }
+  a.link-action-btn {
+    text-decoration: none;
   }
 </style>

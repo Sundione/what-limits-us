@@ -102,7 +102,7 @@ export default function AreaAndAffiliation() {
   const displayedFormatRows = useMemo(() => {
     const q = formatSearch.toLowerCase().trim();
     let rows = PAPER_FORMAT_DATA.filter((r) => {
-      if (formatFilter === "divergent" && r.pValue >= 0.05) return false;
+      if (formatFilter === "divergent" && !r.isExploratoryHighlight && r.pValue >= 0.05) return false;
       if (q && !r.code.toLowerCase().includes(q)) return false;
       return true;
     });
@@ -125,28 +125,14 @@ export default function AreaAndAffiliation() {
   }, [formatSearch, formatFilter, formatSort]);
 
   return (
-    <div class="area-affiliation-section" id="attributes-rq2">
-      {/* Section Lead Header */}
-      <div class="section-lead-header">
-        <div class="section-tag-row">
-          <span class="section-kpi-badge">RQ2 · Paper Attributes &amp; Subfields</span>
-          <span class="section-corpus-pill">29 Research Areas · Forbes Global 2000 · 3 Formats</span>
-        </div>
-        <h2 class="results-subheading">Field-Wide Homogeneity, Corporate Disclosures &amp; Paper Formats</h2>
-        <p class="section-desc">
-          Does limitation reporting differ by research subfield, author affiliation, or publication format? 
-          Our cross-attribute analysis reveals an empirical pattern: <strong>97.2% field-wide uniformity</strong> across 29 research subfields, 
-          contrasted with targeted divergence in corporate disclosures and short paper admissions.
-        </p>
-      </div>
-
+    <div class="area-affiliation-section">
       {/* Plain-Language Intuitive Takeaways for First-Time Readers */}
       <div class="rq-intuitive-lead-box">
         <div class="lead-box-header">
           <span class="lead-box-icon">💡</span>
           <div class="lead-box-title-wrap">
-            <h4 class="lead-box-title">Key Takeaways for Readers · Intuitive Summary</h4>
-            <p class="lead-box-sub">Essential takeaways translating statistical tests into accessible insights for readers exploring this research.</p>
+            <h3 class="lead-box-title">Three comparisons</h3>
+            <p class="lead-box-sub">By research area, by author affiliation, and by paper format. Details and full tables follow below.</p>
           </div>
         </div>
         <div class="lead-points-grid">
@@ -157,10 +143,10 @@ export default function AreaAndAffiliation() {
             </div>
             <strong class="point-title">Field-Wide Uniformity: A Shared Reporting Template</strong>
             <p class="point-text">
-              Across 29 distinct research areas—from Machine Translation to Dialogue and Speech—97.2% of papers share the exact same top-3 limitation themes (Scope Bounding, Methodology, and Compute), reflecting an unwritten community reporting template.
+              Across 29 research areas, 1,128 of 1,160 (area, code) pairs (97.2%) show no statistically significant deviation from the field average: different subfields report limitations in remarkably similar proportions.
             </p>
             <div class="point-highlight">
-              <strong>Notable Exceptions:</strong> Only 32 statistically significant deviations exist (q &lt; 0.05). For instance, Computational Social Science cites <em>Dataset Bias</em> 2.2&times; more often, while Efficient NLP cites <em>Hyperparameter Sensitivity</em> 3.5&times; more often.
+              <strong>Notable Exceptions:</strong> Only 32 cells (2.76%) differ significantly after Bonferroni correction. For instance, Computational Social Science cites <em>Dataset Bias</em> 2.2&times; more often, while Efficient NLP cites <em>Hyperparameter Sensitivity</em> 3.5&times; more often.
             </div>
           </div>
 
@@ -169,12 +155,12 @@ export default function AreaAndAffiliation() {
               <span class="point-icon">🏢</span>
               <span class="point-badge">Corporate vs. Academia</span>
             </div>
-            <strong class="point-title">Big Tech Reports Compute Bottlenecks at Similar Rates to Academia</strong>
+            <strong class="point-title">Large Companies Report Scope Limitation Less Often</strong>
             <p class="point-text">
-              Despite having access to vast compute clusters, corporate researchers (Google, Meta, Microsoft) report <em>High Resource Requirements</em> at virtually identical rates (~20%) as university researchers, as corporate experiments scale up to match infrastructure.
+              Papers without large-company (Forbes Global 2000) affiliations report <em>Scope Limitation</em> significantly more often than papers with only large-company affiliations (63.6% vs. 56.6%, adj. p = 0.019).
             </p>
             <div class="point-highlight">
-              <strong>The Sole Major Divergence:</strong> Industry authors bound their experimental scope significantly more often (69.3% vs. 62.4%, p &lt; 0.001), serving as a deliberate risk-management strategy to establish product boundaries.
+              <strong>Everything else is similar:</strong> e.g. <em>High Resource Requirements</em> appears at nearly identical rates (19.3% vs. 19.7%). Other gaps, such as Data Scarcity or High Time Consumption, are not statistically significant.
             </div>
           </div>
 
@@ -183,12 +169,12 @@ export default function AreaAndAffiliation() {
               <span class="point-icon">📄</span>
               <span class="point-badge">Publication Formats</span>
             </div>
-            <strong class="point-title">Short Papers Focus Heavily on What Was Left Out</strong>
+            <strong class="point-title">Paper Format Makes Little Difference</strong>
             <p class="point-text">
-              Constrained by a 4-page ceiling, short papers disproportionately acknowledge experimental boundaries (Scope Limitations) and upstream model dependencies compared to long papers.
+              Across 7,033 ACL long, short, and Findings papers, no code differs significantly by format after Benjamini–Hochberg correction.
             </p>
             <div class="point-highlight">
-              <strong>Key Implication:</strong> This highlights that a substantial fraction of reported limitations stem from physical page constraints rather than fundamental methodological defects.
+              <strong>Exploratory observation:</strong> Short papers mention <em>Empirical Underperformance</em> somewhat more often (12.2% vs. 7.5%, adj. p = 0.266), consistent with their often smaller-scale or preliminary experiments.
             </div>
           </div>
         </div>
@@ -386,7 +372,7 @@ export default function AreaAndAffiliation() {
 
                     <p class="pair-note-text">{p.note}</p>
                     <div class="pair-card-footer">
-                      <span class="pair-footer-stat">Bonferroni adj. p = {p.adjP}</span>
+                      <span class="pair-footer-stat">Bonferroni adj. p {String(p.adjP).trim().startsWith("<") ? p.adjP : `= ${p.adjP}`}</span>
                       <a
                         href={`${import.meta.env.BASE_URL}explore?code=${encodeURIComponent(p.code)}`}
                         class="pair-explore-link"
@@ -614,7 +600,7 @@ export default function AreaAndAffiliation() {
                       <div class="aff-row-badges">
                         {row.significant && (
                           <span class="sig-badge" title="Statistically significant after Benjamini-Hochberg FDR correction">
-                            ★ Statistically Significant (adj. p = {row.adjP != null ? (row.adjP < 0.001 ? "< 0.001" : row.adjP.toFixed(3)) : "N/A"})
+                            ★ Statistically Significant (adj. p {row.adjP != null ? (row.adjP < 0.001 ? "< 0.001" : `= ${row.adjP.toFixed(3)}`) : "= N/A"})
                           </span>
                         )}
                         <span class={`delta-badge ${row.diff > 0 ? "delta-bigtech" : "delta-academia"}`}>
@@ -628,7 +614,7 @@ export default function AreaAndAffiliation() {
                           </span>
                         )}
                         <span class="stat-pill-subtle" title="Benjamini-Hochberg Adjusted p-value">
-                          adj. p = {row.adjP != null ? (row.adjP < 0.001 ? "< 0.001" : row.adjP.toFixed(3)) : "N/A"}
+                          adj. p {row.adjP != null ? (row.adjP < 0.001 ? "< 0.001" : `= ${row.adjP.toFixed(3)}`) : "= N/A"}
                         </span>
                       </div>
                     </div>
@@ -755,15 +741,15 @@ export default function AreaAndAffiliation() {
           {/* Affiliation Qualitative Synthesis Cards */}
           <div class="aff-synthesis-grid">
             <div class="synthesis-card">
-              <h4 class="synthesis-title">🏛️ Academia: Elevated Scope Bounding &amp; Data Scarcity</h4>
+              <h4 class="synthesis-title">🏛️ Non-large company: More Scope Limitation</h4>
               <p class="synthesis-text">
-                Non-large company (academic) papers disclose a <strong>significantly higher rate of Scope Limitation</strong> (63.6% vs 56.6%, diff = -6.96%, FDR adj. p = 0.019) and higher <em>Data Scarcity</em> (13.4% vs 9.8%). Academic researchers frequently face resource ceilings that mandate tighter domain bounding and cautious claims to withstand reviewer scrutiny.
+                Non-large company (academic) papers disclose a <strong>significantly higher rate of Scope Limitation</strong> (63.6% vs 56.6%, diff = -6.96%, FDR adj. p = 0.019) and higher <em>Data Scarcity</em> (13.4% vs 9.8%, not significant).
               </p>
             </div>
             <div class="synthesis-card">
-              <h4 class="synthesis-title">🏢 Big Tech: High Time Consumption &amp; Model Failures</h4>
+              <h4 class="synthesis-title">🏢 Large company: Higher raw rates, not significant</h4>
               <p class="synthesis-text">
-                Conversely, large commercial labs report higher raw rates of <em>High Time Consumption</em> (11.9% vs 8.8%) and <em>Empirical Underperformance</em> (9.0% vs 6.9%). Despite near-limitless GPU clusters, Big Tech workflows involve extreme scale and long training runs where wall-clock iteration latency becomes the primary development bottleneck.
+                Conversely, large commercial labs report higher raw rates of <em>High Time Consumption</em> (11.9% vs 8.8%) and <em>Empirical Underperformance</em> (9.0% vs 6.9%), but none of these differences is statistically significant after Benjamini–Hochberg correction.
               </p>
             </div>
           </div>
@@ -829,7 +815,7 @@ export default function AreaAndAffiliation() {
                   class={`f-toggle-btn ${formatFilter === "divergent" ? "f-btn-active" : ""}`}
                   onClick={() => setFormatFilter("divergent")}
                 >
-                  Significant Divergence (p &lt; 0.05)
+                  Exploratory (raw p &lt; 0.05)
                 </button>
               </div>
 
@@ -877,6 +863,7 @@ export default function AreaAndAffiliation() {
           <div class="format-bars-container">
             {displayedFormatRows.map((row) => {
               const maxVal = 70; // 70% scale
+              // Raw p only: no format difference survives Benjamini–Hochberg correction (paper §4.3).
               const isSignificant = row.pValue < 0.05;
 
               return (
@@ -891,14 +878,14 @@ export default function AreaAndAffiliation() {
                       </a>
                       {isSignificant && (
                         <span class="format-spike-badge">
-                          ★ Format Divergence (p = {row.pValue < 0.001 ? "< 0.001" : row.pValue.toFixed(3)})
+                          Exploratory · raw p {row.pValue < 0.001 ? "< 0.001" : `= ${row.pValue.toFixed(3)}`}, adj. p = {row.adjP.toFixed(3)}
                         </span>
                       )}
                     </div>
                     <div class="format-stat-meta">
                       <span>&chi;&sup2; = {row.chi2.toFixed(2)}</span>
                       <span>·</span>
-                      <span>p = {row.pValue < 0.001 ? "< 0.001" : row.pValue.toFixed(3)}</span>
+                      <span>p {row.pValue < 0.001 ? "< 0.001" : `= ${row.pValue.toFixed(3)}`}</span>
                       {row.cramersV !== undefined && (
                         <>
                           <span>·</span>

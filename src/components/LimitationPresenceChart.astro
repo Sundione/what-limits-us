@@ -468,11 +468,12 @@ function exploreUrl(year: number, venue: string) {
   </div>
 
   <p class="presence-caption">
-    <strong>Interactive Tip:</strong> Click any item in the legend below to toggle that bar segment or line on/off. Hover over a legend item to isolate that specific data stream. From EMNLP 2022 onward, the % adoption line reflects policy adoption (&ldquo;pipeline failures&rdquo; are inconclusive and not counted as non-adopters).
+    <strong>Interactive Tip:</strong> Click any item in the legend above to toggle that bar segment or line on/off. Hover over a legend item to isolate that specific data stream. From EMNLP 2022 onward, the % adoption line reflects policy adoption (&ldquo;pipeline failures&rdquo; are inconclusive and not counted as non-adopters).
   </p>
 
   <details class="presence-table-details">
     <summary>View exact counts table</summary>
+    <div class="presence-table-scroll">
     <table class="presence-table">
       <thead>
         <tr>
@@ -494,6 +495,7 @@ function exploreUrl(year: number, venue: string) {
         ))}
       </tbody>
     </table>
+    </div>
     <p class="presence-table-note">
       &ldquo;Pipeline failure&rdquo; = extraction pipeline could not parse PDF (inconclusive). &ldquo;Truly missing&rdquo; = verified to lack a section. Only tracked from EMNLP 2022 onward. From paper Section 4.1 / Table 3.
     </p>
@@ -1061,6 +1063,11 @@ function exploreUrl(year: number, venue: string) {
     color: var(--color-text);
   }
 
+  /* Wide table scrolls inside its own box on narrow screens. */
+  .presence-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
   .presence-table-details {
     margin-top: 0.75rem;
     font-size: 0.85rem;

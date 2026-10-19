@@ -1,0 +1,306 @@
+---
+// One real paper traced through the whole pipeline, rendered at build time from
+// the generated per-paper file (zero client JS): published Limitations text ->
+// semantic units -> codes with evidence spans and justifications -> what
+// happened to the new code afterwards.
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import type { PaperDetail } from "../../../scripts/types";
+import { NL_PREFIX } from "../../../scripts/lib/transitions";
+
+const PAPER_ID = "2024.acl-long.599";
+const baseUrl = import.meta.env.BASE_URL;
+
+const detail: PaperDetail = JSON.parse(
+  readFileSync(path.resolve(process.cwd(), `public/data/papers/${PAPER_ID}.json`), "utf-8"),
+);
+
+type Kind = "deductive" | "inductive" | "non-limitation";
+interface Mark {
+  code: string;
+  kind: Kind;
+  start: number | null;
+  end: number | null;
+  justification: string;
+}
+
+const kindOf = (code: string, origin: "existing" | "new"): Kind =>
+  origin === "new" ? "inductive" : code.startsWith(NL_PREFIX) ? "non-limitation" : "deductive";
+
+const marksBySentence = new Map<string, Mark[]>();
+for (const a of detail.llm.codes) {
+  for (const ev of a.evidence) {
+    const list = marksBySentence.get(ev.sentenceId) ?? [];
+    list.push({ code: a.code, kind: kindOf(a.code, a.origin), start: ev.start, end: ev.end, justification: ev.justification });
+    marksBySentence.set(ev.sentenceId, list);
+  }
+}
+
+/** Splits a sentence into plain and highlighted pieces (non-overlapping exact spans only). */
+function pieces(text: string, marks: Mark[]) {
+  const exact = marks
+    .filter((m): m is Mark & { start: number; end: number } => m.start !== null && m.end !== null)
+    .sort((a, b) => a.start - b.start);
+  const out: { text: string; kind?: Kind }[] = [];
+  let cursor = 0;
+  for (const m of exact) {
+    if (m.start < cursor) continue;
+    if (m.start > cursor) out.push({ text: text.slice(cursor, m.start) });
+    out.push({ text: text.slice(m.start, m.end), kind: m.kind });
+    cursor = m.end;
+  }
+  if (cursor < text.length) out.push({ text: text.slice(cursor) });
+  return out;
+}
+
+const units = detail.llm.sentences.map((s, i) => ({
+  n: i + 1,
+  text: s.text.trim(),
+  marks: marksBySentence.get(s.id) ?? [],
+}));
+const coded = units.filter((u) => u.marks.length > 0).length;
+const kindLabel: Record<Kind, string> = {
+  deductive: "Existing code",
+  inductive: "New code proposed",
+  "non-limitation": "Non-limitation move",
+};
+---
+
+<div class="trace">
+  <p class="trace-source">
+    <strong>{detail.title}</strong> ({detail.venue.toUpperCase()} {detail.year}) ·
+    <a href={`https://aclanthology.org/${detail.id}/`} target="_blank" rel="noopener noreferrer">{detail.id} ↗</a>
+  </p>
+
+  <ol class="trace-steps">
+    <li class="trace-step">
+      <span class="trace-step-num">1</span>
+      <div class="trace-step-body">
+        <h3>The Limitations section, as published</h3>
+        <p class="trace-help">Extracted from the paper PDF. This is the only input the pipeline sees.</p>
+        <blockquote class="trace-raw">{detail.llm.limitation}</blockquote>
+      </div>
+    </li>
+
+    <li class="trace-step">
+      <span class="trace-step-num">2</span>
+      <div class="trace-step-body">
+        <h3>Split into {units.length} semantic units</h3>
+        <p class="trace-help">
+          A semantic unit is one self-contained statement, usually a sentence. The splitter (Gemini 2.5 Flash) is
+          instructed to keep the original wording exactly, without omitting or rewriting anything.
+        </p>
+        <ol class="trace-units">
+          {units.map((u) => <li><span class="unit-id">s{u.n}</span> {u.text}</li>)}
+        </ol>
+      </div>
+    </li>
+
+    <li class="trace-step">
+      <span class="trace-step-num">3</span>
+      <div class="trace-step-body">
+        <h3>Each unit is coded ({coded} of {units.length} received a code)</h3>
+        <p class="trace-help">
+          Gemini 3.1 Pro compares every unit with the current codebook (here C₂, the version after the 2023 round). It
+          assigns an existing code where one fits, proposes a new code where none does, and quotes the exact words
+          (highlighted) with a one-line justification.
+        </p>
+        <div class="trace-legend">
+          <span class="trace-chip chip-deductive">Existing code (deductive)</span>
+          <span class="trace-chip chip-inductive">New code proposed (inductive)</span>
+          <span class="trace-chip chip-non-limitation">Non-limitation move</span>
+        </div>
+        <div class="trace-coded">
+          {units.map((u) => (
+            <div class={`trace-unit ${u.marks.length ? "" : "is-uncoded"}`}>
+              <span class="unit-id">s{u.n}</span>
+              <div>
+                <p class="trace-unit-text">
+                  {pieces(u.text, u.marks).map((p) => (p.kind ? <mark class={`mark-${p.kind}`}>{p.text}</mark> : p.text))}
+                </p>
+                {u.marks.length === 0 ? (
+                  <p class="trace-no-code">No code: a background statement, not a limitation.</p>
+                ) : (
+                  u.marks.map((m) => (
+                    <div class="trace-assignment">
+                      <span class={`trace-chip chip-${m.kind}`}>{kindLabel[m.kind]}: {m.code.replace(NL_PREFIX, "")}</span>
+                      <p class="trace-why"><strong>Why:</strong> {m.justification}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </li>
+
+    <li class="trace-step">
+      <span class="trace-step-num">4</span>
+      <div class="trace-step-body">
+        <h3>The new code goes to human review</h3>
+        <p class="trace-help">
+          At the end of the 2024 round, the proposed <strong>Literature Coverage Gap</strong> was pooled with similar
+          proposals from other papers. No existing code covered it, so the researchers approved it as a new code:
+          it appears in codebook C₃ and was used to code the 2025 papers. The paper itself quotes s5 as the example
+          for this new code (§4.2).
+        </p>
+        <p class="trace-cta">
+          <a href={`${baseUrl}explore?paper=${detail.id}`}>Open this paper in the explorer &rarr;</a>
+          <a href={`${baseUrl}codebook?code=${encodeURIComponent("Literature Coverage Gap")}`}>See Literature Coverage Gap in the codebook &rarr;</a>
+        </p>
+      </div>
+    </li>
+  </ol>
+</div>
+
+<style>
+  .trace-source {
+    margin: 0 0 1.25rem;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+  .trace-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .trace-step {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.9rem;
+  }
+  .trace-step-num {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #0f172a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  .trace-step-body h3 {
+    margin: 0.2rem 0 0.3rem;
+    font-size: 1.05rem;
+  }
+  .trace-help {
+    margin: 0 0 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--color-muted);
+    max-width: 760px;
+  }
+  .trace-raw {
+    margin: 0;
+    padding: 0.9rem 1.1rem;
+    border-left: 4px solid #cbd5e1;
+    background: var(--color-surface);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+  .trace-units {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  .trace-units li {
+    padding: 0.45rem 0.7rem;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+  }
+  .unit-id {
+    display: inline-block;
+    min-width: 1.6rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-muted);
+  }
+  .trace-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+  }
+  .trace-chip {
+    display: inline-block;
+    padding: 0.12rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    border: 1px solid;
+  }
+  .chip-deductive { color: #1e40af; background: #dbeafe; border-color: #bfdbfe; }
+  .chip-inductive { color: #9a3412; background: #ffedd5; border-color: #fed7aa; }
+  .chip-non-limitation { color: #5b21b6; background: #ede9fe; border-color: #ddd6fe; }
+  .trace-coded {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .trace-unit {
+    display: grid;
+    grid-template-columns: 1.8rem minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-bg);
+  }
+  .trace-unit.is-uncoded {
+    background: var(--color-surface);
+  }
+  .trace-unit-text {
+    margin: 0 0 0.45rem;
+    font-size: 0.93rem;
+    line-height: 1.55;
+  }
+  .trace-unit mark {
+    padding: 0.05rem 0.15rem;
+    border-radius: 3px;
+    color: inherit;
+  }
+  .mark-deductive { background: #dbeafe; border-bottom: 2px solid #2563eb; }
+  .mark-inductive { background: #ffedd5; border-bottom: 2px solid #ea580c; }
+  .mark-non-limitation { background: #ede9fe; border-bottom: 2px solid #7c3aed; }
+  .trace-no-code {
+    margin: 0;
+    font-size: 0.82rem;
+    font-style: italic;
+    color: var(--color-muted);
+  }
+  .trace-assignment + .trace-assignment {
+    margin-top: 0.4rem;
+  }
+  .trace-why {
+    margin: 0.3rem 0 0;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+  .trace-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    margin: 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .trace-cta a {
+    text-decoration: none;
+  }
+  .trace-cta a:hover {
+    text-decoration: underline;
+  }
+</style>

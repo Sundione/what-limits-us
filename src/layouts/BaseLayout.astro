@@ -153,6 +153,46 @@ const isItemActive = (key: string) => {
         </div>
       </div>
     </footer>
+    <script>
+      // Scroll-spy for in-page sub-navs (methodology, results): marks the
+      // section currently under the sticky header as active.
+      const links = [...document.querySelectorAll<HTMLAnchorElement>('.subnav-links a[href^="#"]')];
+      const targets = links
+        .map((a) => document.getElementById(a.hash.slice(1)))
+        .filter((el): el is HTMLElement => el !== null);
+      if (targets.length) {
+        let currentId = "";
+        const update = () => {
+          const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 65;
+          let current = targets[0];
+          for (const t of targets) {
+            if (t.getBoundingClientRect().top - (headerH + 90) <= 0) current = t;
+          }
+          if (current.id === currentId) return;
+          currentId = current.id;
+          for (const a of links) {
+            const on = a.hash === `#${current.id}`;
+            a.classList.toggle("is-active", on);
+            if (on) {
+              a.setAttribute("aria-current", "location");
+              // Keep the active pill visible when the sub-nav scrolls sideways on phones.
+              const strip = a.closest<HTMLElement>(".methodology-subnav-inner, .results-subnav-inner");
+              if (strip) {
+                const ar = a.getBoundingClientRect();
+                const sr = strip.getBoundingClientRect();
+                if (ar.left < sr.left || ar.right > sr.right) {
+                  strip.scrollBy({ left: ar.left - sr.left - 16, behavior: "smooth" });
+                }
+              }
+            } else {
+              a.removeAttribute("aria-current");
+            }
+          }
+        };
+        addEventListener("scroll", update, { passive: true });
+        update();
+      }
+    </script>
   </body>
 </html>
 
@@ -170,6 +210,8 @@ const isItemActive = (key: string) => {
     --color-human-bg: #f0fdfa;
     --max-width: 1040px;
     --nav-max-width: 1360px;
+    /* Height of the sticky site header; page sub-navs stick just below it. */
+    --header-h: 65px;
   }
 
   * { box-sizing: border-box; }
@@ -422,6 +464,9 @@ const isItemActive = (key: string) => {
 
   /* Responsive Navbar */
   @media (max-width: 960px) {
+    :root {
+      --header-h: 107px;
+    }
     .site-header nav {
       padding: 0.65rem 1rem;
       flex-wrap: wrap;
@@ -430,20 +475,74 @@ const isItemActive = (key: string) => {
     .brand-venue-tag {
       display: none;
     }
-    .nav-actions {
+    /* arXiv / GitHub stay reachable as icon-only buttons */
+    .nav-action-btn {
+      padding: 0.42rem 0.55rem;
+    }
+    .nav-action-btn span {
       display: none;
     }
     .nav-links {
       order: 3;
       width: 100%;
-      overflow-x: auto;
-      justify-content: flex-start;
-      -webkit-overflow-scrolling: touch;
+      justify-content: center;
       padding: 0.2rem;
     }
     .nav-item {
       padding: 0.32rem 0.65rem;
       font-size: 0.82rem;
+    }
+  }
+
+  /* Phones: the five sections move to a fixed bottom tab bar so none of
+     them (especially Explore) is ever scrolled out of view. */
+  @media (max-width: 640px) {
+    :root {
+      --header-h: 59px;
+    }
+    body {
+      padding-bottom: calc(58px + env(safe-area-inset-bottom));
+    }
+    .brand-title {
+      font-size: 1.2rem;
+    }
+    .nav-links {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      width: auto;
+      padding: 0.25rem 0.25rem calc(0.25rem + env(safe-area-inset-bottom));
+      border: 0;
+      border-top: 1px solid var(--color-border);
+      border-radius: 0;
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 -4px 12px -4px rgba(0, 0, 0, 0.06);
+    }
+    .nav-item {
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.18rem;
+      min-height: 48px;
+      padding: 0.3rem 0.1rem;
+      font-size: 0.7rem;
+    }
+    .nav-item.active {
+      box-shadow: none;
+      background: #eff6ff;
+    }
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+    }
+    .nav-badge {
+      display: none;
     }
   }
 </style>
