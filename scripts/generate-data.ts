@@ -6,15 +6,18 @@ import { fileURLToPath } from "node:url";
 import { deriveVenueTrack } from "./lib/deriveVenueTrack.js";
 import { loadCodeDefinitions } from "./lib/codebook.js";
 import { resolveEvidence } from "./lib/resolveEvidence.js";
+import { findTransitions } from "./lib/transitions.js";
 import type {
   CodeAssignment,
   CodebookVersion,
+  EvidenceSpan,
   GlobalIndex,
   IndexEntry,
   LlmCoding,
   PaperDetail,
   RawLlmPaper,
   Sentence,
+  TransitionIndex,
 } from "./types.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -161,6 +164,7 @@ function main() {
   const codeDefinitionsArr = codes.map((c) => codeDefinitions.get(c) ?? null);
 
   const indexEntries: IndexEntry[] = [];
+  const transitionsById = new Map<string, { after: Set<string>; before: Set<string> }>();
   let totalFallback = 0;
   let totalSpans = 0;
 
@@ -190,6 +194,10 @@ function main() {
     };
     writeFileSync(path.join(outPapersDir, `${id}.json`), JSON.stringify(detail));
 
+    const paperTransitions = { after: new Set<string>(), before: new Set<string>() };
+    for (const t of findTransitions(built.coding)) paperTransitions[t.dir].add(t.nlCode);
+    transitionsById.set(id, paperTransitions);
+
     indexEntries.push({
       id,
       title: paper.title,
@@ -210,6 +218,16 @@ function main() {
     papers: indexEntries,
   };
   writeFileSync(path.join(outDataDir, "index.json"), JSON.stringify(index));
+
+  // Loaded by the explorer only when a ?after= / ?before= pattern filter is used.
+  const transitions: TransitionIndex = { after: {}, before: {} };
+  indexEntries.forEach((entry, i) => {
+    const t = transitionsById.get(entry.id)!;
+    for (const dir of ["after", "before"] as const) {
+      for (const code of t[dir]) (transitions[dir][code] ??= []).push(i);
+    }
+  });
+  writeFileSync(path.join(outDataDir, "transitions.json"), JSON.stringify(transitions));
 
   console.log(`[generate-data] wrote ${indexEntries.length} papers to ${outPapersDir}`);
   console.log(`[generate-data] ${codes.length} distinct codes (${codeDefinitionsArr.filter((d) => d === null).length} without a codebook definition)`);

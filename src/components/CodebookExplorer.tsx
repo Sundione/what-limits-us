@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "preact/hooks";
 import { THEMES, getThemeById, type ThemeDefinition } from "../data/themes";
+import { temporalMatrix } from "../data/resultsData";
 import {
   CODEBOOK_ENTRIES,
   MILESTONES,
@@ -7,9 +8,14 @@ import {
   type MilestoneSummary,
 } from "../data/codebookData";
 
+const MOST_COMMON_LIMITATION = CODEBOOK_ENTRIES.filter((e) => e.themeId !== "non-limitation").reduce((a, b) =>
+  b.prevalencePct > a.prevalencePct ? b : a,
+);
+
 export default function CodebookExplorer() {
   // Master-Detail selection: default to the first code
-  const [selectedCodeId, setSelectedCodeId] = useState<string>(CODEBOOK_ENTRIES[0].id);
+  // Open on the most widely reported limitation rather than an arbitrary first entry.
+  const [selectedCodeId, setSelectedCodeId] = useState<string>(MOST_COMMON_LIMITATION.id);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedThemeFilter, setSelectedThemeFilter] = useState<string>("all");
   const [highlightExpansions, setHighlightExpansions] = useState<boolean>(true);
@@ -215,6 +221,34 @@ export default function CodebookExplorer() {
           </svg>
           <span>{showEvolutionOverview ? "Hide Evolution Process" : "View Codebook Evolution (C₀ → C₄)"}</span>
         </button>
+      </div>
+
+      {/* THEME MAP: the 5 limitation themes + non-limitation moves at a glance */}
+      <div class="theme-map-grid">
+        {THEMES.map((theme) => {
+          const entries = CODEBOOK_ENTRIES.filter((e) => e.themeId === theme.id);
+          if (entries.length === 0) return null;
+          const top = entries.reduce((a, b) => (b.prevalencePct > a.prevalencePct ? b : a));
+          const isActive = selectedThemeFilter === theme.id;
+          return (
+            <button
+              key={theme.id}
+              type="button"
+              class={`theme-map-card ${isActive ? "active" : ""}`}
+              style={{ "--theme-color": theme.color, "--theme-bg": theme.bgLight }}
+              onClick={() => {
+                setSelectedThemeFilter(isActive ? "all" : theme.id);
+                if (!isActive) handleSelectCode(top.id);
+              }}
+              aria-pressed={isActive}
+            >
+              <span class="theme-map-name">{theme.shortTitle}</span>
+              <span class="theme-map-meta">
+                {entries.length} codes · most common: {top.name.replace("Non-Limitation: ", "")} ({top.prevalencePct.toFixed(1)}%)
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* COLLAPSIBLE EVOLUTION STORY (Progressive disclosure for interested researchers) */}
@@ -611,6 +645,20 @@ export default function CodebookExplorer() {
               </svg>
               <blockquote class="excerpt-quote">“{currentEntry.exampleQuote}”</blockquote>
             </div>
+            <div class="excerpt-source-row">
+              <a href={`${baseUrl}explore?paper=${encodeURIComponent(currentEntry.examplePaperId)}`}>
+                Read this sentence in context ({currentEntry.examplePaperId}) &rarr;
+              </a>
+              <a href={`${baseUrl}explore?code=${encodeURIComponent(currentEntry.name)}`}>
+                All {currentEntry.paperCount.toLocaleString()} papers with this code &rarr;
+              </a>
+            </div>
+          </section>
+
+          {/* SECTION 1b: PREVALENCE OVER TIME */}
+          <section class="detail-section">
+            <h3 class="section-heading">Prevalence Over Time</h3>
+            <CodeTrend code={currentEntry.name} color={getThemeById(currentEntry.themeId)?.color ?? "#2563eb"} />
           </section>
 
           {/* SECTION 3: EVOLUTION DIFF (Only when expansions exist) */}
@@ -700,6 +748,45 @@ export default function CodebookExplorer() {
           </nav>
         </main>
       </div>
+    </div>
+  );
+}
+
+
+/** Share of each year's papers carrying the code (all venues), as a small line chart. */
+function CodeTrend({ code, color }: { code: string; color: string }) {
+  const series = temporalMatrix.codeData[code]?.all;
+  if (!series) return null;
+  const years = temporalMatrix.years;
+  const points = years.map((y) => ({ year: y, ...series[String(y)] }));
+  const max = Math.max(...points.map((p) => p.pct), 1);
+  const W = 320;
+  const H = 90;
+  const padX = 18;
+  const padY = 14;
+  const x = (i: number) => padX + (i * (W - 2 * padX)) / (years.length - 1);
+  const y = (v: number) => H - padY - (v / max) * (H - 2 * padY);
+  const path = points.map((p, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(p.pct).toFixed(1)}`).join(" ");
+  const first = points[0];
+  const last = points[points.length - 1];
+  return (
+    <div class="code-trend">
+      <svg viewBox={`0 0 ${W} ${H + 16}`} class="code-trend-svg" role="img"
+        aria-label={`${code}: ${first.pct.toFixed(1)}% of papers in ${first.year}, ${last.pct.toFixed(1)}% in ${last.year}`}>
+        <path d={path} fill="none" stroke={color} stroke-width="2.5" stroke-linejoin="round" />
+        {points.map((p, i) => (
+          <g key={p.year}>
+            <circle cx={x(i)} cy={y(p.pct)} r="3.5" fill={color}>
+              <title>{`${p.year}: ${p.pct.toFixed(1)}% (${p.count} of ${p.total} papers)`}</title>
+            </circle>
+            <text x={x(i)} y={H + 12} text-anchor="middle" class="code-trend-year">{p.year}</text>
+          </g>
+        ))}
+      </svg>
+      <p class="code-trend-caption">
+        {first.pct.toFixed(1)}% of papers in {first.year} &rarr; <strong>{last.pct.toFixed(1)}%</strong> in {last.year}.
+        Few 2020–2021 papers had a Limitations section (n = {points[0].total}, {points[1].total}), so early values are noisy.
+      </p>
     </div>
   );
 }

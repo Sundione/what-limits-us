@@ -19,6 +19,8 @@ export interface CodebookEntry {
   definitionBase: string;
   expansions: CodeExpansion[];
   exampleQuote: string;
+  /** Anthology ID of the paper the example sentence comes from (opens in the explorer). */
+  examplePaperId: string;
 }
 
 export interface MilestoneSummary {
@@ -121,7 +123,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Refers to the requirement for significant processing power, high-performance hardware (e.g., A100 GPUs, TPU pods), or excessive usage of memory (RAM, VRAM, or disk storage), which may prevent the model from being deployed on consumer-grade hardware or edge devices.",
     "definitionBase": "Refers to the requirement for significant processing power, high-performance hardware (e.g., A100 GPUs, TPU pods), or excessive usage of memory (RAM, VRAM, or disk storage), which may prevent the model from being deployed on consumer-grade hardware or edge devices.",
     "expansions": [],
-    "exampleQuote": "Second, due to the limitation of computational resources, we focus on fine-tuning in this work, leaving applying ROSE to pre-training for future work."
+    "exampleQuote": "Second, due to the limitation of computational resources, we focus on fine-tuning in this work, leaving applying ROSE to pre-training for future work.",
+    "examplePaperId": "2022.emnlp-main.186"
   },
   {
     "id": "high-time-consumption",
@@ -134,7 +137,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Describes processes that require excessive duration for training, processing, or inference (latency), making the method unsuitable for some applications.",
     "definitionBase": "Describes processes that require excessive duration for training, processing, or inference (latency), making the method unsuitable for some applications.",
     "expansions": [],
-    "exampleQuote": "Due to the complexity of the dynamic programming algorithm, it takes almost two days to finish all training epochs on 1 Tesla V100 GPU (32GB memory)."
+    "exampleQuote": "For example, it takes us more than 10 hours to evaluate a checkpoint on a single NVIDIA A6000 GPU for all languages in the Mr. TyDi dataset.",
+    "examplePaperId": "2022.emnlp-main.730"
   },
   {
     "id": "high-financial-cost",
@@ -147,7 +151,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Refers to prohibitive monetary expenses required to replicate or use the method, such as cloud computing fees, proprietary API costs, or paid datasets.",
     "definitionBase": "Refers to prohibitive monetary expenses required to replicate or use the method, such as cloud computing fees, proprietary API costs, or paid datasets.",
     "expansions": [],
-    "exampleQuote": "First, due to budget limit, for the non-instruction following datasets, we only examined our methods with GPT3.5 and Gemini-1.0-Pro as LLM evaluators."
+    "exampleQuote": "First, due to budget limit, for the non-instruction following datasets, we only examined our methods with GPT3.5 and Gemini-1.0-Pro as LLM evaluators.",
+    "examplePaperId": "2024.emnlp-main.273"
   },
   {
     "id": "human-labor-and-annotation-bottleneck",
@@ -160,7 +165,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "A severe operational constraint where the method relies on heavy, non-scalable manual labor, domain expertise, or human intervention, or suffers from a scarcity, cognitive overload, or lack of quality control of human annotators.",
     "definitionBase": "A severe operational constraint where the method relies on heavy, non-scalable manual labor, domain expertise, or human intervention, or suffers from a scarcity, cognitive overload, or lack of quality control of human annotators.",
     "expansions": [],
-    "exampleQuote": "Finally, our approach relies on human feedback on new questions that TeachMe fails to answer or fails to justify indicating significant human efforts."
+    "exampleQuote": "Finally, our approach relies on human feedback on new questions that TeachMe fails to answer or fails to justify indicating significant human efforts.",
+    "examplePaperId": "2022.emnlp-main.644"
   },
   {
     "id": "scalability-bottleneck",
@@ -178,7 +184,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes static architectural constraints such as context window limitations or maximum input token lengths, which act as a hard ceiling for processing long-form data."
       }
     ],
-    "exampleQuote": "Second, our graph construction is quadratic in the number of document sentences, which restricts our method to documents of average length (e.g. 50-70 sentences)."
+    "exampleQuote": "Also, the token-token matrix is built on all tokens in each document, resulting in a large-scale matrix and the reduction of model training.",
+    "examplePaperId": "2023.acl-long.584"
   },
   {
     "id": "high-data-requirement",
@@ -191,7 +198,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Refers to architectural constraints where methods inherently demand massive volumes of training data to function competitively",
     "definitionBase": "Refers to architectural constraints where methods inherently demand massive volumes of training data to function competitively",
     "expansions": [],
-    "exampleQuote": "One limitation of this work is that the generative model used in this paper requires a large amount of training data and is computationally expensive."
+    "exampleQuote": "One limitation of this work is that the generative model used in this paper requires a large amount of training data and is computationally expensive.",
+    "examplePaperId": "2023.emnlp-main.350"
   },
   {
     "id": "environmental-impact",
@@ -204,7 +212,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "The real-world ecological consequences, such as carbon emissions and energy consumption, caused by the computational overhead of training or running large models.",
     "definitionBase": "The real-world ecological consequences, such as carbon emissions and energy consumption, caused by the computational overhead of training or running large models.",
     "expansions": [],
-    "exampleQuote": "Thirdly, compared to single-agent approaches, multiple agents require more tokens and time, increasing computational demands and environmental impact."
+    "exampleQuote": "Thirdly, compared to single-agent approaches, multiple agents require more tokens and time, increasing computational demands and environmental impact.",
+    "examplePaperId": "2024.acl-long.810"
   },
   {
     "id": "scope-limitation",
@@ -217,7 +226,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Clarifies the deliberate boundaries set by the researchers, detailing what was explicitly excluded from the study (e.g., specific languages, model sizes).",
     "definitionBase": "Clarifies the deliberate boundaries set by the researchers, detailing what was explicitly excluded from the study (e.g., specific languages, model sizes).",
     "expansions": [],
-    "exampleQuote": "Despite the strong performance of our two key designs (COCO and iDRO), we mainly verify their efficacy from their empirical performance on BEIR tasks."
+    "exampleQuote": "Despite the strong performance of our two key designs (COCO and iDRO), we mainly verify their efficacy from their empirical performance on BEIR tasks.",
+    "examplePaperId": "2022.emnlp-main.95"
   },
   {
     "id": "methodological-constraints",
@@ -235,7 +245,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: pipeline complexity, preprocessing overhead, training instability, hardware/framework incompatibilities, and the need for task-specific architectural adaptations."
       }
     ],
-    "exampleQuote": "We use a simple heuristically derived semantic similarity metric, which may not fully capture all aspects of semantic similarity between sentence pairs (Table 3)."
+    "exampleQuote": "In particular, our dataset treats physical harm as binary, with text classified as leading to physical harm or not leading to physical harm.",
+    "examplePaperId": "2022.emnlp-main.154"
   },
   {
     "id": "generalization-gap",
@@ -253,7 +264,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: vulnerability to overfitting on specific datasets or artifacts during training, and sensitivity to noisy, corrupted, or highly variable input data."
       }
     ],
-    "exampleQuote": "For the latter, we increase our dataset with samples from the CNN/DM dataset, partially mitigating the problem, but out-of-domain topics still suffer."
+    "exampleQuote": "For the latter, we increase our dataset with samples from the CNN/DM dataset, partially mitigating the problem, but out-of-domain topics still suffer.",
+    "examplePaperId": "2022.findings-emnlp.138"
   },
   {
     "id": "empirical-underperformance",
@@ -271,7 +283,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": ", or yields only marginal and underwhelming empirical improvements."
       }
     ],
-    "exampleQuote": "First, there is still a performance gap between our method and the vanilla transformer in the language modeling task and CNN/Daily summarization task."
+    "exampleQuote": "First, there is still a performance gap between our method and the vanilla transformer in the language modeling task and CNN/Daily summarization task.",
+    "examplePaperId": "2022.emnlp-main.24"
   },
   {
     "id": "real-world-deployment-barrier",
@@ -289,7 +302,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: evaluation datasets or synthetic data failing to faithfully capture the true distribution of live environments."
       }
     ],
-    "exampleQuote": "Moreover, our experiments are conducted on standard benchmark datasets, which may not faithfully represent the noise and complexity of real-world text streams."
+    "exampleQuote": "However, compared to the information in real-world scenarios, the complexity and breadth of data in DetectBench are noticeably insufficient.",
+    "examplePaperId": "2024.findings-emnlp.11"
   },
   {
     "id": "performance-trade-off",
@@ -302,7 +316,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Highlights scenarios where an improvement in one metric (e.g., efficiency, speed) results in a direct and unavoidable degradation of another metric (e.g., accuracy, quality).",
     "definitionBase": "Highlights scenarios where an improvement in one metric (e.g., efficiency, speed) results in a direct and unavoidable degradation of another metric (e.g., accuracy, quality).",
     "expansions": [],
-    "exampleQuote": "Although the decrease of fluency is relatively small compared to"
+    "exampleQuote": "Although the decrease of fluency is relatively small compared to",
+    "examplePaperId": "2023.acl-long.11"
   },
   {
     "id": "hyperparameter-sensitivity",
@@ -315,7 +330,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "A methodological and configuration fragility where a model's performance, stability, or success is highly contingent on precise architectural choices, random seed selection, or extensive manual tuning of mathematical hyperparameters, making the system difficult to optimize or reproduce without exhaustive trial and error.",
     "definitionBase": "A methodological and configuration fragility where a model's performance, stability, or success is highly contingent on precise architectural choices, random seed selection, or extensive manual tuning of mathematical hyperparameters, making the system difficult to optimize or reproduce without exhaustive trial and error.",
     "expansions": [],
-    "exampleQuote": "Further, the need for extensive hyperparameter optimisation, particularly for combining loss functions, can hinder accessibility for non-expert users."
+    "exampleQuote": "Further, the need for extensive hyperparameter optimisation, particularly for combining loss functions, can hinder accessibility for non-expert users.",
+    "examplePaperId": "2025.findings-acl.924"
   },
   {
     "id": "temporal-degradation",
@@ -328,7 +344,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "A vulnerability where a model's effectiveness degrades over time, or a dataset becomes obsolete, due to shifting language patterns, concept drift, or temporal cutoffs.",
     "definitionBase": "A vulnerability where a model's effectiveness degrades over time, or a dataset becomes obsolete, due to shifting language patterns, concept drift, or temporal cutoffs.",
     "expansions": [],
-    "exampleQuote": "This can lead to a degraded real-world performance if a system relies exclusively on WebIE for evaluation when the dataset is not updated accordingly."
+    "exampleQuote": "This can lead to a degraded real-world performance if a system relies exclusively on WebIE for evaluation when the dataset is not updated accordingly.",
+    "examplePaperId": "2023.acl-long.428"
   },
   {
     "id": "prompt-sensitivity",
@@ -346,7 +363,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: a strict dependency on high-quality, representative few-shot examples to function effectively."
       }
     ],
-    "exampleQuote": "We also note that using different prompt templates or changing the phrasing of instruction prompt leads to distinct response behaviors and performance (Table 5)."
+    "exampleQuote": "For example, the prompt sensitivity of an LLM is one of the important aspects to consider, as different prompts may lead to varying results.",
+    "examplePaperId": "2023.findings-emnlp.207"
   },
   {
     "id": "literature-coverage-gap",
@@ -359,7 +377,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "A methodological and scoping limitation where the authors explicitly acknowledge the potential omission of relevant prior works, recent findings, or valuable contributions due to the rapid expansion, vast volume, or dynamic nature of the scholarly literature in the field",
     "definitionBase": "A methodological and scoping limitation where the authors explicitly acknowledge the potential omission of relevant prior works, recent findings, or valuable contributions due to the rapid expansion, vast volume, or dynamic nature of the scholarly literature in the field",
     "expansions": [],
-    "exampleQuote": "Although we attempted to review the literature comprehensively, the rapid growth of LLM research means some recent preprints might have been missed (Section 1)."
+    "exampleQuote": "Despite our best efforts to ensure comprehensive coverage of the published works, it is possible that some relevant studies were overlooked.",
+    "examplePaperId": "2025.findings-acl.614"
   },
   {
     "id": "dependency-on-upstream-quality",
@@ -377,7 +396,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: structural domain mismatches between pre-training and downstream data, inheriting stylistic, structural, or content biases from upstream source data or simulators, and strict dependency on the characteristics of specific source data."
       }
     ],
-    "exampleQuote": "Our model also suffers from the noisy OCR prediction of off-the-shelf object detector, whose performance will depend highly on the extracted OCR text qualities."
+    "exampleQuote": "Our model also suffers from the noisy OCR prediction of off-the-shelf object detector, whose performance will depend highly on the extracted OCR text qualities.",
+    "examplePaperId": "2023.findings-acl.85"
   },
   {
     "id": "data-scarcity",
@@ -395,7 +415,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: data collection attrition caused by low participant response rates or missing data."
       }
     ],
-    "exampleQuote": "We clearly realize that our dataset size is relatively small compared with other related datasets due to its unique property of context-sensitiveness."
+    "exampleQuote": "We clearly realize that our dataset size is relatively small compared with other related datasets due to its unique property of context-sensitiveness.",
+    "examplePaperId": "2022.findings-acl.308"
   },
   {
     "id": "dataset-bias-imbalance",
@@ -408,7 +429,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Acknowledges that the researchers did not have or collect enough data for certain groups, leading to a skewed data distribution, class imbalances, or misrepresentations that contain social/demographic biases (e.g., gender, race).",
     "definitionBase": "Acknowledges that the researchers did not have or collect enough data for certain groups, leading to a skewed data distribution, class imbalances, or misrepresentations that contain social/demographic biases (e.g., gender, race).",
     "expansions": [],
-    "exampleQuote": "MTurk workers generally tend to be less religious, more educated, and more likely to be unemployed than the general population (Goodman et al., 2013)."
+    "exampleQuote": "MTurk workers generally tend to be less religious, more educated, and more likely to be unemployed than the general population (Goodman et al., 2013).",
+    "examplePaperId": "2022.acl-long.261"
   },
   {
     "id": "low-data-quality",
@@ -430,7 +452,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: coarse labeling constraints lacking fine-grained granularity, inherent data ambiguity where categories lack clear semantic definitions, artifacts and semantic loss introduced by relying on machine translation"
       }
     ],
-    "exampleQuote": "For instance, OntoNotes 5.0 dataset contains 18 coarse-grained entity types while FEW-NERD contains 9 coarse-grained and 66 fine-grained entity types."
+    "exampleQuote": "For instance, OntoNotes 5.0 dataset contains 18 coarse-grained entity types while FEW-NERD contains 9 coarse-grained and 66 fine-grained entity types.",
+    "examplePaperId": "2022.emnlp-main.120"
   },
   {
     "id": "reliance-on-external-tools-or-resources",
@@ -448,7 +471,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: structural bottlenecks where performance is constrained by the limited coverage or availability of external knowledge bases."
       }
     ],
-    "exampleQuote": "Moreover, to automatically extract the expected evidence, we rely on core NLP tools such as coreference resolution, POS tagger and dependency parsers."
+    "exampleQuote": "Moreover, to automatically extract the expected evidence, we rely on core NLP tools such as coreference resolution, POS tagger and dependency parsers.",
+    "examplePaperId": "2022.emnlp-main.14"
   },
   {
     "id": "resource-accessibility-barriers",
@@ -461,7 +485,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "A systemic and infrastructural barrier where the broader community is restricted from accessing essential underlying materials due to proprietary data dependencies, closed-source models, copyright constraints, or financial obstacles (e.g., paywalled APIs), hindering the ability to build upon or extend the research.",
     "definitionBase": "A systemic and infrastructural barrier where the broader community is restricted from accessing essential underlying materials due to proprietary data dependencies, closed-source models, copyright constraints, or financial obstacles (e.g., paywalled APIs), hindering the ability to build upon or extend the research.",
     "expansions": [],
-    "exampleQuote": "Further, many open and close language models are trained on content that cannot be acquired or redistributed, and thus could not be included in Dolma."
+    "exampleQuote": "Further, many open and close language models are trained on content that cannot be acquired or redistributed, and thus could not be included in Dolma.",
+    "examplePaperId": "2024.acl-long.840"
   },
   {
     "id": "dataset-task-mismatch",
@@ -474,7 +499,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "A data-centric limitation where the available datasets used for training, fine-tuning, or evaluation do not structurally, semantically, or stylistically align with the target downstream task, specific domain, or intended real-world application.available resources",
     "definitionBase": "A data-centric limitation where the available datasets used for training, fine-tuning, or evaluation do not structurally, semantically, or stylistically align with the target downstream task, specific domain, or intended real-world application.available resources",
     "expansions": [],
-    "exampleQuote": "Those that are available tend to use more general language than scientific medical writing; this is especially true for the En \u2192 Ar test set."
+    "exampleQuote": "Those that are available tend to use more general language than scientific medical writing; this is especially true for the En \u2192 Ar test set.",
+    "examplePaperId": "2025.findings-emnlp.495"
   },
   {
     "id": "sparse-data-sensitivity",
@@ -487,7 +513,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "data-centric limitation occurring at the inference or execution stage where the provided individual input data\u2014despite being valid and in-domain\u2014is too brief, fragmentary, or lacks sufficient contextual depth for the model to extract meaningful signals or perform accurate reasoning.",
     "definitionBase": "data-centric limitation occurring at the inference or execution stage where the provided individual input data\u2014despite being valid and in-domain\u2014is too brief, fragmentary, or lacks sufficient contextual depth for the model to extract meaningful signals or perform accurate reasoning.",
     "expansions": [],
-    "exampleQuote": "Sparsity of Belief Signals Most users only post about a narrow subset of the belief topics we study, meaning their full belief structure is only partially observable."
+    "exampleQuote": "Sparsity of Belief Signals Most users only post about a narrow subset of the belief topics we study, meaning their full belief structure is only partially observable.",
+    "examplePaperId": "2025.findings-emnlp.1132"
   },
   {
     "id": "measurement-vulnerabilities",
@@ -505,7 +532,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: high variance across different data splits, small evaluation scales preventing statistically robust conclusions, lack of expert validation, experimental design biases (e.g., ordering bias, outcome reporting, survivorship bias, or participant observation bias/Hawthorne effect), and proxy or surrogate model discrepancies."
       }
     ],
-    "exampleQuote": "Although the random selection should ideally represent the whole distribution, the performance may vary slightly when comparing to the whole test set."
+    "exampleQuote": "Although the random selection should ideally represent the whole distribution, the performance may vary slightly when comparing to the whole test set.",
+    "examplePaperId": "2023.emnlp-main.16"
   },
   {
     "id": "subjectivity-in-evaluation-annotation",
@@ -523,7 +551,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: specific demographic biases introduced by a lack of demographic diversity among human annotators."
       }
     ],
-    "exampleQuote": "While the benchmark dataset was annotated by human annotators, it is important to acknowledge the possibility of annotation errors or inconsistencies."
+    "exampleQuote": "While the benchmark dataset was annotated by human annotators, it is important to acknowledge the possibility of annotation errors or inconsistencies.",
+    "examplePaperId": "2023.findings-emnlp.592"
   },
   {
     "id": "theoretical-gap",
@@ -536,7 +565,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "An analytical or epistemic limitation where the study identifies empirical success but lacks rigorous mathematical formalization, theoretical guarantees, or fails to isolate the underlying causal mechanisms and confounding variables driving the results.",
     "definitionBase": "An analytical or epistemic limitation where the study identifies empirical success but lacks rigorous mathematical formalization, theoretical guarantees, or fails to isolate the underlying causal mechanisms and confounding variables driving the results.",
     "expansions": [],
-    "exampleQuote": "How to design a unified and more powerful KD method from the perspective of the connection between word- and sequence-level KD still remains unsolved."
+    "exampleQuote": "How to design a unified and more powerful KD method from the perspective of the connection between word- and sequence-level KD still remains unsolved.",
+    "examplePaperId": "2023.acl-long.448"
   },
   {
     "id": "lack-of-reliable-evaluation-metrics-or-benchmarks",
@@ -554,7 +584,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: structural vulnerabilities where chosen metrics are inadequate, inconsistent, or structurally fail to measure critical qualitative dimensions of model behavior"
       }
     ],
-    "exampleQuote": "However, existing benchmarks for low-resource (Han et al., 2018; Gao et al., 2019) are limited to the simple scenario of sentence-level relation classification."
+    "exampleQuote": "However, existing benchmarks for low-resource (Han et al., 2018; Gao et al., 2019) are limited to the simple scenario of sentence-level relation classification.",
+    "examplePaperId": "2022.emnlp-main.477"
   },
   {
     "id": "reliance-on-automatic-metrics",
@@ -572,7 +603,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: systematic biases introduced by using LLMs as automated evaluators (e.g., favoring their own generated text, preferring longer responses, or exhibiting instability and inconsistency across multiple evaluation runs)."
       }
     ],
-    "exampleQuote": "Evaluation Metrics Second, we caveat that our accuracy metrics (STR-EM and Disambig-F1) only measure the recall of the required information in the long answers."
+    "exampleQuote": "Evaluation Metrics Second, we caveat that our accuracy metrics (STR-EM and Disambig-F1) only measure the recall of the required information in the long answers.",
+    "examplePaperId": "2022.emnlp-main.566"
   },
   {
     "id": "data-leakage-contamination",
@@ -585,7 +617,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Mentions the risk of evaluation data (test set) being inadvertently included or \"seen\" during the training phase, leading to invalid or inflated results.",
     "definitionBase": "Mentions the risk of evaluation data (test set) being inadvertently included or \"seen\" during the training phase, leading to invalid or inflated results.",
     "expansions": [],
-    "exampleQuote": "Lastly, since training data for most models is not publicly available, data leakage from the training data corpus could possibly affects our findings."
+    "exampleQuote": "Lastly, since training data for most models is not publicly available, data leakage from the training data corpus could possibly affects our findings.",
+    "examplePaperId": "2024.acl-long.300"
   },
   {
     "id": "lack-of-interpretability",
@@ -598,7 +631,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Refers to the difficulty in understanding the internal decision-making logic of the model, often described as the \"Black Box\" problem.",
     "definitionBase": "Refers to the difficulty in understanding the internal decision-making logic of the model, often described as the \"Black Box\" problem.",
     "expansions": [],
-    "exampleQuote": "The black box nature of these models not only constrains our ability to comprehensively understand their behavior but also has ethical implications downstream."
+    "exampleQuote": "The black box nature of these models not only constrains our ability to comprehensively understand their behavior but also has ethical implications downstream.",
+    "examplePaperId": "2024.acl-long.671"
   },
   {
     "id": "reproducibility-gap",
@@ -616,7 +650,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: the inability to accurately reproduce the results of external baselines due to unmaintained repositories or missing implementation details"
       }
     ],
-    "exampleQuote": "We use proprietary LLMs like GPT-4 in certain experiments, and those results may be difficult reproduce if changes to the proprietary services occur."
+    "exampleQuote": "We use proprietary LLMs like GPT-4 in certain experiments, and those results may be difficult reproduce if changes to the proprietary services occur.",
+    "examplePaperId": "2024.acl-long.377"
   },
   {
     "id": "model-reasoning-and-generation-deficits",
@@ -634,7 +669,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: inherent behavioral instability or non-determinism across inference runs, and susceptibility to reward hacking."
       }
     ],
-    "exampleQuote": "As the appended adversarial suffix tokens may lack meaning, the resulting adversarial prompt found by the attack methods exhibits reduced naturalness."
+    "exampleQuote": "As the appended adversarial suffix tokens may lack meaning, the resulting adversarial prompt found by the attack methods exhibits reduced naturalness.",
+    "examplePaperId": "2024.findings-emnlp.753"
   },
   {
     "id": "bias-and-fairness-risks",
@@ -647,7 +683,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "An ethical and socio-technical vulnerability where the system or dataset inherits, reproduces, or amplifies historical prejudices, cultural stereotypes, or exhibits structural disparities in performance across different demographic groups.",
     "definitionBase": "An ethical and socio-technical vulnerability where the system or dataset inherits, reproduces, or amplifies historical prejudices, cultural stereotypes, or exhibits structural disparities in performance across different demographic groups.",
     "expansions": [],
-    "exampleQuote": "For convenience, this work uses a standard pronunciation acoustic model from MFA, which may disadvantage those with varying pronunciation preferences."
+    "exampleQuote": "For convenience, this work uses a standard pronunciation acoustic model from MFA, which may disadvantage those with varying pronunciation preferences.",
+    "examplePaperId": "2024.acl-long.435"
   },
   {
     "id": "model-hallucination-incoherence",
@@ -660,7 +697,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Refers to the generation of output that is factually false, logically nonsensical, repetitive, or fluent but incorrect (common in LLMs).",
     "definitionBase": "Refers to the generation of output that is factually false, logically nonsensical, repetitive, or fluent but incorrect (common in LLMs).",
     "expansions": [],
-    "exampleQuote": "At the same time, the generated premises could potentially contain fictional information, and should not be used for training models that learn facts from data."
+    "exampleQuote": "At the same time, the generated premises could potentially contain fictional information, and should not be used for training models that learn facts from data.",
+    "examplePaperId": "2024.acl-long.120"
   },
   {
     "id": "potential-for-misuse",
@@ -673,7 +711,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Emphasizes the ethical risks where the technology could be exploited for malicious purposes, fraud, disinformation, or harmful content generation.",
     "definitionBase": "Emphasizes the ethical risks where the technology could be exploited for malicious purposes, fraud, disinformation, or harmful content generation.",
     "expansions": [],
-    "exampleQuote": "For instance, systems might exploit inferred emotional or cognitive states to influence decisions in commercial, political, or interpersonal contexts."
+    "exampleQuote": "For instance, systems might exploit inferred emotional or cognitive states to influence decisions in commercial, political, or interpersonal contexts.",
+    "examplePaperId": "2025.findings-acl.287"
   },
   {
     "id": "societal-and-ethical-risks",
@@ -691,7 +730,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "legal and liability risks,"
       }
     ],
-    "exampleQuote": "However, the current model outputs may be factually inconsistent with the input documents, and in such a case could contribute to misinformation on the internet."
+    "exampleQuote": "However, the current model outputs may be factually inconsistent with the input documents, and in such a case could contribute to misinformation on the internet.",
+    "examplePaperId": "2023.acl-long.713"
   },
   {
     "id": "privacy-and-security-risks",
@@ -709,7 +749,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: vulnerabilities in watermarks, defense mechanisms, paraphrasing attacks, or countermeasures."
       }
     ],
-    "exampleQuote": "A concept has the potential to reveal additional information about the input, which may not be immediately evident upon inspecting the concept itself."
+    "exampleQuote": "A concept has the potential to reveal additional information about the input, which may not be immediately evident upon inspecting the concept itself.",
+    "examplePaperId": "2023.emnlp-main.318"
   },
   {
     "id": "toxicity-risks",
@@ -722,7 +763,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "A behavioral and content-safety vulnerability where the system could inadvertently generate or be provoked into producing abusive language, hate speech, or other violent, offensive, and inappropriate content.",
     "definitionBase": "A behavioral and content-safety vulnerability where the system could inadvertently generate or be provoked into producing abusive language, hate speech, or other violent, offensive, and inappropriate content.",
     "expansions": [],
-    "exampleQuote": "Moreover, the training datasets we used contain violence, abuse, and biased content that can be upsetting or offensive to particular groups of people."
+    "exampleQuote": "Moreover, the training datasets we used contain violence, abuse, and biased content that can be upsetting or offensive to particular groups of people.",
+    "examplePaperId": "2024.findings-acl.221"
   },
   {
     "id": "non-limitation-future-work",
@@ -740,7 +782,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: theoretical mitigations proposed by the authors."
       }
     ],
-    "exampleQuote": "There are also ways to incorporate model generated labelling methods for more robust semi-supervision into our framework that we leave to future work."
+    "exampleQuote": "There are also ways to incorporate model generated labelling methods for more robust semi-supervision into our framework that we leave to future work.",
+    "examplePaperId": "2021.acl-long.332"
   },
   {
     "id": "non-limitation-contextual-justification",
@@ -753,7 +796,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Refers to explanations that provide external background, common field practices, or real-world constraints to defend and justify a limitation.",
     "definitionBase": "Refers to explanations that provide external background, common field practices, or real-world constraints to defend and justify a limitation.",
     "expansions": [],
-    "exampleQuote": "This is largely due to copyright issues involved with using more modern texts, and because of this, our models are inherently biased to the language used in older texts."
+    "exampleQuote": "This is largely due to copyright issues involved with using more modern texts, and because of this, our models are inherently biased to the language used in older texts.",
+    "examplePaperId": "2022.emnlp-main.253"
   },
   {
     "id": "non-limitation-method-details",
@@ -766,7 +810,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Refers to factual descriptions of the proposed method which are typically stated to explain the root cause of a specific limitation.",
     "definitionBase": "Refers to factual descriptions of the proposed method which are typically stated to explain the root cause of a specific limitation.",
     "expansions": [],
-    "exampleQuote": "Intuitively, the connection between nodes in the input graph can influence the encoding of x by guiding what to extract from x in order to generate y."
+    "exampleQuote": "Intuitively, the connection between nodes in the input graph can influence the encoding of x by guiding what to extract from x in order to generate y.",
+    "examplePaperId": "2021.emnlp-main.351"
   },
   {
     "id": "non-limitation-strong-reported-performance",
@@ -779,7 +824,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Refers to statements explicitly highlighting the model's empirical success, effectiveness, or superior benchmark results.",
     "definitionBase": "Refers to statements explicitly highlighting the model's empirical success, effectiveness, or superior benchmark results.",
     "expansions": [],
-    "exampleQuote": "Although MABEL shows exciting performance across an extensive range of evaluation settings, these results should not be construed as a complete erasure of bias."
+    "exampleQuote": "Although MABEL shows exciting performance across an extensive range of evaluation settings, these results should not be construed as a complete erasure of bias.",
+    "examplePaperId": "2022.emnlp-main.657"
   },
   {
     "id": "non-limitation-theoretical-projection",
@@ -792,7 +838,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Optimistic or theoretical guesses, as well as explicit uncertainties, regarding how a method might perform in untested scenarios, unseen domains, or with future parameter and scale adjustments.",
     "definitionBase": "Optimistic or theoretical guesses, as well as explicit uncertainties, regarding how a method might perform in untested scenarios, unseen domains, or with future parameter and scale adjustments.",
     "expansions": [],
-    "exampleQuote": "We expect improvements in classification performance when applied to multiclass or multilabel classification settings, but we have not confirmed this."
+    "exampleQuote": "We expect improvements in classification performance when applied to multiclass or multilabel classification settings, but we have not confirmed this.",
+    "examplePaperId": "2022.emnlp-main.696"
   },
   {
     "id": "non-limitation-conducted-mitigation",
@@ -810,7 +857,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
         "addedClause": "Includes: failed mitigation attempts."
       }
     ],
-    "exampleQuote": "To reduce the impact of LM bias, we generate hundreds of thousands of test cases to increase the chance we obtain test cases for a given sub-category."
+    "exampleQuote": "To reduce the impact of LM bias, we generate hundreds of thousands of test cases to increase the chance we obtain test cases for a given sub-category.",
+    "examplePaperId": "2022.emnlp-main.225"
   },
   {
     "id": "non-limitation-method-strength",
@@ -823,7 +871,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Highlights the theoretical, structural, or conceptual advantages of the proposed approach, distinct from empirical performance.",
     "definitionBase": "Highlights the theoretical, structural, or conceptual advantages of the proposed approach, distinct from empirical performance.",
     "expansions": [],
-    "exampleQuote": "In this work, we propose a method to draw structured robust early-bird tickets, which can be used as an efficient alternative to adversarial training."
+    "exampleQuote": "In this work, we propose a method to draw structured robust early-bird tickets, which can be used as an efficient alternative to adversarial training.",
+    "examplePaperId": "2022.emnlp-main.569"
   },
   {
     "id": "non-limitation-anticipated-impact",
@@ -836,7 +885,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Expresses the authors' hopes, expectations, or the broader potential influence that their findings might have on the research community or industry.",
     "definitionBase": "Expresses the authors' hopes, expectations, or the broader potential influence that their findings might have on the research community or industry.",
     "expansions": [],
-    "exampleQuote": "We hope our findings can inform potential avenues of improvement on data augmentation for NER and"
+    "exampleQuote": "We hope our findings can inform potential avenues of improvement on data augmentation for NER and",
+    "examplePaperId": "2022.emnlp-main.120"
   },
   {
     "id": "non-limitation-recommendations",
@@ -849,7 +899,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Outward-facing directives advising the broader research or practitioner community to adopt specific operational practices, metrics, strategies, or to contribute to specific research directions.",
     "definitionBase": "Outward-facing directives advising the broader research or practitioner community to adopt specific operational practices, metrics, strategies, or to contribute to specific research directions.",
     "expansions": [],
-    "exampleQuote": "In the long-run, the community should build more elaborate coherence measures, to build a more complete picture of model capabilities and limitations."
+    "exampleQuote": "In the long-run, the community should build more elaborate coherence measures, to build a more complete picture of model capabilities and limitations.",
+    "examplePaperId": "2021.acl-short.134"
   },
   {
     "id": "non-limitation-authorial-disclaimers",
@@ -862,7 +913,8 @@ export const CODEBOOK_ENTRIES: CodebookEntry[] = [
     "definitionFull": "Explicit epistemic boundaries and warnings drawn by authors to prevent readers from overclaiming, misinterpreting, or prematurely deploying the empirical results in real-world or high-stakes applications.",
     "definitionBase": "Explicit epistemic boundaries and warnings drawn by authors to prevent readers from overclaiming, misinterpreting, or prematurely deploying the empirical results in real-world or high-stakes applications.",
     "expansions": [],
-    "exampleQuote": "Regardless, we believe our models should be utilized with caution and approaches to mitigating social risks, biases, and toxicities should be carefully applied."
+    "exampleQuote": "Regardless, we believe our models should be utilized with caution and approaches to mitigating social risks, biases, and toxicities should be carefully applied.",
+    "examplePaperId": "2023.emnlp-main.1040"
   }
 ];
 

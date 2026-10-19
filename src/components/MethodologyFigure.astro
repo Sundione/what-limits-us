@@ -63,7 +63,7 @@ const components: Component[] = [
   {
     id: "annotated",
     label: "Annotated Dataset",
-    detail: "Output: 1,029 papers with 3,118 sentence-level annotations, code tags, and rationale justifications across 5 thematic categories.",
+    detail: "Output: 16,047 papers with 84,930 code assignments and 131,166 sentence-level evidence spans with justifications across 5 thematic categories.",
     action: "Click node to open Dataset Explorer →"
   },
 ];
@@ -92,6 +92,7 @@ const C = {
 };
 ---
 <div class="methodology-figure-wrap">
+  <div class="methodology-figure-scroll">
   <svg viewBox="0 0 1691 672" role="img" aria-labelledby="methodology-svg-title" class="methodology-svg">
     <title id="methodology-svg-title">Iterative Hybrid Coding pipeline diagram</title>
     <defs>
@@ -331,6 +332,7 @@ const C = {
       <line x1="1375" y1="489" x2="1440" y2="489" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)" />
     </g>
   </svg>
+  </div>
 
   <!-- High z-index floating HTML tooltip: immune to SVG paint-order clipping -->
   <div id="methodology-tooltip" class="methodology-html-tooltip" role="tooltip" aria-hidden="true" style="display: none;">
@@ -349,6 +351,7 @@ const C = {
     <line x1="12" y1="8" x2="12.01" y2="8"></line>
   </svg>
   Hover or tap stages for methodology details. Click any Codebook or Annotated Data stage to open its full page.
+  <span class="methodology-hint-mobile">Swipe sideways to see the whole figure.</span>
 </p>
 
 <script>
@@ -462,6 +465,29 @@ const C = {
     height: auto;
     display: block;
     overflow: visible;
+  }
+
+  .methodology-hint-mobile {
+    display: none;
+  }
+
+  /* Phones: keep the figure at a legible size and let it scroll sideways
+     inside its card rather than shrinking the labels to ~5px. */
+  @media (max-width: 640px) {
+    .methodology-figure-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .methodology-svg {
+      width: 760px;
+      max-width: none;
+    }
+    .methodology-hint {
+      display: block;
+    }
+    .methodology-hint-mobile {
+      display: inline;
+    }
   }
 
   .arrows { pointer-events: none; }

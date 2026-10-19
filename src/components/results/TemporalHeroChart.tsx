@@ -285,11 +285,7 @@ export default function TemporalHeroChart() {
       {/* Narrative Headline */}
       <div class="temporal-header">
         <div class="header-text-block">
-          <div class="section-tag-row">
-            <span class="section-kpi-badge">RQ1 · Temporal Evolution</span>
-            <span class="section-corpus-pill">2020–2025 · 16,047 Papers</span>
-          </div>
-          <h3 class="temporal-title">The Policy Divergence &amp; The Rise of Scope Bounding</h3>
+          <h3 class="temporal-title">Scope Limitation Overtakes Methodological Constraints</h3>
           <p class="temporal-lead">
             {venue === "all" && (
               <>

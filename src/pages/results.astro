@@ -14,9 +14,9 @@ import "../styles/results.css";
   {/* Sticky Sub-Navigation Stepper */}
   <div class="results-subnav-sticky">
     <div class="results-subnav-inner">
-      <div class="subnav-links" role="tablist">
+      <div class="subnav-links">
         <a href="#overview" class="subnav-link">
-          <span>Overview</span>
+          <span>Most Common</span>
         </a>
         <a href="#temporal-rq1" class="subnav-link">
           <span>RQ1: Temporal Trends</span>
@@ -26,6 +26,9 @@ import "../styles/results.css";
         </a>
         <a href="#discursive-rq3" class="subnav-link">
           <span>RQ3: Discursive Patterns</span>
+        </a>
+        <a href="#takeaways" class="subnav-link">
+          <span>Takeaways</span>
         </a>
       </div>
       <span class="subnav-corpus-badge">16,047 Papers (2020–2025)</span>
@@ -69,15 +72,12 @@ import "../styles/results.css";
     {/* Section 1: Most Common Limitations (Corpus Baseline) */}
     <section class="results-section" id="overview">
       <div class="section-lead-header">
-        <div class="section-tag-row">
-          <span class="section-kpi-badge">Baseline Distribution</span>
-          <span class="section-corpus-pill">Corpus-Wide Prevalence</span>
-        </div>
-        <h2 class="results-subheading">Most Common Limitations Across the Corpus</h2>
-        <p class="section-desc">
-          Distribution of limitation codes across all 16,047 papers. Authors frequently report
-          methodological constraints and scope limitations, but also use the section for broader discursive
-          functions (e.g., framing future work or contextualizing achievements).
+        <span class="rq-kicker">Starting point · All 16,047 papers</span>
+        <h2 class="results-subheading">What limitations do papers report most?</h2>
+        <p class="rq-answer">
+          <strong>Short answer:</strong> Scope Limitation (in 62.9% of papers) and Methodological Constraints (39.8%)
+          dominate, followed by High Resource Requirements (20.5%). Authors also use the section for non-limitation
+          moves such as future work; toggle "All codes" to include them.
         </p>
       </div>
       <PrevalenceChart />
@@ -85,17 +85,77 @@ import "../styles/results.css";
 
     {/* Section 2: RQ1 — Temporal Trends & The 2022 Policy Divergence */}
     <section class="results-section" id="temporal-rq1">
+      <header class="rq-head">
+        <span class="rq-kicker">RQ1 · Temporal analysis</span>
+        <h2 class="results-subheading">How have reported limitations changed over time?</h2>
+        <p class="rq-answer">
+          <strong>Short answer:</strong> Scope Limitation rose from 31% of papers in 2020 to 66% in 2025, while
+          Methodological Constraints fell from a 2021 peak; their ranks swapped around EMNLP 2022, when the section became
+          mandatory. This is a temporal association, and the shift may also reflect confounders such as the rapid adoption of LLMs.
+        </p>
+      </header>
       <TemporalHeroChart client:load />
     </section>
 
     {/* Section 3: RQ2 — Area Homogeneity & Corporate Disclosures */}
     <section class="results-section" id="attributes-rq2">
+      <header class="rq-head">
+        <span class="rq-kicker">RQ2 · Paper attributes</span>
+        <h2 class="results-subheading">Do research areas, affiliations or formats report different limitations?</h2>
+        <p class="rq-answer">
+          <strong>Short answer:</strong> Mostly no. About 97% of (research area, code) pairs do not differ significantly
+          from the field average. Papers without large-company authors report Scope Limitation more often (63.6% vs. 56.6%),
+          and differences by paper format are exploratory only.
+        </p>
+      </header>
       <AreaAndAffiliation client:visible />
     </section>
 
     {/* Section 4: RQ3 — Discursive Patterns & Contextual Sequencing */}
     <section class="results-section" id="discursive-rq3">
+      <header class="rq-head">
+        <span class="rq-kicker">RQ3 · Discursive patterns</span>
+        <h2 class="results-subheading">What do authors write around a limitation?</h2>
+        <p class="rq-answer">
+          <strong>Short answer:</strong> Limitations are often followed by Future Work or a Contextual Justification
+          (the paper's "soft landing") and are sometimes preceded by a statement of strong results (a "preemptive buffer").
+          These patterns are inferred from sentence order alone, so they suggest, but cannot confirm, deliberate rhetorical intent.
+        </p>
+      </header>
       <DiscursiveSandwich client:visible />
+    </section>
+
+    <section class="results-section takeaways-section" id="takeaways">
+      <header class="rq-head">
+        <span class="rq-kicker">Takeaways</span>
+        <h2 class="results-subheading">What this means, and what it does not</h2>
+      </header>
+      <p class="takeaways-lead">
+        Now that a Limitations section is mandatory, almost every paper has one, and authors pack more distinct limitation
+        types into roughly the same length (1.63 codes per paper in ACL 2020 vs. 3.02 in EMNLP 2025). The paper hopes these
+        results start a community conversation about what a <em>good</em> limitation disclosure looks like, and how
+        researchers can use this section for transparent and responsible research.
+      </p>
+      <div class="takeaways-grid">
+        <div class="takeaway-card">
+          <h3>Read these results with care</h3>
+          <ul>
+            <li><strong>What is said, not what is true.</strong> Only the dedicated Limitations section is analyzed; unwritten limitations, or ones stated elsewhere in a paper, are not counted.</li>
+            <li><strong>Correlation, not causation.</strong> Trends and group differences are associations; e.g. the 2022 policy cannot be shown to have caused the RQ1 shift.</li>
+            <li><strong>LLM-coded at scale.</strong> Coding was validated against 150 human-coded papers (α 0.644 → 0.647), but the LLM saw only the Limitations section, without the rest of the paper.</li>
+          </ul>
+        </div>
+        <div class="takeaway-card">
+          <h3>Check it yourself</h3>
+          <ul class="takeaway-links">
+            <li><a href={`${import.meta.env.BASE_URL}explore#search`}>Find your own paper and see how it was coded &rarr;</a></li>
+            <li><a href={`${import.meta.env.BASE_URL}explore?after=Future%20Work`}>Read limitations followed by future work &rarr;</a></li>
+            <li><a href={`${import.meta.env.BASE_URL}explore?implicit=1&year=2025`}>2025 sections with no actual limitation &rarr;</a></li>
+            <li><a href={`${import.meta.env.BASE_URL}codebook`}>Browse all 50 codes with real examples &rarr;</a></li>
+            <li><a href={`${import.meta.env.BASE_URL}#citation`}>Cite the paper &rarr;</a></li>
+          </ul>
+        </div>
+      </div>
     </section>
   </div>
 </BaseLayout>
@@ -118,6 +178,73 @@ import "../styles/results.css";
     letter-spacing: -0.03em;
     margin: 0.35rem 0 0.75rem;
     line-height: 1.15;
+  }
+
+  .rq-head {
+    margin-bottom: 1.5rem;
+  }
+  .rq-kicker {
+    display: inline-block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #2563eb;
+    margin-bottom: 0.3rem;
+  }
+  .rq-answer {
+    max-width: 860px;
+    margin: 0.5rem 0 0;
+    padding: 0.85rem 1.1rem;
+    border-left: 4px solid #2563eb;
+    border-radius: 0 8px 8px 0;
+    background: #eff6ff;
+    color: #1e293b;
+    font-size: 0.98rem;
+    line-height: 1.6;
+  }
+  .takeaways-section {
+    border-bottom: 0;
+  }
+  .takeaways-lead {
+    max-width: 860px;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--color-text);
+  }
+  .takeaways-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+  .takeaway-card {
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+  }
+  .takeaway-card h3 {
+    margin: 0 0 0.6rem;
+    font-size: 1.05rem;
+  }
+  .takeaway-card ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--color-muted);
+  }
+  .takeaway-links {
+    list-style: none;
+    padding-left: 0 !important;
+    font-weight: 600;
+  }
+  .takeaway-links a {
+    text-decoration: none;
   }
 
   .intro {

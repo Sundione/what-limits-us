@@ -1130,7 +1130,7 @@
 /* Responsive adjustments */
 @media (max-width: 900px) {
   .master-detail-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .master-sidebar {
     position: static;
@@ -1141,5 +1141,94 @@
   }
   .detail-code-title {
     font-size: 1.5rem;
+  }
+}
+
+/* Example provenance + per-code trend */
+.excerpt-source-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.excerpt-source-row a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.excerpt-source-row a:hover {
+  text-decoration: underline;
+}
+.code-trend-svg {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  display: block;
+}
+.code-trend-year {
+  font-size: 10px;
+  fill: #64748b;
+}
+.code-trend-caption {
+  margin: 0.4rem 0 0;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+/* Theme map above the master-detail browser */
+.theme-map-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.6rem;
+  margin: 0 0 1.5rem;
+}
+.theme-map-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: left;
+  font: inherit;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--theme-color);
+  border-radius: 8px;
+  background: var(--color-bg);
+  cursor: pointer;
+}
+.theme-map-card:hover,
+.theme-map-card.active {
+  background: var(--theme-bg);
+}
+.theme-map-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.theme-map-meta {
+  font-size: 0.76rem;
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
+/* Let grid columns shrink below their content's intrinsic width (e.g. the trend SVG) */
+.master-detail-container > * {
+  min-width: 0;
+}
+
+/* .detail-canvas is a <main>; undo BaseLayout's global main{margin:0 auto;max-width} so it fills its grid column */
+.master-detail-container > .detail-canvas {
+  margin: 0;
+  max-width: none;
+}
+
+@media (max-width: 640px) {
+  .detail-bottom-nav > * {
+    min-width: 0;
+    max-width: 48%;
+  }
+  .btn-text {
+    min-width: 0;
   }
 }
