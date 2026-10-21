@@ -4,6 +4,7 @@ import PrevalenceChart from "../components/PrevalenceChart.astro";
 import TemporalHeroChart from "../components/results/TemporalHeroChart";
 import AreaAndAffiliation from "../components/results/AreaAndAffiliation";
 import DiscursiveSandwich from "../components/results/DiscursiveSandwich";
+import ScopeSubcodes from "../components/results/ScopeSubcodes.astro";
 import "../styles/results.css";
 ---
 
@@ -65,7 +66,7 @@ import "../styles/results.css";
       <div class="kpi-card">
         <span class="kpi-tag">Reporting Density</span>
         <span class="kpi-val">1.63 &rarr; 3.02</span>
-        <span class="kpi-sub">Average codes per paper grew ~85% while median section length stabilized (~139 words)</span>
+        <span class="kpi-sub">Distinct codes per section, ACL 2020 → EMNLP 2025, while median length settled around 138–150 words (Table 4)</span>
       </div>
     </div>
 
@@ -74,6 +75,7 @@ import "../styles/results.css";
       <div class="section-lead-header">
         <span class="rq-kicker">Starting point · All 16,047 papers</span>
         <h2 class="results-subheading">What limitations do papers report most?</h2>
+        <p class="rq-source-note">Computed from the released dataset; not a figure in the paper.</p>
         <p class="rq-answer">
           <strong>Short answer:</strong> Scope Limitation (in 62.9% of papers) and Methodological Constraints (39.8%)
           dominate, followed by High Resource Requirements (20.5%). Authors also use the section for non-limitation
@@ -87,7 +89,7 @@ import "../styles/results.css";
     <section class="results-section" id="temporal-rq1">
       <header class="rq-head">
         <span class="rq-kicker">RQ1 · Temporal analysis</span>
-        <h2 class="results-subheading">How have reported limitations changed over time?</h2>
+        <h2 class="results-subheading">How have the contents of self-reported limitations evolved over time?</h2>
         <p class="rq-answer">
           <strong>Short answer:</strong> Scope Limitation rose from 31% of papers in 2020 to 66% in 2025, while
           Methodological Constraints fell from a 2021 peak; their ranks swapped around EMNLP 2022, when the section became
@@ -95,13 +97,23 @@ import "../styles/results.css";
         </p>
       </header>
       <TemporalHeroChart client:load />
+
+      <div class="rq-subsection">
+        <h3 class="rq3-heading">Inside Scope Limitation: what are authors bounding?</h3>
+        <p class="rq3-lead">
+          Because Scope Limitation grew so much, the paper re-annotated its sentences with a finer sub-codebook.{" "}
+          <strong>Model Scale</strong> became the fastest-growing sub-code.
+        </p>
+        <ScopeSubcodes />
+      </div>
+
     </section>
 
     {/* Section 3: RQ2 — Area Homogeneity & Corporate Disclosures */}
     <section class="results-section" id="attributes-rq2">
       <header class="rq-head">
         <span class="rq-kicker">RQ2 · Paper attributes</span>
-        <h2 class="results-subheading">Do research areas, affiliations or formats report different limitations?</h2>
+        <h2 class="results-subheading">How do specific limitation codes correlate with research areas, paper formats and author affiliations?</h2>
         <p class="rq-answer">
           <strong>Short answer:</strong> Mostly no. About 97% of (research area, code) pairs do not differ significantly
           from the field average. Papers without large-company authors report Scope Limitation more often (63.6% vs. 56.6%),
@@ -115,11 +127,13 @@ import "../styles/results.css";
     <section class="results-section" id="discursive-rq3">
       <header class="rq-head">
         <span class="rq-kicker">RQ3 · Discursive patterns</span>
-        <h2 class="results-subheading">What do authors write around a limitation?</h2>
+        <h2 class="results-subheading">Are there recurring textual patterns that could suggest potential reporting strategies?</h2>
         <p class="rq-answer">
-          <strong>Short answer:</strong> Limitations are often followed by Future Work or a Contextual Justification
-          (the paper's "soft landing") and are sometimes preceded by a statement of strong results (a "preemptive buffer").
-          These patterns are inferred from sentence order alone, so they suggest, but cannot confirm, deliberate rhetorical intent.
+          <strong>Short answer:</strong> Some Limitations sections state no explicit limitation at all (90 papers in 2025).
+          Around the limitations that are stated, three patterns recur more often than chance: a <strong>Preemptive Buffer</strong>
+          (a statement of strong results right before a limitation), a <strong>Soft Landing</strong> (a limitation followed by Future
+          Work or a Contextual Justification), and <strong>Proactive Efforts</strong> to address it (Conducted Mitigation). They are inferred
+          from sentence order alone, so they suggest, but cannot confirm, deliberate rhetorical intent.
         </p>
       </header>
       <DiscursiveSandwich client:visible />
@@ -187,19 +201,25 @@ import "../styles/results.css";
     display: inline-block;
     font-size: 0.74rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #2563eb;
+    color: var(--primary-text);
     margin-bottom: 0.3rem;
+  }
+  .rq-subsection {
+    margin-top: 2.5rem;
+  }
+  .rq-source-note {
+    margin: 0.25rem 0 0;
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
   }
   .rq-answer {
     max-width: 860px;
     margin: 0.5rem 0 0;
     padding: 0.85rem 1.1rem;
-    border-left: 4px solid #2563eb;
+    border-left: 4px solid var(--primary);
     border-radius: 0 8px 8px 0;
-    background: #eff6ff;
-    color: #1e293b;
+    background: var(--primary-soft);
+    color: var(--foreground);
     font-size: 0.98rem;
     line-height: 1.6;
   }
@@ -221,7 +241,7 @@ import "../styles/results.css";
   .takeaway-card {
     padding: 1.1rem 1.25rem;
     border: 1px solid var(--color-border);
-    border-radius: 10px;
+    border-radius: var(--radius);
     background: var(--color-surface);
   }
   .takeaway-card h3 {

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "preact/hooks";
+import { useState, useMemo, useRef } from "preact/hooks";
 import type { JSX } from "preact";
 import {
   temporalMatrix,
@@ -6,19 +6,11 @@ import {
   type TemporalDataPoint,
 } from "../../data/resultsData";
 import { THEMES, getThemeByCode, type ThemeDefinition } from "../../data/themes";
+import { MousePointerClick, TriangleAlert } from "lucide-preact";
 
-const PALETTE = [
-  "#2563eb", // Blue
-  "#d97706", // Amber
-  "#059669", // Emerald
-  "#7c3aed", // Purple
-  "#e11d48", // Rose
-  "#0891b2", // Cyan
-  "#ea580c", // Orange
-  "#4f46e5", // Indigo
-  "#0d9488", // Teal
-  "#db2777", // Pink
-];
+// Validated categorical palette (8 slots, light + dark tokens in theme.css).
+const MAX_SERIES = 8;
+const seriesColor = (slot: number) => `var(--series-${slot + 1})`;
 
 interface HoveredDotData {
   code: string;
@@ -89,11 +81,11 @@ export default function TemporalHeroChart() {
     }
   };
 
-  // Add / remove code (supports up to 10 codes)
+  // Add / remove code (up to MAX_SERIES, one validated colour each)
   const handleAddCode = (codeName: string) => {
     if (selectedCodes.includes(codeName)) return;
-    if (selectedCodes.length >= 10) {
-      alert("To keep the visualization readable, you can compare up to 10 codes simultaneously. Please remove a code before adding another.");
+    if (selectedCodes.length >= MAX_SERIES) {
+      alert(`To keep the visualization readable, you can compare up to ${MAX_SERIES} codes simultaneously. Please remove a code before adding another.`);
       return;
     }
     setSpotlightCode(null);
@@ -232,9 +224,21 @@ export default function TemporalHeroChart() {
   };
 
   // Active series lines data (all lines use uniform, robust thickness and reliable Non-Limitation flag)
+  // Colour follows the code, not its position: a code keeps its slot while it
+  // stays selected, and a new code takes the lowest free slot.
+  const slotByCode = useRef(new Map<string, number>());
   const seriesList = useMemo(() => {
-    return selectedCodes.map((code, idx) => {
-      const color = PALETTE[idx % PALETTE.length];
+    const slots = slotByCode.current;
+    for (const code of [...slots.keys()]) if (!selectedCodes.includes(code)) slots.delete(code);
+    for (const code of selectedCodes) {
+      if (slots.has(code)) continue;
+      const used = new Set(slots.values());
+      let free = 0;
+      while (used.has(free)) free++;
+      slots.set(code, free);
+    }
+    return selectedCodes.map((code) => {
+      const color = seriesColor(slots.get(code)! % MAX_SERIES);
       const isNonLim =
         code.startsWith("Non-Limitation") ||
         code.startsWith("NL:") ||
@@ -313,7 +317,7 @@ export default function TemporalHeroChart() {
         {/* Causal & Staggered Rollout Interpretation Caveat Banner */}
         <div class="causal-caveat-box">
           <div class="causal-caveat-title">
-            <span class="caveat-icon">⚠️</span>
+            <span class="caveat-icon"><TriangleAlert size={16} aria-hidden="true" /></span>
             <span>Policy Timing &amp; Causal Interpretation (§4.2)</span>
           </div>
           <p class="causal-caveat-text">
@@ -322,35 +326,11 @@ export default function TemporalHeroChart() {
         </div>
       </div>
 
-      {/* Preset Pills Toolbar (Cognitive Scaffolding) */}
-      <div class="presets-toolbar">
-        <span class="presets-label">Exploratory Lenses:</span>
-        <div class="presets-pills-row" role="tablist">
-          {THEMATIC_PRESETS.map((p) => {
-            const isActive = activePresetId === p.id;
-            return (
-              <button
-                key={p.id}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                class={`preset-pill ${isActive ? "preset-pill-active" : ""}`}
-                onClick={() => handleSelectPreset(p.id)}
-                title={p.description}
-              >
-                {p.badge && <span class="pill-badge">{p.badge}</span>}
-                <span>{p.name}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       {/* View Options Bar: Chips, Visual Legend, Scale, Venue, Metric */}
       <div class="chart-controls-bar">
         {/* Active Series Chips */}
         <div class="active-chips-container">
-          <span class="chips-label">Plotted ({selectedCodes.length}/10):</span>
+          <span class="chips-label">Plotted ({selectedCodes.length}/{MAX_SERIES}):</span>
           <div class="active-chips-wrap">
             {seriesList.map((s) => {
               const isSpotlighted = spotlightCode === s.code;
@@ -398,7 +378,7 @@ export default function TemporalHeroChart() {
                   type="button"
                   class="add-code-trigger-btn"
                   onClick={() => setIsPickerOpen(!isPickerOpen)}
-                  title="Compare another code grouped by theme (up to 10 simultaneous lines)"
+                  title="Compare another code grouped by theme (up to 8 simultaneous lines)"
                 >
                   <span class="plus-icon">+</span>
                   <span>Compare other code...</span>
@@ -514,14 +494,14 @@ export default function TemporalHeroChart() {
           <div class="line-style-legend-pill" title="Limitations use solid lines. Non-limitation rhetorical buffers use dashed lines.">
             <span class="legend-style-item">
               <svg width="22" height="10" viewBox="0 0 22 10" class="legend-line-svg" aria-hidden="true">
-                <line x1="0" y1="5" x2="22" y2="5" stroke="#475569" stroke-width="3" stroke-linecap="round" />
+                <line x1="0" y1="5" x2="22" y2="5" stroke="var(--muted-foreground)" stroke-width="3" stroke-linecap="round" />
               </svg>
               <span>Limitations (Solid)</span>
             </span>
             <span class="legend-style-sep">·</span>
             <span class="legend-style-item">
               <svg width="22" height="10" viewBox="0 0 22 10" class="legend-line-svg" aria-hidden="true">
-                <line x1="0" y1="5" x2="22" y2="5" stroke="#7c3aed" stroke-width="3" stroke-dasharray="6,4" stroke-linecap="round" />
+                <line x1="0" y1="5" x2="22" y2="5" stroke="var(--violet-solid)" stroke-width="3" stroke-dasharray="6,4" stroke-linecap="round" />
               </svg>
               <span>Non-Limitations (Dashed)</span>
             </span>
@@ -634,6 +614,10 @@ export default function TemporalHeroChart() {
         </div>
       </div>
 
+      <p class="chart-paper-caption">
+        <span class="paper-ref">Figure 3 in the paper</span>
+        Share of papers mentioning each code per year. Dashed lines mark when the Limitations section became mandatory.
+      </p>
       {/* Main SVG Visualization Canvas */}
       <div class="temporal-canvas-wrapper">
         {/* Floating Line Hover Indicator (Shows when hovering on a line without hovering a dot) */}
@@ -665,8 +649,8 @@ export default function TemporalHeroChart() {
         >
           <defs>
             <linearGradient id="mandateLineGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#7c3aed" stopOpacity="0.2" />
+              <stop offset="0%" stopColor="var(--violet-solid)" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="var(--violet-solid)" stopOpacity="0.2" />
             </linearGradient>
             <filter id="shadowFilter" x="-10%" y="-10%" width="120%" height="120%">
               <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.1" />
@@ -683,7 +667,7 @@ export default function TemporalHeroChart() {
                   y1={yPos}
                   x2={padding.left + plotWidth}
                   y2={yPos}
-                  stroke="#e2e8f0"
+                  stroke="var(--border)"
                   stroke-width="1"
                   stroke-dasharray={val === 0 ? "none" : "3,3"}
                 />
@@ -707,7 +691,7 @@ export default function TemporalHeroChart() {
                 y1={padding.top}
                 x2={emnlpMandateX}
                 y2={padding.top + plotHeight}
-                stroke="#7c3aed"
+                stroke="var(--violet-solid)"
                 stroke-width="2"
                 stroke-dasharray="5,4"
                 opacity="0.85"
@@ -719,11 +703,11 @@ export default function TemporalHeroChart() {
                   width="144"
                   height="22"
                   rx="4"
-                  fill="#f5f3ff"
-                  stroke="#c4b5fd"
+                  fill="var(--violet-bg)"
+                  stroke="var(--violet-border)"
                   stroke-width="1"
                 />
-                <text x="6" y="1" class="mandate-badge-text" fill="#6d28d9">
+                <text x="6" y="1" class="mandate-badge-text" fill="var(--violet-fg)">
                   EMNLP 2022 Mandate
                 </text>
               </g>
@@ -737,7 +721,7 @@ export default function TemporalHeroChart() {
                 y1={padding.top}
                 x2={aclMandateX}
                 y2={padding.top + plotHeight}
-                stroke="#2563eb"
+                stroke="var(--primary)"
                 stroke-width="2"
                 stroke-dasharray="5,4"
                 opacity="0.85"
@@ -749,11 +733,11 @@ export default function TemporalHeroChart() {
                   width="134"
                   height="22"
                   rx="4"
-                  fill="#eff6ff"
-                  stroke="#bfdbfe"
+                  fill="var(--primary-soft)"
+                  stroke="var(--primary-border)"
                   stroke-width="1"
                 />
-                <text x="6" y="1" class="mandate-badge-text" fill="#1d4ed8">
+                <text x="6" y="1" class="mandate-badge-text" fill="var(--primary-strong)">
                   ACL 2023 Mandate
                 </text>
               </g>
@@ -767,7 +751,7 @@ export default function TemporalHeroChart() {
               y1={padding.top}
               x2={xForYear(hoveredYear)}
               y2={padding.top + plotHeight}
-              stroke="#0f172a"
+              stroke="var(--foreground)"
               stroke-width="1.5"
               stroke-dasharray="4,4"
               opacity="0.5"
@@ -898,8 +882,8 @@ export default function TemporalHeroChart() {
                       cx={pt.x}
                       cy={pt.y}
                       r={isThisDotHovered ? 9 : (isHighlighted ? 7.2 : (isYearActive ? 6.5 : 5.2))}
-                      fill={s.isNonLim ? "#ffffff" : s.color}
-                      stroke={s.isNonLim ? s.color : "#ffffff"}
+                      fill={s.isNonLim ? "var(--card)" : s.color}
+                      stroke={s.isNonLim ? s.color : "var(--card)"}
                       stroke-width={s.isNonLim ? 3.5 : 2}
                       vector-effect="non-scaling-stroke"
                       class="series-dot"
@@ -1021,10 +1005,40 @@ export default function TemporalHeroChart() {
                 ))}
             </div>
             <div class="tooltip-footer">
-              <span class="tip-subtext">💡 Click empty space to explore all papers in {hoveredYear} ↗</span>
+              <span class="tip-subtext"><MousePointerClick size={12} aria-hidden="true" /> Click empty space to explore all papers in {hoveredYear} ↗</span>
             </div>
           </div>
         )}
+      </div>
+
+      {/* Other lenses come after the paper's figure, as optional exploration */}
+      <div class="lenses-block">
+        <h4 class="lenses-title">Explore other codes</h4>
+        <p class="lenses-sub">Switch to another preset group, or add and remove codes above the chart (up to 8 at once).</p>
+      {/* Preset Pills Toolbar (Cognitive Scaffolding) */}
+        <div class="presets-toolbar">
+          <span class="presets-label">Exploratory Lenses:</span>
+          <div class="presets-pills-row" role="tablist">
+            {THEMATIC_PRESETS.map((p) => {
+              const isActive = activePresetId === p.id;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  class={`preset-pill ${isActive ? "preset-pill-active" : ""}`}
+                  onClick={() => handleSelectPreset(p.id)}
+                  title={p.description}
+                >
+                  {p.badge && <span class="pill-badge">{p.badge}</span>}
+                  <span>{p.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
       </div>
 
       {/* Expandable Data Table (Accessibility & Deep Data Verification) */}

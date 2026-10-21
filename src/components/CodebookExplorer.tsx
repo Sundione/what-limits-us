@@ -489,7 +489,7 @@ export default function CodebookExplorer() {
               groupedSidebarEntries.map(({ theme, entries }) => (
                 <div key={theme.id} class="sidebar-theme-group">
                   <div class="sidebar-theme-heading">
-                    <span class="theme-chip" style={{ backgroundColor: theme.color }}>
+                    <span class="theme-chip" style={{ backgroundColor: theme.bgLight, color: theme.text, boxShadow: `inset 0 0 0 1px ${theme.borderColor}` }}>
                       {theme.number === 0 ? "NL" : `T${theme.number}`}
                     </span>
                     <span class="theme-heading-text">{theme.shortTitle}</span>
@@ -699,7 +699,7 @@ export default function CodebookExplorer() {
             <h3 class="section-heading">Thematic Classification</h3>
             <div class="theme-context-card" style={{ borderLeftColor: currentTheme.color }}>
               <div class="theme-card-top">
-                <span class="theme-number-badge" style={{ backgroundColor: currentTheme.color }}>
+                <span class="theme-number-badge" style={{ backgroundColor: currentTheme.bgLight, color: currentTheme.text, boxShadow: `inset 0 0 0 1px ${currentTheme.borderColor}` }}>
                   {currentTheme.number === 0 ? "NL" : `Theme ${currentTheme.number}`}
                 </span>
                 <h4 class="theme-card-title">{currentTheme.name}</h4>

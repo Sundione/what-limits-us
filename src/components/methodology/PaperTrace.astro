@@ -180,8 +180,8 @@ const kindLabel: Record<Kind, string> = {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #0f172a;
-    color: #ffffff;
+    background: var(--inverse-bg);
+    color: var(--on-color);
     font-weight: 700;
     font-size: 0.9rem;
   }
@@ -199,7 +199,7 @@ const kindLabel: Record<Kind, string> = {
   .trace-raw {
     margin: 0;
     padding: 0.9rem 1.1rem;
-    border-left: 4px solid #cbd5e1;
+    border-left: 4px solid var(--border-strong);
     background: var(--color-surface);
     border-radius: 0 8px 8px 0;
     font-size: 0.92rem;
@@ -217,8 +217,8 @@ const kindLabel: Record<Kind, string> = {
   }
   .trace-units li {
     padding: 0.45rem 0.7rem;
-    border: 1px dashed #cbd5e1;
-    border-radius: 6px;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-sm);
   }
   .unit-id {
     display: inline-block;
@@ -241,9 +241,9 @@ const kindLabel: Record<Kind, string> = {
     font-weight: 600;
     border: 1px solid;
   }
-  .chip-deductive { color: #1e40af; background: #dbeafe; border-color: #bfdbfe; }
-  .chip-inductive { color: #9a3412; background: #ffedd5; border-color: #fed7aa; }
-  .chip-non-limitation { color: #5b21b6; background: #ede9fe; border-color: #ddd6fe; }
+  .chip-deductive { color: var(--primary-strong); background: var(--primary-soft-2); border-color: var(--primary-border); }
+  .chip-inductive { color: var(--orange-fg); background: var(--orange-bg); border-color: var(--orange-border); }
+  .chip-non-limitation { color: var(--violet-fg); background: var(--violet-bg); border-color: var(--violet-border); }
   .trace-coded {
     display: flex;
     flex-direction: column;
@@ -255,7 +255,7 @@ const kindLabel: Record<Kind, string> = {
     gap: 0.5rem;
     padding: 0.7rem 0.85rem;
     border: 1px solid var(--color-border);
-    border-radius: 8px;
+    border-radius: var(--radius);
     background: var(--color-bg);
   }
   .trace-unit.is-uncoded {
@@ -271,9 +271,9 @@ const kindLabel: Record<Kind, string> = {
     border-radius: 3px;
     color: inherit;
   }
-  .mark-deductive { background: #dbeafe; border-bottom: 2px solid #2563eb; }
-  .mark-inductive { background: #ffedd5; border-bottom: 2px solid #ea580c; }
-  .mark-non-limitation { background: #ede9fe; border-bottom: 2px solid #7c3aed; }
+  .mark-deductive { background: var(--primary-soft-2); border-bottom: 2px solid var(--primary); }
+  .mark-inductive { background: var(--orange-bg); border-bottom: 2px solid var(--orange-solid); }
+  .mark-non-limitation { background: var(--violet-bg); border-bottom: 2px solid var(--violet-solid); }
   .trace-no-code {
     margin: 0;
     font-size: 0.82rem;

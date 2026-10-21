@@ -49,7 +49,7 @@ import { paper } from "../data/paper";
 <style>
   .bibtex-block {
     border: 1px solid var(--color-border);
-    border-radius: 8px;
+    border-radius: var(--radius);
     overflow: hidden;
     margin: 1rem 0;
   }
@@ -79,7 +79,7 @@ import { paper } from "../data/paper";
     font-size: 0.8rem;
     font-weight: 500;
     padding: 0.28rem 0.75rem;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--color-border);
     background: var(--color-bg);
     color: var(--color-text);
@@ -92,9 +92,9 @@ import { paper } from "../data/paper";
     background: color-mix(in srgb, var(--color-accent) 6%, transparent);
   }
   .copy-btn.copied {
-    border-color: #059669;
-    color: #059669;
-    background: #ecfdf5;
+    border-color: var(--green-solid);
+    color: var(--green-fg);
+    background: var(--green-bg);
   }
   pre {
     margin: 0;

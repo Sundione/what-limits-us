@@ -16,6 +16,7 @@ interface Row {
   isNonLimitation: boolean;
   themeTitle: string;
   themeColor: string;
+  themeText: string;
   themeBg: string;
   themeBorder: string;
   themeNumber: number;
@@ -49,6 +50,7 @@ function rankTopCodes(
         isNonLimitation,
         themeTitle: theme.shortTitle,
         themeColor: theme.color,
+        themeText: theme.text,
         themeBg: theme.bgLight,
         themeBorder: theme.borderColor,
         themeNumber: theme.number,
@@ -114,7 +116,7 @@ if (existsSync(indexPath)) {
                 </a>
                 <span
                   class="prevalence-theme-tag"
-                  style={`color: ${c.themeColor}; background-color: ${c.themeBg}; border-color: ${c.themeBorder};`}
+                  style={`color: ${c.themeText}; background-color: ${c.themeBg}; border-color: ${c.themeBorder};`}
                 >
                   {`T${c.themeNumber} · ${c.themeTitle}`}
                 </span>
@@ -137,7 +139,7 @@ if (existsSync(indexPath)) {
               <div class="prevalence-track">
                 <div
                   class="prevalence-fill"
-                  style={`width: ${c.barPct}%; background: linear-gradient(90deg, ${c.themeColor}, ${c.themeColor}dd);`}
+                  style={`width: ${c.barPct}%; background: ${c.themeColor};`}
                 ></div>
               </div>
             </div>
@@ -166,7 +168,7 @@ if (existsSync(indexPath)) {
                 </a>
                 <span
                   class={`prevalence-theme-tag ${c.isNonLimitation ? "tag-nonlim" : ""}`}
-                  style={`color: ${c.themeColor}; background-color: ${c.themeBg}; border-color: ${c.themeBorder};`}
+                  style={`color: ${c.themeText}; background-color: ${c.themeBg}; border-color: ${c.themeBorder};`}
                 >
                   {c.isNonLimitation ? "Non-Limitation (Discourse)" : `T${c.themeNumber} · ${c.themeTitle}`}
                 </span>
@@ -189,7 +191,7 @@ if (existsSync(indexPath)) {
               <div class="prevalence-track">
                 <div
                   class={`prevalence-fill ${c.isNonLimitation ? "fill-nonlim-pattern" : ""}`}
-                  style={`width: ${c.barPct}%; background: ${c.isNonLimitation ? "#64748b" : `linear-gradient(90deg, ${c.themeColor}, ${c.themeColor}dd)`};`}
+                  style={`width: ${c.barPct}%; background: ${c.isNonLimitation ? "var(--theme-nl)" : `${c.themeColor}`};`}
                 ></div>
               </div>
             </div>
@@ -206,9 +208,9 @@ if (existsSync(indexPath)) {
 
 <style>
   .prevalence-chart-container {
-    background: #ffffff;
+    background: var(--card);
     border: 1px solid var(--color-border);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     padding: 1.5rem;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
     margin: 1.25rem 0 2rem;
@@ -235,19 +237,22 @@ if (existsSync(indexPath)) {
     flex-wrap: wrap;
   }
 
+  /* shadcn TabsList / TabsTrigger */
   .chart-toggle {
     display: inline-flex;
-    background: #f1f5f9;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    padding: 0.2rem;
+    flex-wrap: wrap;
+    gap: 2px;
+    background: var(--muted);
+    border-radius: var(--radius);
+    padding: 3px;
   }
 
   .chart-toggle label {
-    padding: 0.35rem 0.95rem;
-    border-radius: 999px;
-    font-size: 0.82rem;
-    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: calc(var(--radius) - 2px);
+    font-size: 0.875rem;
+    font-weight: 500;
     cursor: pointer;
     color: var(--color-muted);
     transition: all 0.15s ease;
@@ -255,9 +260,10 @@ if (existsSync(indexPath)) {
 
   :global(#view-limitations:checked) ~ .prevalence-top-bar .chart-toggle label[for="view-limitations"],
   :global(#view-all:checked) ~ .prevalence-top-bar .chart-toggle label[for="view-all"] {
-    background: #1e293b;
-    color: #ffffff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: var(--background);
+    color: var(--foreground);
+    border-color: var(--input-bg);
+    box-shadow: var(--shadow-sm);
   }
 
   :global(#view-limitations:focus-visible) ~ .prevalence-top-bar .chart-toggle label[for="view-limitations"],
@@ -269,11 +275,11 @@ if (existsSync(indexPath)) {
   .prevalence-meta-pill {
     font-size: 0.76rem;
     font-weight: 600;
-    color: #64748b;
-    background: #f8fafc;
+    color: var(--muted-foreground);
+    background: var(--surface);
     border: 1px solid var(--color-border);
     padding: 0.25rem 0.65rem;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
   }
 
   .chart-panel { display: none; }
@@ -284,7 +290,7 @@ if (existsSync(indexPath)) {
   .prevalence-scale-header {
     padding: 0 0.95rem 0.5rem;
     margin-bottom: 0.6rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border);
   }
 
   .scale-ticks-grid {
@@ -297,7 +303,7 @@ if (existsSync(indexPath)) {
   .tick-mark {
     font-size: 0.72rem;
     font-weight: 700;
-    color: #94a3b8;
+    color: var(--muted-foreground-faint);
     font-variant-numeric: tabular-nums;
   }
 
@@ -312,20 +318,20 @@ if (existsSync(indexPath)) {
     flex-direction: column;
     gap: 0.55rem;
     padding: 0.75rem 0.95rem;
-    border-radius: 10px;
-    background: #fafbfc;
-    border: 1px solid #f1f5f9;
+    border-radius: var(--radius);
+    background: var(--card);
+    border: 1px solid var(--border);
     transition: all 0.15s ease;
   }
 
   .prevalence-row-card:hover {
-    background: #ffffff;
-    border-color: #cbd5e1;
+    background: var(--card);
+    border-color: var(--border-strong);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
   }
 
   .row-card-nonlim {
-    background: #f8fafc;
+    background: var(--surface);
   }
 
   .card-meta-row {
@@ -347,19 +353,19 @@ if (existsSync(indexPath)) {
   .prevalence-code-link {
     font-size: 0.92rem;
     line-height: 1.35;
-    color: #0f172a;
+    color: var(--foreground);
     text-decoration: none;
     font-weight: 650;
     transition: color 0.15s ease;
   }
 
   .prevalence-code-link:hover {
-    color: #2563eb;
+    color: var(--primary-text);
     text-decoration: underline;
   }
 
   .link-non-limitation {
-    color: #334155;
+    color: var(--foreground-soft);
   }
 
   .prevalence-theme-tag {
@@ -367,7 +373,7 @@ if (existsSync(indexPath)) {
     font-size: 0.68rem;
     font-weight: 600;
     padding: 0.12rem 0.5rem;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     border: 1px solid transparent;
     line-height: 1.25;
     white-space: nowrap;
@@ -388,13 +394,13 @@ if (existsSync(indexPath)) {
   .prevalence-pct-text {
     font-size: 1.02rem;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--foreground);
     font-variant-numeric: tabular-nums;
   }
 
   .prevalence-count-sub {
     font-size: 0.76rem;
-    color: #64748b;
+    color: var(--muted-foreground);
   }
 
   .prevalence-explore-mini {
@@ -402,11 +408,11 @@ if (existsSync(indexPath)) {
     pointer-events: none;
     font-size: 0.72rem;
     font-weight: 700;
-    color: #2563eb;
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
+    color: var(--primary-text);
+    background: var(--primary-soft);
+    border: 1px solid var(--primary-border);
     padding: 0.15rem 0.5rem;
-    border-radius: 5px;
+    border-radius: var(--radius-sm);
     text-decoration: none;
     transition: all 0.15s ease;
     margin-left: 0.25rem;
@@ -418,9 +424,9 @@ if (existsSync(indexPath)) {
   }
 
   .prevalence-explore-mini:hover {
-    background: #2563eb;
-    color: #ffffff;
-    border-color: #2563eb;
+    background: var(--primary);
+    color: var(--on-color);
+    border-color: var(--primary);
   }
 
   .prevalence-track-wrap {
@@ -429,7 +435,7 @@ if (existsSync(indexPath)) {
   }
 
   .prevalence-track {
-    background: #e2e8f0;
+    background: var(--track);
     border-radius: 999px;
     height: 0.65rem;
     overflow: hidden;
@@ -465,6 +471,87 @@ if (existsSync(indexPath)) {
     .prevalence-explore-mini {
       opacity: 1;
       pointer-events: auto;
+    }
+  }
+
+  /* ---- Compact one-line rows: name | bar | value (overrides the card layout above) ---- */
+  .prevalence-rows-list {
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--card);
+  }
+  .prevalence-row-card {
+    display: grid;
+    grid-template-columns: var(--prev-label-w) minmax(0, 1fr) var(--prev-value-w);
+    grid-template-areas: "left track right";
+    align-items: center;
+    gap: 1rem;
+    padding: 0.55rem 1rem;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .prevalence-row-card:last-child {
+    border-bottom: 0;
+  }
+  .prevalence-row-card:hover {
+    background: var(--surface);
+  }
+  .card-meta-row {
+    display: contents;
+  }
+  .card-meta-left {
+    grid-area: left;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    min-width: 0;
+  }
+  .card-meta-right {
+    grid-area: right;
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 0.4rem;
+  }
+  .prevalence-track-wrap {
+    grid-area: track;
+  }
+  .prevalence-code-link {
+    font-size: 0.875rem;
+  }
+  .prevalence-explore-mini {
+    display: none;
+  }
+  .prevalence-scale-header {
+    padding: 0 calc(1rem + var(--prev-value-w) + 1rem) 0.5rem calc(1rem + var(--prev-label-w) + 1rem);
+    border-bottom: 0;
+  }
+  .prevalence-wrap,
+  .chart-panel,
+  .prevalence-scale-header {
+    --prev-label-w: 27rem;
+    --prev-value-w: 9.5rem;
+  }
+  @media (max-width: 760px) {
+    .prevalence-wrap,
+    .chart-panel,
+    .prevalence-scale-header {
+      --prev-label-w: 100%;
+      --prev-value-w: 100%;
+    }
+    .prevalence-row-card {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: "left right" "track track";
+      gap: 0.35rem 0.75rem;
+    }
+    .prevalence-scale-header {
+      display: none;
     }
   }
 </style>

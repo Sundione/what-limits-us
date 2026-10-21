@@ -205,6 +205,8 @@ export const SECTION_EVOLUTION = {
 
 // Research Area Homogeneity & Significant Divergences (Paper Table 5 & Section 4.3)
 export const HOMOGENEITY_STAT = {
+  papersAnalyzed: 6742, // papers whose research area was available from conference programs
+  researchAreas: 29,
   totalCells: 1160, // 29 research areas × 40 limitation codes
   significantCells: 32,
   nonSignificantCells: 1128,
@@ -217,377 +219,28 @@ export const HOMOGENEITY_STAT = {
   effectSize: "Medium effect (Cohen's df-adjusted benchmark)",
 };
 
-export interface SignificantAreaCodePair {
+// Paper Table 5: top 10 significant (research area, limitation code) pairs by
+// observed-to-expected ratio (O/E); adj. p from the residual analysis after
+// Bonferroni correction. Only these ten pairs are reported in the paper.
+export interface AreaCodePair {
   area: string;
   code: string;
-  O: number;
-  E: number;
-  oeRatio: number;
-  z: number;
+  oe: number;
   adjP: string;
-  dir: "over" | "under";
-  note: string;
 }
 
-// Exactly 32 statistically significant cells matching Section 4.3 of the published paper
-export const TOP_32_SIGNIFICANT_PAIRS: SignificantAreaCodePair[] = [
-  {
-    area: "Efficient Methods for NLP",
-    code: "Hyperparameter Sensitivity",
-    O: 44,
-    E: 12.5,
-    oeRatio: 3.53,
-    z: 9.26,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "High tuning volatility and sensitivity under strict compute budgets.",
-  },
-  {
-    area: "Interpretability and Analysis",
-    code: "Theoretical Gap",
-    O: 59,
-    E: 21.3,
-    oeRatio: 2.77,
-    z: 8.51,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Absence of formal analytical guarantees for empirical attention mechanisms.",
-  },
-  {
-    area: "Computational Social Science",
-    code: "Dataset Bias/Imbalance",
-    O: 78,
-    E: 35.2,
-    oeRatio: 2.22,
-    z: 7.55,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Severe demographic, ideological, and social media source skews.",
-  },
-  {
-    area: "Resources and Evaluation",
-    code: "Subjectivity in Evaluation/Annotation",
-    O: 88,
-    E: 42.7,
-    oeRatio: 2.06,
-    z: 7.43,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Human disagreement, subjective guidelines, and annotator variability.",
-  },
-  {
-    area: "Computational Social Science",
-    code: "Subjectivity in Evaluation/Annotation",
-    O: 49,
-    E: 19.3,
-    oeRatio: 2.54,
-    z: 7.00,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Inherent nuance in coding complex social phenomena (e.g. hate speech).",
-  },
-  {
-    area: "Human-Centered NLP & HCI",
-    code: "Subjectivity in Evaluation/Annotation",
-    O: 20,
-    E: 5.2,
-    oeRatio: 3.83,
-    z: 6.58,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Variability in human user ratings, subjective prompts, and feedback.",
-  },
-  {
-    area: "Interpretability and Analysis",
-    code: "Lack of Interpretability",
-    O: 24,
-    E: 7.2,
-    oeRatio: 3.31,
-    z: 6.46,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Black-box nature of deep neural networks and internal feature circuits.",
-  },
-  {
-    area: "Resources and Evaluation",
-    code: "Low Data Quality",
-    O: 105,
-    E: 59.3,
-    oeRatio: 1.77,
-    z: 6.38,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Crowdsourced label noise, OCR artifacts, and corpus extraction errors.",
-  },
-  {
-    area: "Computational Social Science",
-    code: "Temporal Degradation",
-    O: 27,
-    E: 9.3,
-    oeRatio: 2.90,
-    z: 5.98,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Rapid concept drift in colloquial language and cultural events over time.",
-  },
-  {
-    area: "Human-Centered NLP & HCI",
-    code: "Societal and Ethical Risks",
-    O: 8,
-    E: 1.4,
-    oeRatio: 5.80,
-    z: 5.69,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Highest lift in the corpus (5.80×): Direct psychological or social harms to end-users.",
-  },
-  {
-    area: "Multilingualism & Cross-Lingual",
-    code: "Data Scarcity",
-    O: 57,
-    E: 28.3,
-    oeRatio: 2.01,
-    z: 5.59,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Severe lack of parallel corpora and native resources for low-resource languages.",
-  },
-  {
-    area: "Multimodality & Language Grounding",
-    code: "Dependency on Upstream Quality",
-    O: 140,
-    E: 90.6,
-    oeRatio: 1.54,
-    z: 5.56,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Downstream vision/audio errors propagating into language reasoning.",
-  },
-  {
-    area: "Computational Social Science",
-    code: "Bias and Fairness Risks",
-    O: 27,
-    E: 10.0,
-    oeRatio: 2.70,
-    z: 5.54,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Stereotyping, toxic outputs, and demographic misrepresentation.",
-  },
-  {
-    area: "Resources and Evaluation",
-    code: "Human Labor and Annotation Bottleneck",
-    O: 73,
-    E: 40.5,
-    oeRatio: 1.80,
-    z: 5.48,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Massive human effort required to curate and verify gold evaluation benchmarks.",
-  },
-  {
-    area: "Resources and Evaluation",
-    code: "Dataset Bias/Imbalance",
-    O: 122,
-    E: 77.8,
-    oeRatio: 1.57,
-    z: 5.42,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Skew across genres, writing styles, and demographic annotator backgrounds.",
-  },
-  {
-    area: "Efficient Methods for NLP",
-    code: "High Resource Requirements",
-    O: 131,
-    E: 85.3,
-    oeRatio: 1.54,
-    z: 5.30,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Heavy GPU demands needed to benchmark compression algorithms at scale.",
-  },
-  {
-    area: "Machine Learning for NLP",
-    code: "Theoretical Gap",
-    O: 25,
-    E: 9.3,
-    oeRatio: 2.69,
-    z: 5.28,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Empirical heuristics lacking rigorous theoretical convergence guarantees.",
-  },
-  {
-    area: "Resources and Evaluation",
-    code: "Data Leakage/Contamination",
-    O: 35,
-    E: 15.5,
-    oeRatio: 2.26,
-    z: 5.28,
-    adjP: "< 0.001",
-    dir: "over",
-    note: "Test splits inadvertently absorbed into massive web-scale pre-training data.",
-  },
-  {
-    area: "Summarization",
-    code: "Reliance on Automatic Metrics",
-    O: 14,
-    E: 4.3,
-    oeRatio: 3.29,
-    z: 4.80,
-    adjP: "0.002",
-    dir: "over",
-    note: "Flaws in n-gram overlap metrics (ROUGE) failing on semantic faithfulness.",
-  },
-  {
-    area: "Ethics, Bias, and Fairness",
-    code: "Privacy and Security Risks",
-    O: 17,
-    E: 6.1,
-    oeRatio: 2.78,
-    z: 4.58,
-    adjP: "0.005",
-    dir: "over",
-    note: "Memorized PII extraction risks and jailbreak vulnerability.",
-  },
-  {
-    area: "Multilingualism & Cross-Lingual",
-    code: "Dataset Task Mismatch",
-    O: 2,
-    E: 0.2,
-    oeRatio: 11.97,
-    z: 4.56,
-    adjP: "0.006",
-    dir: "over",
-    note: "Western-centric task formulations failing on non-Indo-European linguistic structures.",
-  },
-  {
-    area: "Machine Translation",
-    code: "Reliance on Automatic Metrics",
-    O: 17,
-    E: 6.0,
-    oeRatio: 2.82,
-    z: 4.54,
-    adjP: "0.007",
-    dir: "over",
-    note: "BLEU and COMET scoring blind spots on subtle idiom and stylistic translation errors.",
-  },
-  {
-    area: "Interpretability and Analysis",
-    code: "Scope Limitation",
-    O: 356,
-    E: 290.9,
-    oeRatio: 1.22,
-    z: 4.47,
-    adjP: "0.009",
-    dir: "over",
-    note: "Probing insights carefully bounded to specific layers or model scales.",
-  },
-  {
-    area: "Efficient Methods for NLP",
-    code: "Methodological Constraints",
-    O: 209,
-    E: 158.5,
-    oeRatio: 1.32,
-    z: 4.44,
-    adjP: "0.010",
-    dir: "over",
-    note: "Quantization, pruning, and architectural simplifications limiting model capacity.",
-  },
-  // Under-represented cells (statistically significant negative residuals)
-  {
-    area: "Resources and Evaluation",
-    code: "High Resource Requirements",
-    O: 92,
-    E: 156.9,
-    oeRatio: 0.59,
-    z: -5.70,
-    adjP: "< 0.001",
-    dir: "under",
-    note: "Under-reported: Benchmark construction emphasizes curation rather than compute.",
-  },
-  {
-    area: "Resources and Evaluation",
-    code: "Methodological Constraints",
-    O: 208,
-    E: 291.6,
-    oeRatio: 0.71,
-    z: -5.57,
-    adjP: "< 0.001",
-    dir: "under",
-    note: "Under-reported: Focuses on dataset quality rather than algorithmic limitations.",
-  },
-  {
-    area: "Interpretability and Analysis",
-    code: "Low Data Quality",
-    O: 7,
-    E: 34.6,
-    oeRatio: 0.20,
-    z: -4.92,
-    adjP: "0.001",
-    dir: "under",
-    note: "Under-reported: Probing studies predominantly run on clean, synthetic benchmark suites.",
-  },
-  {
-    area: "Interpretability and Analysis",
-    code: "Dataset Bias/Imbalance",
-    O: 14,
-    E: 45.3,
-    oeRatio: 0.31,
-    z: -4.90,
-    adjP: "0.001",
-    dir: "under",
-    note: "Under-reported: Internal representation probing rarely evaluates training set distribution skew.",
-  },
-  {
-    area: "Resources and Evaluation",
-    code: "Dependency on Upstream Quality",
-    O: 83,
-    E: 132.6,
-    oeRatio: 0.63,
-    z: -4.71,
-    adjP: "0.003",
-    dir: "under",
-    note: "Under-reported: Benchmarks establish ground-truth annotations rather than stacking pipelines.",
-  },
-  {
-    area: "Resources and Evaluation",
-    code: "High Time Consumption",
-    O: 30,
-    E: 62.4,
-    oeRatio: 0.48,
-    z: -4.42,
-    adjP: "0.012",
-    dir: "under",
-    note: "Under-reported: Evaluation runs do not incur weeks-long training cycles.",
-  },
-  {
-    area: "Efficient Methods for NLP",
-    code: "Subjectivity in Evaluation/Annotation",
-    O: 3,
-    E: 23.2,
-    oeRatio: 0.13,
-    z: -4.37,
-    adjP: "0.014",
-    dir: "under",
-    note: "Under-reported: Efficiency evaluations rely on deterministic hardware metrics (latency, FLOPs).",
-  },
-  {
-    area: "Computational Social Science",
-    code: "High Time Consumption",
-    O: 6,
-    E: 28.2,
-    oeRatio: 0.21,
-    z: -4.35,
-    adjP: "0.016",
-    dir: "under",
-    note: "Under-reported: Analyses typically train smaller discriminative models or run zero-shot inference.",
-  },
+export const AREA_TOP_PAIRS: AreaCodePair[] = [
+  { area: "Human-Centered NLP", code: "Societal and Ethical Risks", oe: 5.8, adjP: "< 0.001" },
+  { area: "Human-Centered NLP", code: "Subjectivity in Evaluation/Annotation", oe: 3.83, adjP: "< 0.001" },
+  { area: "Efficient NLP", code: "Hyperparameter Sensitivity", oe: 3.53, adjP: "< 0.001" },
+  { area: "Interpretability", code: "Lack of Interpretability", oe: 3.31, adjP: "< 0.001" },
+  { area: "Summarization", code: "Reliance on Automatic Metrics", oe: 3.29, adjP: "0.002" },
+  { area: "Language Modeling", code: "Reproducibility Gap", oe: 2.91, adjP: "0.036" },
+  { area: "Computational Social Science", code: "Temporal Degradation", oe: 2.9, adjP: "< 0.001" },
+  { area: "Machine Translation", code: "Reliance on Automatic Metrics", oe: 2.82, adjP: "0.006" },
+  { area: "Ethics, Bias, and Fairness", code: "Privacy and Security Risks", oe: 2.78, adjP: "0.005" },
+  { area: "Interpretability", code: "Theoretical Gap", oe: 2.77, adjP: "< 0.001" },
 ];
-
-// Backwards-compatible alias for TOP_32_SIGNIFICANT_PAIRS
-export const TOP_SIGNIFICANT_PAIRS = TOP_32_SIGNIFICANT_PAIRS;
 
 // The 3 Research Area Clusters (Paper Figure 7 & Appendix D)
 export interface AreaCluster {
@@ -704,14 +357,6 @@ export interface AffiliationComparisonRow {
   category: "higher-in-academia" | "higher-in-bigtech" | "equal";
 }
 
-export const AFFILIATION_STAT_SUMMARY = {
-  totalCodes: 40,
-  significantCodes: 1,
-  nonSignificantCodes: 39,
-  uniformityPct: 97.5,
-  significantCodeName: "Scope Limitation",
-  fdrThreshold: 0.05,
-};
 
 export const TOP_AFFILIATION_GAPS: AffiliationComparisonRow[] = affiliationFullData as AffiliationComparisonRow[];
 
@@ -721,8 +366,6 @@ export interface TransitionStat {
   code: string;
   obsPct: number;
   nullMeanPct: number;
-  nullCi: [number, number];
-  z: number;
   adjP: string;
   direction: "enriched" | "depleted";
   role: string;
@@ -730,62 +373,65 @@ export interface TransitionStat {
 
 export interface ConductedMitigationPairing {
   code: string;
+  total: number;
+  fwPct: number;
+  fwNullPct: number;
+  fwAdjP: string;
   obsPct: number;
   nullMeanPct: number;
-  nullCi: [number, number];
-  z: number;
   adjP: string;
 }
 
 export const DISCURSIVE_PATTERNS = {
   implicitLimitationShare2025: 1.4, // 90 papers with only Non-Limitation codes
   
-  // Lim -> NL: What non-limitation code succeeds a limitation? (Table 4)
+  // Lim -> NL: What non-limitation code succeeds a limitation? (paper Table 6)
   transitionsAfter: [
-    { code: "Future Work", obsPct: 40.2, nullMeanPct: 32.8, nullCi: [32.3, 33.3] as [number, number], z: 30.05, adjP: "< 0.001", direction: "enriched" as const, role: "Future outlook & follow-up directions" },
-    { code: "Contextual Justification", obsPct: 19.7, nullMeanPct: 17.0, nullCi: [16.6, 17.4] as [number, number], z: 13.58, adjP: "< 0.001", direction: "enriched" as const, role: "Rationale & contextual grounding" },
-    { code: "Conducted Mitigation", obsPct: 8.2, nullMeanPct: 6.3, nullCi: [6.0, 6.5] as [number, number], z: 16.17, adjP: "< 0.001", direction: "enriched" as const, role: "Proactive mitigations already executed" },
-    { code: "Theoretical Projection", obsPct: 7.3, nullMeanPct: 6.3, nullCi: [6.0, 6.5] as [number, number], z: 7.78, adjP: "< 0.001", direction: "enriched" as const, role: "Theoretical implications & hypotheses" },
-    { code: "Method Details", obsPct: 7.4, nullMeanPct: 12.6, nullCi: [12.2, 12.9] as [number, number], z: -29.80, adjP: "< 0.001", direction: "depleted" as const, role: "Implementation & system specs" },
-    { code: "Strong Reported Performance", obsPct: 4.5, nullMeanPct: 11.8, nullCi: [11.4, 12.1] as [number, number], z: -43.43, adjP: "< 0.001", direction: "depleted" as const, role: "Claims of high empirical results" },
-    { code: "Method Strength", obsPct: 3.8, nullMeanPct: 4.7, nullCi: [4.5, 4.9] as [number, number], z: -8.63, adjP: "< 0.001", direction: "depleted" as const, role: "Algorithmic advantages" },
-    { code: "Recommendations", obsPct: 3.5, nullMeanPct: 2.8, nullCi: [2.7, 3.0] as [number, number], z: 8.07, adjP: "< 0.001", direction: "enriched" as const, role: "Actionable advice for practitioners" },
-    { code: "Anticipated Impact", obsPct: 3.0, nullMeanPct: 3.5, nullCi: [3.3, 3.7] as [number, number], z: -6.04, adjP: "< 0.001", direction: "depleted" as const, role: "Long-term societal footprint" },
-    { code: "Authorial Disclaimers", obsPct: 2.4, nullMeanPct: 2.2, nullCi: [2.0, 2.3] as [number, number], z: 2.79, adjP: "0.003", direction: "enriched" as const, role: "Formal boundaries of liability" },
+    { code: "Future Work", obsPct: 40.2, nullMeanPct: 32.8, adjP: "< 0.001", direction: "enriched" as const, role: "Future outlook & follow-up directions" },
+    { code: "Contextual Justification", obsPct: 19.7, nullMeanPct: 17.0, adjP: "< 0.001", direction: "enriched" as const, role: "Rationale & contextual grounding" },
+    { code: "Conducted Mitigation", obsPct: 8.2, nullMeanPct: 6.3, adjP: "< 0.001", direction: "enriched" as const, role: "Proactive mitigations already executed" },
+    { code: "Theoretical Projection", obsPct: 7.3, nullMeanPct: 6.3, adjP: "< 0.001", direction: "enriched" as const, role: "Theoretical implications & hypotheses" },
+    { code: "Method Details", obsPct: 7.4, nullMeanPct: 12.6, adjP: "< 0.001", direction: "depleted" as const, role: "Implementation & system specs" },
+    { code: "Strong Reported Performance", obsPct: 4.5, nullMeanPct: 11.8, adjP: "< 0.001", direction: "depleted" as const, role: "Claims of high empirical results" },
+    { code: "Method Strength", obsPct: 3.8, nullMeanPct: 4.7, adjP: "< 0.001", direction: "depleted" as const, role: "Algorithmic advantages" },
+    { code: "Recommendations", obsPct: 3.5, nullMeanPct: 2.8, adjP: "< 0.001", direction: "enriched" as const, role: "Actionable advice for practitioners" },
+    { code: "Anticipated Impact", obsPct: 3.0, nullMeanPct: 3.5, adjP: "< 0.001", direction: "depleted" as const, role: "Long-term societal footprint" },
+    { code: "Authorial Disclaimers", obsPct: 2.4, nullMeanPct: 2.2, adjP: "0.003", direction: "enriched" as const, role: "Formal boundaries of liability" },
   ],
 
-  // NL -> Lim: What non-limitation code precedes a limitation? (Table 4)
+  // NL -> Lim: What non-limitation code precedes a limitation? (paper Table 6)
   transitionsBefore: [
-    { code: "Strong Reported Performance", obsPct: 17.5, nullMeanPct: 11.8, nullCi: [11.4, 12.1] as [number, number], z: 34.10, adjP: "< 0.001", direction: "enriched" as const, role: "Performance premise before admitting boundaries" },
-    { code: "Method Details", obsPct: 16.3, nullMeanPct: 12.6, nullCi: [12.2, 12.9] as [number, number], z: 21.35, adjP: "< 0.001", direction: "enriched" as const, role: "Methodological context framing the boundary" },
-    { code: "Contextual Justification", obsPct: 17.3, nullMeanPct: 17.0, nullCi: [16.7, 17.4] as [number, number], z: 1.13, adjP: "0.280", direction: "enriched" as const, role: "Design constraints preceding limitation" },
-    { code: "Method Strength", obsPct: 4.9, nullMeanPct: 4.7, nullCi: [4.5, 4.9] as [number, number], z: 1.26, adjP: "0.234", direction: "enriched" as const, role: "System strengths preceding weaknesses" },
-    { code: "Future Work", obsPct: 27.9, nullMeanPct: 32.8, nullCi: [32.3, 33.3] as [number, number], z: -20.05, adjP: "< 0.001", direction: "depleted" as const, role: "Typically appears after rather than before" },
-    { code: "Conducted Mitigation", obsPct: 5.8, nullMeanPct: 6.3, nullCi: [6.0, 6.5] as [number, number], z: -3.61, adjP: "0.002", direction: "depleted" as const, role: "Usually introduced after identifying the problem" },
-    { code: "Theoretical Projection", obsPct: 4.8, nullMeanPct: 6.3, nullCi: [6.0, 6.5] as [number, number], z: -11.60, adjP: "< 0.001", direction: "depleted" as const, role: "Theoretical framing" },
-    { code: "Anticipated Impact", obsPct: 2.1, nullMeanPct: 3.6, nullCi: [3.4, 3.7] as [number, number], z: -14.41, adjP: "< 0.001", direction: "depleted" as const, role: "Impact projection" },
-    { code: "Recommendations", obsPct: 1.9, nullMeanPct: 2.8, nullCi: [2.7, 3.0] as [number, number], z: -10.72, adjP: "< 0.001", direction: "depleted" as const, role: "Recommendations" },
-    { code: "Authorial Disclaimers", obsPct: 1.6, nullMeanPct: 2.2, nullCi: [2.0, 2.3] as [number, number], z: -8.35, adjP: "< 0.001", direction: "depleted" as const, role: "Disclaimers" },
+    { code: "Strong Reported Performance", obsPct: 17.5, nullMeanPct: 11.8, adjP: "< 0.001", direction: "enriched" as const, role: "Performance premise before admitting boundaries" },
+    { code: "Method Details", obsPct: 16.3, nullMeanPct: 12.6, adjP: "< 0.001", direction: "enriched" as const, role: "Methodological context framing the boundary" },
+    { code: "Contextual Justification", obsPct: 17.3, nullMeanPct: 17.0, adjP: "0.280", direction: "enriched" as const, role: "Design constraints preceding limitation" },
+    { code: "Method Strength", obsPct: 4.9, nullMeanPct: 4.7, adjP: "0.234", direction: "enriched" as const, role: "System strengths preceding weaknesses" },
+    { code: "Future Work", obsPct: 27.9, nullMeanPct: 32.8, adjP: "< 0.001", direction: "depleted" as const, role: "Typically appears after rather than before" },
+    { code: "Conducted Mitigation", obsPct: 5.8, nullMeanPct: 6.3, adjP: "0.002", direction: "depleted" as const, role: "Usually introduced after identifying the problem" },
+    { code: "Theoretical Projection", obsPct: 4.8, nullMeanPct: 6.3, adjP: "< 0.001", direction: "depleted" as const, role: "Theoretical framing" },
+    { code: "Anticipated Impact", obsPct: 2.1, nullMeanPct: 3.6, adjP: "< 0.001", direction: "depleted" as const, role: "Impact projection" },
+    { code: "Recommendations", obsPct: 1.9, nullMeanPct: 2.8, adjP: "< 0.001", direction: "depleted" as const, role: "Recommendations" },
+    { code: "Authorial Disclaimers", obsPct: 1.6, nullMeanPct: 2.2, adjP: "< 0.001", direction: "depleted" as const, role: "Disclaimers" },
   ],
 
-  // Table 7: Limitations followed by Conducted Mitigation
+  // Paper Table 11 (Appendix G): share of each limitation code's outgoing transitions
+  // that land on Future Work vs. Conducted Mitigation, against the permutation null.
   conductedMitigationPairings: [
-    { code: "Data Leakage/Contamination", obsPct: 24.1, nullMeanPct: 12.1, nullCi: [6.6, 18.1] as [number, number], z: 4.07, adjP: "0.002" },
-    { code: "Reproducibility Gap", obsPct: 23.5, nullMeanPct: 12.7, nullCi: [5.5, 21.0] as [number, number], z: 2.75, adjP: "0.012" },
-    { code: "Subjectivity in Evaluation/Annotation", obsPct: 23.4, nullMeanPct: 11.0, nullCi: [7.9, 14.3] as [number, number], z: 7.46, adjP: "0.002" },
-    { code: "Reliance on Automatic Metrics", obsPct: 20.8, nullMeanPct: 9.9, nullCi: [6.3, 13.8] as [number, number], z: 5.71, adjP: "0.002" },
-    { code: "Prompt Sensitivity", obsPct: 20.0, nullMeanPct: 9.3, nullCi: [4.6, 14.5] as [number, number], z: 4.23, adjP: "0.003" },
-    { code: "Privacy and Security Risks", obsPct: 20.0, nullMeanPct: 7.9, nullCi: [2.6, 14.1] as [number, number], z: 4.07, adjP: "0.003" },
-    { code: "Toxicity Risks", obsPct: 19.3, nullMeanPct: 9.0, nullCi: [2.0, 17.8] as [number, number], z: 2.57, adjP: "0.024" },
+    { code: "Data Leakage/Contamination", total: 141, fwPct: 10.6, fwNullPct: 20.6, fwAdjP: "0.007", obsPct: 24.1, nullMeanPct: 12.1, adjP: "0.002" },
+    { code: "Reproducibility Gap", total: 68, fwPct: 11.8, fwNullPct: 22.0, fwAdjP: "0.072", obsPct: 23.5, nullMeanPct: 12.7, adjP: "0.005" },
+    { code: "Subjectivity in Evaluation/Annotation", total: 364, fwPct: 23.1, fwNullPct: 25.9, fwAdjP: "0.402", obsPct: 23.4, nullMeanPct: 11.0, adjP: "0.002" },
+    { code: "Reliance on Automatic Metrics", total: 259, fwPct: 32.8, fwNullPct: 30.2, fwAdjP: "0.484", obsPct: 20.8, nullMeanPct: 9.9, adjP: "0.027" },
+    { code: "Prompt Sensitivity", total: 130, fwPct: 27.7, fwNullPct: 29.2, fwAdjP: "0.845", obsPct: 20.0, nullMeanPct: 9.3, adjP: "0.025" },
+    { code: "Privacy and Security Risks", total: 80, fwPct: 27.5, fwNullPct: 27.7, fwAdjP: "0.993", obsPct: 20.0, nullMeanPct: 7.9, adjP: "0.039" },
+    { code: "Toxicity Risks", total: 57, fwPct: 7.0, fwNullPct: 26.0, fwAdjP: "0.007", obsPct: 19.3, nullMeanPct: 9.0, adjP: "0.002" },
   ],
 
-  // Table 8: Share of transitions into limitation departing from Strong Reported Performance
+  // Paper Table 12 (Appendix H): limitation codes most often preceded by Strong Reported Performance
   strongReportedPerformancePreceding: [
-    { targetCode: "Empirical Underperformance", obsRate: 23.3, nullRate: 9.1, factor: 2.56, adjP: "< 0.001" },
-    { targetCode: "Methodological Constraints", obsRate: 13.1, nullRate: 6.9, factor: 1.90, adjP: "< 0.001" },
-    { targetCode: "Dependency on Upstream Quality", obsRate: 12.9, nullRate: 7.2, factor: 1.79, adjP: "< 0.001" },
-    { targetCode: "High Time Consumption", obsRate: 12.4, nullRate: 7.4, factor: 1.68, adjP: "< 0.001" },
-    { targetCode: "Model Reasoning and Generation Deficits", obsRate: 12.1, nullRate: 7.2, factor: 1.68, adjP: "< 0.001" },
+    { targetCode: "Empirical Underperformance", srpCount: 233, allCount: 1001, obsRate: 23.3, nullRate: 9.1, factor: 2.56, adjP: "< 0.001" },
+    { targetCode: "Methodological Constraints", srpCount: 645, allCount: 4941, obsRate: 13.1, nullRate: 6.9, factor: 1.90, adjP: "< 0.001" },
+    { targetCode: "Dependency on Upstream Quality", srpCount: 264, allCount: 2042, obsRate: 12.9, nullRate: 7.2, factor: 1.79, adjP: "< 0.001" },
+    { targetCode: "High Time Consumption", srpCount: 149, allCount: 1201, obsRate: 12.4, nullRate: 7.4, factor: 1.68, adjP: "< 0.001" },
+    { targetCode: "Model Reasoning and Generation Deficits", srpCount: 74, allCount: 614, obsRate: 12.1, nullRate: 7.2, factor: 1.68, adjP: "< 0.001" },
   ],
 
   // Backwards-compatible alias for existing successors

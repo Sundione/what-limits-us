@@ -15,13 +15,13 @@ const rowFor = (venue: PresenceRow["venue"], year: number) =>
   presenceRows.find((r) => r.venue === venue && r.year === year)!;
 
 const COLORS = {
-  aclDark: "#0072b2",
-  aclLight: "#b6dbff",
-  emnlpDark: "#e69f00",
-  emnlpLight: "#ffe2b3",
-  grid: "#e5e7eb",
-  axisText: "#374151",
-  axisTitle: "#111827",
+  aclDark: "var(--venue-acl)",
+  aclLight: "var(--venue-acl-soft)",
+  emnlpDark: "var(--venue-emnlp)",
+  emnlpLight: "var(--venue-emnlp-soft)",
+  grid: "var(--border)",
+  axisText: "var(--foreground-soft)",
+  axisTitle: "var(--foreground)",
 };
 
 // Exact Matplotlib PDF coordinates
@@ -172,11 +172,11 @@ function exploreUrl(year: number, venue: string) {
       <span class="toolbar-label">Conferences (Click to Toggle):</span>
       <div class="conf-toggles">
         <button type="button" class="conf-toggle-btn active" data-conf="acl" title="Toggle ACL bars and adoption line">
-          <span class="conf-bullet" style="background-color: #0072b2;"></span>
+          <span class="conf-bullet" style="background-color: var(--venue-acl);"></span>
           <span>ACL</span>
         </button>
         <button type="button" class="conf-toggle-btn active" data-conf="emnlp" title="Toggle EMNLP bars and adoption line">
-          <span class="conf-bullet" style="background-color: #e69f00;"></span>
+          <span class="conf-bullet" style="background-color: var(--venue-emnlp);"></span>
           <span>EMNLP</span>
         </button>
       </div>
@@ -193,7 +193,7 @@ function exploreUrl(year: number, venue: string) {
       shape-rendering="geometricPrecision"
     >
       <!-- Chart Canvas Background -->
-      <rect width={width} height={height} fill="#ffffff" />
+      <rect width={width} height={height} fill="var(--card)" />
 
       <!-- Horizontal Gridlines & Left Y-Axis Tick Labels -->
       {countGrid.map((n) => (
@@ -361,7 +361,7 @@ function exploreUrl(year: number, venue: string) {
               y={c.y}
               width={c.width}
               height="48"
-              fill="#ffffff"
+              fill="var(--card)"
               stroke={c.color}
               stroke-width="3"
               rx="0"
@@ -386,7 +386,7 @@ function exploreUrl(year: number, venue: string) {
               y={c.y}
               width={c.width}
               height="48"
-              fill="#ffffff"
+              fill="var(--card)"
               stroke={c.color}
               stroke-width="3"
               rx="0"
@@ -687,7 +687,7 @@ function exploreUrl(year: number, venue: string) {
         const d = JSON.parse(raw);
         if (ttBadge) {
           ttBadge.textContent = `${d.venue} ${d.year}`;
-          ttBadge.style.backgroundColor = d.venue === "ACL" ? "#0072b2" : "#e69f00";
+          ttBadge.style.backgroundColor = d.venue === "ACL" ? "var(--venue-acl)" : "var(--venue-emnlp)";
         }
         if (ttPct) ttPct.textContent = `${d.pct}% adopted`;
         if (ttTotal) ttTotal.textContent = Number(d.total).toLocaleString();
@@ -777,9 +777,9 @@ function exploreUrl(year: number, venue: string) {
     gap: 1rem;
     margin-bottom: 0.85rem;
     flex-wrap: wrap;
-    background: #f8fafc;
+    background: var(--surface);
     border: 1px solid var(--color-border);
-    border-radius: 10px;
+    border-radius: var(--radius);
     padding: 0.55rem 0.9rem;
   }
   .toolbar-section {
@@ -797,8 +797,6 @@ function exploreUrl(year: number, venue: string) {
     font-size: 0.82rem;
     font-weight: 700;
     color: var(--color-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
   }
   .preset-buttons {
     display: flex;
@@ -817,7 +815,7 @@ function exploreUrl(year: number, venue: string) {
     font-weight: 500;
     line-height: 1.2;
     border: 1px solid var(--color-border);
-    background: #ffffff;
+    background: var(--card);
     color: var(--color-text);
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
@@ -827,12 +825,12 @@ function exploreUrl(year: number, venue: string) {
   .preset-btn:hover {
     border-color: var(--color-accent);
     color: var(--color-accent);
-    background: #f1f5f9;
+    background: var(--muted);
   }
   .preset-btn.active {
-    background: var(--color-accent);
-    color: #ffffff;
-    border-color: var(--color-accent);
+    background: var(--primary);
+    color: var(--on-color);
+    border-color: var(--primary);
     font-weight: 600;
   }
 
@@ -849,17 +847,17 @@ function exploreUrl(year: number, venue: string) {
     font-size: 0.82rem;
     font-weight: 600;
     border: 1px solid var(--color-border);
-    background: #ffffff;
+    background: var(--card);
     color: var(--color-text);
     cursor: pointer;
     transition: all 0.15s ease;
   }
   .conf-toggle-btn:hover {
-    background: #f1f5f9;
+    background: var(--muted);
   }
   .conf-toggle-btn.active {
     border-color: currentColor;
-    background: #ffffff;
+    background: var(--card);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   }
   .conf-toggle-btn:not(.active) {
@@ -875,9 +873,9 @@ function exploreUrl(year: number, venue: string) {
   /* SVG Container & Border */
   .svg-container {
     position: relative;
-    background: #ffffff;
+    background: var(--card);
     border: 1px solid var(--color-border);
-    border-radius: 10px;
+    border-radius: var(--radius);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     overflow: visible;
   }
@@ -890,18 +888,18 @@ function exploreUrl(year: number, venue: string) {
 
   /* Typography matching paper PDF */
   .axis-num {
-    fill: #374151;
+    fill: var(--foreground-soft);
     font-size: 27px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   .axis-year {
-    fill: #111827;
+    fill: var(--foreground);
     font-size: 32px;
     font-weight: 600;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   .axis-title {
-    fill: #111827;
+    fill: var(--foreground);
     font-size: 32px;
     font-weight: 600;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -954,23 +952,23 @@ function exploreUrl(year: number, venue: string) {
     transition: opacity 0.2s ease;
   }
   .legend-item:hover .legend-txt {
-    fill: #000000;
+    fill: var(--foreground);
     font-weight: 700;
   }
   .legend-item:focus-visible {
-    outline: 2px dashed #0066cc;
+    outline: 2px dashed var(--primary);
   }
   .legend-item.is-disabled {
     opacity: 0.35;
   }
   .legend-item.is-disabled .legend-txt {
     text-decoration: line-through;
-    fill: #888888;
+    fill: var(--muted-foreground);
   }
   .legend-txt {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 26px;
-    fill: #222222;
+    fill: var(--foreground);
     font-weight: 500;
   }
 
@@ -979,10 +977,10 @@ function exploreUrl(year: number, venue: string) {
     position: absolute;
     pointer-events: none;
     z-index: 99999;
-    background: #18181b;
-    color: #ffffff;
+    background: var(--inverse-bg);
+    color: var(--on-color);
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: var(--radius);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
     border: 1px solid rgba(255, 255, 255, 0.2);
     min-width: 240px;
@@ -1011,14 +1009,14 @@ function exploreUrl(year: number, venue: string) {
     border-radius: 999px;
     font-size: 0.76rem;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--on-color);
     white-space: nowrap;
     flex-shrink: 0;
   }
   .tooltip-pct {
     font-size: 0.88rem;
     font-weight: 700;
-    color: #38bdf8;
+    color: var(--primary-text);
     white-space: nowrap;
     flex-shrink: 0;
   }
@@ -1033,23 +1031,23 @@ function exploreUrl(year: number, venue: string) {
     justify-content: space-between;
   }
   .tt-lbl {
-    color: #9ca3af;
+    color: var(--muted-foreground);
   }
   .tt-subrow {
     font-size: 0.72rem;
-    color: #9ca3af;
+    color: var(--muted-foreground);
     line-height: 1.3;
     margin-top: 2px;
   }
   .text-blue {
-    color: #60a5fa;
+    color: var(--primary-text);
   }
   .tooltip-cta {
     margin-top: 8px;
     padding-top: 6px;
     border-top: 1px dashed rgba(255, 255, 255, 0.15);
     font-size: 0.74rem;
-    color: #93c5fd;
+    color: var(--primary-strong);
     text-align: right;
   }
 

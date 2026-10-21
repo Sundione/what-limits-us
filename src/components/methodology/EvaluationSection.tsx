@@ -1,5 +1,6 @@
 import { useState, useMemo } from "preact/hooks";
 import { PER_CODE_AGREEMENT_DATA } from "../../data/methodologyData";
+import { Check, Info, Table2 } from "lucide-preact";
 
 type FilterType = "all" | "limitation" | "non-limitation";
 type SortField = "support" | "annotatorAlpha" | "modelAlpha" | "code";
@@ -173,7 +174,7 @@ export default function EvaluationSection() {
               </div>
             </div>
             <div class="insight-takeaway-footer">
-              <span class="footer-icon">✓</span>
+              <span class="footer-icon"><Check size={14} aria-hidden="true" /></span>
               <span><strong>Key Takeaway:</strong> Explicit, factual statements leave little room for interpretation. Codes seen in only a few papers (small n) can swing sharply, so read those with caution.</span>
             </div>
           </div>
@@ -203,7 +204,7 @@ export default function EvaluationSection() {
               </div>
             </div>
             <div class="insight-takeaway-footer footer-amber">
-              <span class="footer-icon">ℹ</span>
+              <span class="footer-icon"><Info size={14} aria-hidden="true" /></span>
               <span><strong>Key Takeaway:</strong> Where the annotators themselves disagreed before consensus, the code's boundary is hard to pin down. The LLM can still match the final consensus on some of these codes (e.g. Subjectivity), but the two α values use different references and are not directly comparable.</span>
             </div>
           </div>
@@ -218,7 +219,7 @@ export default function EvaluationSection() {
           aria-expanded={isTableExpanded}
         >
           <div class="toggle-btn-left">
-            <span class="toggle-icon">📊</span>
+            <span class="toggle-icon"><Table2 size={18} aria-hidden="true" /></span>
             <div class="toggle-text-wrap">
               <span class="toggle-title">
                 {isTableExpanded ? "Hide the 25-code agreement table" : "Inspect the full 25-code agreement table (paper Table 7)"}
@@ -355,7 +356,7 @@ export default function EvaluationSection() {
         {/* Statistical Correlation Footnote */}
         <div class="table-footnote-bar">
           <div class="footnote-left">
-            <span class="footnote-dot">ℹ</span>
+            <span class="footnote-dot"><Info size={14} aria-hidden="true" /></span>
             <span>
               Support counts papers in which the LLM, the adjudicated labels, or both assign the code. At such low support, a few disagreements shift α substantially, so values for rare codes (e.g. the 1.000 for Model Hallucination/Incoherence) should be read with caution. "—" means too few instances for α to be defined.
             </span>

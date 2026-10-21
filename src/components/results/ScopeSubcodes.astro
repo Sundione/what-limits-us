@@ -1,0 +1,136 @@
+---
+// Paper Figure 4 / Table 8: yearly share of papers mentioning each Scope
+// Limitation sub-code. Small multiples (one tile per sub-code, one hue, shared
+// y-axis) instead of seven overlapping lines. Static, zero client JS.
+import { SCOPE_SUBCODES } from "../../data/resultsData";
+
+const W = 220;
+const H = 70;
+const PAD = { l: 6, r: 6, t: 8, b: 6 };
+const Y_MAX = 20; // shared axis so tiles are comparable
+const years = SCOPE_SUBCODES[0].trend.map((p) => p.year);
+const x = (i: number) => PAD.l + (i * (W - PAD.l - PAD.r)) / (years.length - 1);
+const y = (v: number) => H - PAD.b - (v / Y_MAX) * (H - PAD.t - PAD.b);
+
+const tiles = SCOPE_SUBCODES.map((s) => {
+  const pts = s.trend;
+  const d = pts.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.pct).toFixed(1)}`).join(" ");
+  const area = `${d} L${x(pts.length - 1).toFixed(1)},${H - PAD.b} L${x(0).toFixed(1)},${H - PAD.b} Z`;
+  const p22 = pts.find((p) => p.year === 2022)!;
+  const p25 = pts.find((p) => p.year === 2025)!;
+  return { ...s, d, area, p22, p25, highlight: s.name === "Model Scale" };
+});
+---
+<figure class="data-figure scope-subcodes">
+  <figcaption>
+    <span class="paper-ref">Figure 4 / Table 8 in the paper</span>
+    Share of each year's papers that bound their scope in each way (Scope Limitation sub-codes). Same 0–20% axis in
+    every tile. 2020–2021 rest on very few papers (74 and 84 in total), so their values are noisy.
+  </figcaption>
+  <div class="subcode-grid">
+    {tiles.map((t) => (
+      <div class={`subcode-tile ${t.highlight ? "is-highlight" : ""}`}>
+        <div class="subcode-head">
+          <strong>{t.name}</strong>
+          {t.highlight && <span class="subcode-flag">Fastest-growing</span>}
+        </div>
+        <svg viewBox={`0 0 ${W} ${H}`} class="subcode-svg" role="img"
+          aria-label={`${t.name}: ${t.p22.pct}% of papers in 2022, ${t.p25.pct}% in 2025`}>
+          <line x1={PAD.l} x2={W - PAD.r} y1={y(10)} y2={y(10)} class="subcode-grid-line" />
+          <path d={t.area} class="subcode-area" />
+          <path d={t.d} class="subcode-line" />
+          {t.trend.map((p, i) => (
+            <circle cx={x(i)} cy={y(p.pct)} r="3" class="subcode-dot">
+              <title>{`${p.year}: ${p.pct}% (${p.count.toLocaleString()} papers)`}</title>
+            </circle>
+          ))}
+        </svg>
+        <div class="subcode-years" aria-hidden="true"><span>2020</span><span>2025</span></div>
+        <p class="subcode-change">
+          {t.p22.pct.toFixed(1)}% <span>(2022)</span> → <strong>{t.p25.pct.toFixed(1)}%</strong> <span>(2025)</span>
+        </p>
+      </div>
+    ))}
+  </div>
+  <p class="data-table-note">
+    The paper reads Model Scale's rise as researchers bounding the parameter sizes they evaluate (e.g. "limited our
+    study to [Model X], and our findings may not generalize to larger models"), reflecting the shift brought by
+    large language models, and the sharp increase in Language Coverage during 2020–2022 as growing awareness of the
+    field's English-centric bias and calls to name the languages studied.
+  </p>
+</figure>
+
+<style>
+  .subcode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+  }
+  .subcode-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--card);
+  }
+  .subcode-tile.is-highlight {
+    border-color: var(--primary-border);
+    box-shadow: 0 0 0 1px var(--primary-border);
+  }
+  .subcode-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+  .subcode-flag {
+    padding: 0.05rem 0.45rem;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary-strong);
+    font-size: 0.7rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .subcode-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .subcode-grid-line {
+    stroke: var(--border);
+    stroke-dasharray: 3 3;
+  }
+  .subcode-area {
+    fill: color-mix(in srgb, var(--primary) 12%, transparent);
+  }
+  .subcode-line {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+  .subcode-dot {
+    fill: var(--card);
+    stroke: var(--primary);
+    stroke-width: 1.5;
+  }
+  .subcode-years {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--muted-foreground);
+  }
+  .subcode-change {
+    margin: 0;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .subcode-change span {
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+  }
+</style>

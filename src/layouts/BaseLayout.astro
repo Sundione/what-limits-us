@@ -1,4 +1,10 @@
 ---
+import "@fontsource-variable/inter";
+import "../styles/theme.css";
+import "../styles/shadcn.css";
+import { House, Workflow, BookOpen, Search, ChartColumn, Sun, Moon } from "lucide-preact";
+import LogoMark from "../components/LogoMark.astro";
+import BrandIcon from "../components/BrandIcon.astro";
 import { paper } from "../data/paper";
 
 interface Props {
@@ -18,6 +24,9 @@ const navItems = [
   { href: `${baseUrl}results`, label: "Results", icon: "results", key: "results" },
 ];
 
+const ogImage = new URL(`${baseUrl}og-image.png`, Astro.site).href;
+const navIcons = { overview: House, methodology: Workflow, codebook: BookOpen, explore: Search, results: ChartColumn };
+
 const isItemActive = (key: string) => {
   if (key === "overview") {
     const normalized = currentPath.replace(/\/index\.html$/, "").replace(/\/$/, "");
@@ -33,15 +42,35 @@ const isItemActive = (key: string) => {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.svg`} type="image/svg+xml" />
+    <link rel="icon" href={`${baseUrl}favicon.svg`} type="image/svg+xml" />
+    <link rel="icon" href={`${baseUrl}favicon-32.png`} sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href={`${baseUrl}apple-touch-icon.png`} />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="NLP Limitations" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <title>{title}</title>
+    <script is:inline>
+      // Apply a saved theme choice before first paint (no flash). Without a
+      // saved choice the CSS follows the OS via prefers-color-scheme.
+      try {
+        var t = localStorage.getItem("theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <header class="site-header">
       <nav aria-label="Main Navigation">
-        <a class="brand" href={baseUrl}>
-          <span class="brand-badge">NLP</span>
-          <span class="brand-title">Limitations</span>
+        <a class="brand" href={baseUrl} aria-label="NLP Limitations, home">
+          <LogoMark size={30} />
+          <span class="brand-title"><span class="brand-title-nlp">NLP</span> Limitations</span>
         </a>
 
         <div class="nav-links" role="menubar">
@@ -54,39 +83,10 @@ const isItemActive = (key: string) => {
                 aria-current={active ? "page" : undefined}
                 role="menuitem"
               >
-                {item.icon === "overview" && (
-                  <svg class="nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                  </svg>
-                )}
-                {item.icon === "methodology" && (
-                  <svg class="nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="18" cy="18" r="3"></circle>
-                    <circle cx="6" cy="6" r="3"></circle>
-                    <path d="M13 6h3a2 2 0 0 1 2 2v7"></path>
-                    <line x1="6" y1="9" x2="6" y2="21"></line>
-                  </svg>
-                )}
-                {item.icon === "codebook" && (
-                  <svg class="nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                  </svg>
-                )}
-                {item.icon === "explore" && (
-                  <svg class="nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  </svg>
-                )}
-                {item.icon === "results" && (
-                  <svg class="nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="20" x2="18" y2="10"></line>
-                    <line x1="12" y1="20" x2="12" y2="4"></line>
-                    <line x1="6" y1="20" x2="6" y2="14"></line>
-                  </svg>
-                )}
+                {(() => {
+                  const Icon = navIcons[item.icon as keyof typeof navIcons];
+                  return <Icon class="nav-icon" size={16} strokeWidth={2} aria-hidden="true" />;
+                })()}
                 <span class="nav-label">{item.label}</span>
                 {item.badge && <span class="nav-badge">{item.badge}</span>}
               </a>
@@ -102,9 +102,7 @@ const isItemActive = (key: string) => {
             rel="noopener noreferrer"
             title="Read paper on arXiv"
           >
-            <svg class="action-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3.8423 0a1.0037 1.0037 0 0 0-.922.6078c-.1536.3687-.0438.6275.2938 1.1113l6.9185 8.3597-1.0223 1.1058a1.0393 1.0393 0 0 0 .003 1.4229l1.2292 1.3135-5.4391 6.4444c-.2803.299-.4538.823-.2971 1.1986a1.0253 1.0253 0 0 0 .9585.635.9133.9133 0 0 0 .6891-.3405l5.783-6.126 7.4902 8.0051a.8527.8527 0 0 0 .6835.2597.9575.9575 0 0 0 .8777-.6138c.1577-.377-.017-.7502-.306-1.1407l-7.0518-8.3418 1.0632-1.13a.9626.9626 0 0 0 .0089-1.3165L4.6336.4639s-.3733-.4535-.768-.463zm0 .272h.0166c.2179.0052.4874.2715.5644.3639l.005.006.0052.0055 10.169 10.9905a.6915.6915 0 0 1-.0072.945l-1.0666 1.133-1.4982-1.7724-8.5994-10.39c-.3286-.472-.352-.6183-.2592-.841a.7307.7307 0 0 1 .6704-.4401Zm14.341 1.5701a.877.877 0 0 0-.6554.2418l-5.6962 6.1584 1.6944 1.8319 5.3089-6.5138c.3251-.4335.479-.6603.3247-1.0292a1.1205 1.1205 0 0 0-.9763-.689zm-7.6557 12.2823 1.3186 1.4135-5.7864 6.1295a.6494.6494 0 0 1-.4959.26.7516.7516 0 0 1-.706-.4669c-.1119-.2682.0359-.6864.2442-.9083l.0051-.0055.0047-.0055z"/>
-            </svg>
+            <BrandIcon name="arxiv" size={15} class="action-icon" />
             <span>arXiv</span>
           </a>
           <a
@@ -114,11 +112,13 @@ const isItemActive = (key: string) => {
             rel="noopener noreferrer"
             title="View dataset repository on GitHub"
           >
-            <svg class="action-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-            </svg>
+            <BrandIcon name="github" size={15} class="action-icon" />
             <span>GitHub</span>
           </a>
+          <button type="button" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+            <Moon class="theme-icon-moon" size={16} aria-hidden="true" />
+            <Sun class="theme-icon-sun" size={16} aria-hidden="true" />
+          </button>
         </div>
       </nav>
     </header>
@@ -129,8 +129,8 @@ const isItemActive = (key: string) => {
       <div class="footer-inner">
         <div class="footer-meta">
           <span class="footer-brand">
-            <span class="footer-badge">NLP</span>
-            <strong>Limitations</strong>
+            <LogoMark size={20} />
+            <strong>NLP Limitations</strong>
           </span>
           <span class="footer-sep">&bull;</span>
           <span class="footer-context">Companion site for an EMNLP 2026 Findings paper</span>
@@ -154,6 +154,18 @@ const isItemActive = (key: string) => {
       </div>
     </footer>
     <script>
+      // Theme toggle: flips the effective theme and remembers the choice.
+      const toggle = document.querySelector<HTMLButtonElement>(".theme-toggle");
+      toggle?.addEventListener("click", () => {
+        const root = document.documentElement;
+        const current = root.dataset.theme ?? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        const next = current === "dark" ? "light" : "dark";
+        root.dataset.theme = next;
+        try {
+          localStorage.setItem("theme", next);
+        } catch {}
+      });
+
       // Scroll-spy for in-page sub-navs (methodology, results): marks the
       // section currently under the sticky header as active.
       const links = [...document.querySelectorAll<HTMLAnchorElement>('.subnav-links a[href^="#"]')];
@@ -198,16 +210,7 @@ const isItemActive = (key: string) => {
 
 <style is:global>
   :root {
-    --color-bg: #ffffff;
-    --color-surface: #f8fafc;
-    --color-text: #0f172a;
-    --color-muted: #475569;
-    --color-border: #e2e8f0;
-    --color-accent: #2563eb;
-    --color-llm: #7c3aed;
-    --color-llm-bg: #f5f3ff;
-    --color-human: #0f766e;
-    --color-human-bg: #f0fdfa;
+    /* Colours live in src/styles/theme.css (light + dark tokens). */
     --max-width: 1040px;
     --nav-max-width: 1360px;
     /* Height of the sticky site header; page sub-navs stick just below it. */
@@ -220,23 +223,32 @@ const isItemActive = (key: string) => {
     margin: 0;
     background: var(--color-bg);
     color: var(--color-text);
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-family: var(--font-sans);
     line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  code, pre, kbd {
+    font-family: var(--font-mono);
   }
 
   a { color: var(--color-accent); }
 
-  /* ---------------- Expanded & Decorated Header ---------------- */
+  /* ---------------- Header (shadcn-style) ---------------- */
   .site-header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--color-border);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
-    transition: all 0.2s ease;
+    background: var(--header-bg);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
   }
 
   .site-header nav {
@@ -254,114 +266,120 @@ const isItemActive = (key: string) => {
   .brand {
     display: inline-flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.6rem;
     text-decoration: none;
-    transition: opacity 0.15s ease, transform 0.15s ease;
     flex-shrink: 0;
   }
-  .brand:hover {
-    opacity: 0.92;
-    transform: translateY(-0.5px);
-    text-decoration: none;
-  }
-  .brand-badge {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: #ffffff;
-    padding: 0.25rem 0.65rem;
-    border-radius: 7px;
-    font-size: 0.88rem;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.28);
-  }
   .brand-title {
-    color: var(--color-text);
-    font-size: 1.35rem;
-    font-weight: 800;
-    letter-spacing: -0.025em;
+    color: var(--foreground);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .brand-title-nlp {
+    color: var(--primary-text);
   }
 
-  /* Segmented Nav Links */
+  /* Nav links: quiet text links, active page in full ink */
   .nav-links {
     display: flex;
     align-items: center;
-    gap: 0.3rem;
-    background: #f1f5f9;
-    border: 1px solid var(--color-border);
-    padding: 0.25rem 0.35rem;
-    border-radius: 10px;
+    gap: 0.15rem;
   }
   .nav-item {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.38rem 0.8rem;
-    border-radius: 7px;
+    gap: 0.45rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-sm);
     text-decoration: none;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--color-muted);
-    transition: all 0.15s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    transition: color 0.15s ease, background-color 0.15s ease;
     white-space: nowrap;
   }
   .nav-item:hover {
-    color: var(--color-text);
-    background: rgba(255, 255, 255, 0.75);
+    color: var(--foreground);
+    background: var(--muted);
     text-decoration: none;
   }
   .nav-item.active {
-    color: #1d4ed8;
-    background: #ffffff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
-    font-weight: 700;
+    color: var(--foreground);
+    background: var(--muted);
+    font-weight: 600;
   }
   .nav-icon {
-    font-size: 0.95rem;
-    line-height: 1;
+    flex-shrink: 0;
   }
   .nav-badge {
     font-size: 0.68rem;
-    font-weight: 800;
-    background: #2563eb;
-    color: #ffffff;
-    padding: 0.06rem 0.38rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--primary-strong);
+    background: var(--primary-soft);
+    border: 1px solid var(--primary-border);
+    padding: 0 0.35rem;
     border-radius: 999px;
-    margin-left: -0.1rem;
-    box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+    font-variant-numeric: tabular-nums;
   }
 
-  /* Right-side Quick Actions */
+  /* Right-side actions: outline buttons + icon-only theme toggle */
   .nav-actions {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.4rem;
     flex-shrink: 0;
   }
-  .nav-action-btn {
+  .nav-action-btn,
+  .theme-toggle {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.4rem;
-    padding: 0.38rem 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    font-size: 0.84rem;
-    font-weight: 600;
-    color: var(--color-text);
+    height: 2.25rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--foreground);
     text-decoration: none;
-    background: #ffffff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-    transition: all 0.15s ease;
+    background: var(--background);
+    box-shadow: var(--shadow-xs);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
   }
-  .nav-action-btn:hover {
-    border-color: #94a3b8;
-    color: #0f172a;
-    background: #f8fafc;
+  .nav-action-btn:hover,
+  .theme-toggle:hover {
+    background: var(--muted);
     text-decoration: none;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  }
+  .theme-toggle {
+    width: 2.25rem;
+    padding: 0;
   }
   .action-icon {
     flex-shrink: 0;
+  }
+  /* Show the icon for the theme you would switch TO */
+  .theme-icon-sun {
+    display: none;
+  }
+  :root[data-theme="dark"] .theme-icon-sun {
+    display: block;
+  }
+  :root[data-theme="dark"] .theme-icon-moon {
+    display: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .theme-icon-sun {
+      display: block;
+    }
+    :root:where(:not([data-theme="light"])) .theme-icon-moon {
+      display: none;
+    }
   }
 
   /* Main & Layout */
@@ -375,7 +393,7 @@ const isItemActive = (key: string) => {
     border-top: 1px solid var(--color-border);
     color: var(--color-muted);
     font-size: 0.88rem;
-    background: #f8fafc;
+    background: var(--surface);
     margin-top: 3rem;
   }
   .site-footer .footer-inner {
@@ -398,20 +416,11 @@ const isItemActive = (key: string) => {
   .footer-brand {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    color: var(--color-text);
-  }
-  .footer-badge {
-    background: #2563eb;
-    color: #ffffff;
-    font-size: 0.68rem;
-    font-weight: 800;
-    padding: 0.1rem 0.38rem;
-    border-radius: 4px;
-    letter-spacing: 0.03em;
+    gap: 0.45rem;
+    color: var(--foreground);
   }
   .footer-sep {
-    color: #cbd5e1;
+    color: var(--muted-foreground-faint);
     font-weight: bold;
   }
   .footer-context {
@@ -429,9 +438,9 @@ const isItemActive = (key: string) => {
     align-items: center;
     gap: 0.35rem;
     padding: 0.22rem 0.6rem;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--color-border);
-    background: #ffffff;
+    background: var(--card);
     color: var(--color-text);
     text-decoration: none;
     font-weight: 600;
@@ -441,7 +450,7 @@ const isItemActive = (key: string) => {
   .license-link:hover {
     border-color: var(--color-accent);
     color: var(--color-accent);
-    background: #eff6ff;
+    background: var(--primary-soft);
     text-decoration: none;
   }
   .license-icon {
@@ -459,8 +468,8 @@ const isItemActive = (key: string) => {
     font-size: 0.75rem;
     font-weight: 600;
   }
-  .badge-llm { background: var(--color-llm-bg); color: var(--color-llm); }
-  .badge-human { background: var(--color-human-bg); color: var(--color-human); }
+  .badge-llm { background: var(--llm-bg); color: var(--llm-fg); border: 1px solid var(--llm-border); }
+  .badge-human { background: var(--human-bg); color: var(--human-fg); border: 1px solid var(--human-border); }
 
   /* Responsive Navbar */
   @media (max-width: 960px) {
@@ -477,7 +486,8 @@ const isItemActive = (key: string) => {
     }
     /* arXiv / GitHub stay reachable as icon-only buttons */
     .nav-action-btn {
-      padding: 0.42rem 0.55rem;
+      width: 2.25rem;
+      padding: 0;
     }
     .nav-action-btn span {
       display: none;
@@ -520,10 +530,9 @@ const isItemActive = (key: string) => {
       border: 0;
       border-top: 1px solid var(--color-border);
       border-radius: 0;
-      background: rgba(255, 255, 255, 0.97);
+      background: var(--header-bg);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 -4px 12px -4px rgba(0, 0, 0, 0.06);
     }
     .nav-item {
       flex-direction: column;
@@ -534,8 +543,8 @@ const isItemActive = (key: string) => {
       font-size: 0.7rem;
     }
     .nav-item.active {
-      box-shadow: none;
-      background: #eff6ff;
+      background: var(--primary-soft);
+      color: var(--primary-strong);
     }
     .nav-icon {
       width: 20px;

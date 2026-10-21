@@ -3,6 +3,7 @@ import type { ComponentChildren } from "preact";
 import type { GlobalIndex, IndexEntry, PaperDetail, TransitionIndex } from "../../scripts/types";
 import { findTransitions, isLimitationCode, NL_PREFIX } from "../../scripts/lib/transitions";
 import { THEMES, getThemeByCode, type ThemeDefinition } from "../data/themes";
+import { Search, X } from "lucide-preact";
 
 const DATA_BASE = `${import.meta.env.BASE_URL}data/`;
 const PAGE_SIZE = 40;
@@ -392,7 +393,7 @@ export default function Explorer() {
                   pushParams({ q: null });
                 }}
               >
-                ✕
+                <X size={16} aria-hidden="true" />
               </button>
             )}
           </div>
@@ -609,7 +610,7 @@ export default function Explorer() {
         <div class="starter-strip">
           <span class="starter-label">Not sure where to start?</span>
           <button type="button" class="starter-btn" onClick={() => applyStarter("own")}>
-            🔎 Find your own paper
+            <Search size={14} aria-hidden="true" /> Find your own paper
           </button>
           <button type="button" class="starter-btn" onClick={() => applyStarter("codes")}>
             Most limitation codes in one section
@@ -681,7 +682,7 @@ export default function Explorer() {
                                       <span
                                         key={name}
                                         class="theme-mini-tag"
-                                        style={{ backgroundColor: theme.bgLight, borderColor: theme.borderColor, color: theme.color }}
+                                        style={{ backgroundColor: theme.bgLight, borderColor: theme.borderColor, color: theme.text }}
                                         title={`${name} (${theme.shortTitle})`}
                                       >
                                         <span class="dot" style={{ backgroundColor: theme.color }}></span>
@@ -922,7 +923,7 @@ function PaperDetailInspector({
         <div class="inspector-title-row">
           <h2 class="inspector-title">{detail.title}</h2>
           <button type="button" class="close-inspector-btn" onClick={onClose} title="Close inspector">
-            ✕
+            <X size={16} aria-hidden="true" />
           </button>
         </div>
 
@@ -1113,6 +1114,7 @@ function PaperDetailInspector({
                                 class={`thematic-code-chip ${isChipActive ? "chip-active" : ""}`}
                                 style={{
                                   "--chip-color": m.theme.color,
+                                  "--chip-text": m.theme.text,
                                   "--chip-bg": m.theme.bgLight,
                                   "--chip-border": m.theme.borderColor,
                                 }}
