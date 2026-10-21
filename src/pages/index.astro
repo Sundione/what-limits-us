@@ -4,6 +4,7 @@ import LinkBar from "../components/LinkBar.astro";
 import BibtexBlock from "../components/BibtexBlock.astro";
 import LimitationPresenceChart from "../components/LimitationPresenceChart.astro";
 import LiveAnnotationDemo from "../components/LiveAnnotationDemo.astro";
+import { BookOpen, User, Bot } from "lucide-preact";
 import { authors, affiliations, paper } from "../data/paper";
 ---
 <BaseLayout title={`${paper.title} — NLP Limitations`}>
@@ -23,10 +24,7 @@ import { authors, affiliations, paper } from "../data/paper";
 
   <div class="venue-strip">
     <span class="venue-pill">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="venue-icon">
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-      </svg>
+      <BookOpen size={14} class="venue-icon" aria-hidden="true" />
       {paper.venue}
     </span>
   </div>
@@ -82,7 +80,7 @@ import { authors, affiliations, paper } from "../data/paper";
       <h3 class="finding-question">How do authors frame a limitation?</h3>
       <p class="finding-number">40% &rarr; future work</p>
       <p class="finding-answer">
-        A limitation is often followed directly by future work (40.2% of transitions, vs. 32.8% expected by chance).
+        A limitation is often followed directly by future work (40.2% of transitions, vs. 32.8% expected by chance), a pattern the paper calls the Soft Landing.
         In 2025, 90 papers had a Limitations section with only non-limitation statements, such as future-work plans.
       </p>
       <div class="finding-links">
@@ -123,22 +121,13 @@ import { authors, affiliations, paper } from "../data/paper";
   </p>
   <p class="iaa-numbers">
     <span class="badge badge-human">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;">
-        <circle cx="12" cy="7" r="4"></circle>
-        <path d="M5.5 21a8.38 8.38 0 0 1 13 0"></path>
-      </svg>
+      <User size={14} aria-hidden="true" />
       Human annotators only
     </span>
     <strong>α = 0.644</strong>
     <span class="iaa-arrow">&rarr;</span>
     <span class="badge badge-llm">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;">
-        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
-        <circle cx="12" cy="5" r="2"></circle>
-        <path d="M12 7v4"></path>
-        <line x1="8" y1="16" x2="8.01" y2="16"></line>
-        <line x1="16" y1="16" x2="16.01" y2="16"></line>
-      </svg>
+      <Bot size={14} aria-hidden="true" />
       + LLM as a coder
     </span>
     <strong>α = 0.647</strong>
@@ -184,21 +173,21 @@ import { authors, affiliations, paper } from "../data/paper";
     gap: 0.45rem;
     padding: 0.28rem 0.75rem;
     border-radius: 999px;
-    background: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
+    background: var(--primary-soft);
+    color: var(--primary-strong);
+    border: 1px solid var(--primary-border);
     font-size: 0.82rem;
     font-weight: 600;
   }
   .venue-icon {
-    color: #2563eb;
+    color: var(--primary-text);
   }
 
   .tldr {
-    background: #f0f9ff;
-    border: 1px solid #bae6fd;
-    border-left: 4px solid #0284c7;
-    border-radius: 8px;
+    background: var(--primary-soft);
+    border: 1px solid var(--primary-border);
+    border-left: 4px solid var(--primary);
+    border-radius: var(--radius);
     padding: 0.9rem 1.2rem;
     margin: 1.5rem 0 2rem;
   }
@@ -207,17 +196,17 @@ import { authors, affiliations, paper } from "../data/paper";
   }
   .tldr-badge {
     display: inline-block;
-    background: #0284c7;
-    color: #ffffff;
+    background: var(--primary);
+    color: var(--on-color);
     font-size: 0.74rem;
     font-weight: 800;
     padding: 0.12rem 0.48rem;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     letter-spacing: 0.05em;
   }
   .tldr-text {
     margin: 0;
-    color: #0f172a;
+    color: var(--foreground);
     font-size: 0.95rem;
     line-height: 1.55;
   }
@@ -227,14 +216,14 @@ import { authors, affiliations, paper } from "../data/paper";
     font-size: 1.5rem;
     font-weight: 750;
     letter-spacing: -0.015em;
-    color: #0f172a;
+    color: var(--foreground);
   }
   h3 {
     margin-top: 1.5rem;
     font-size: 1.2rem;
     font-weight: 650;
     letter-spacing: -0.01em;
-    color: #1e293b;
+    color: var(--foreground);
   }
 
   .iaa-numbers {
@@ -249,19 +238,19 @@ import { authors, affiliations, paper } from "../data/paper";
     align-items: center;
     gap: 0.35rem;
     padding: 0.25rem 0.65rem;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     font-size: 0.85rem;
     font-weight: 600;
   }
   .badge-human {
-    background: #ecfdf5;
-    color: #065f46;
-    border: 1px solid #a7f3d0;
+    background: var(--green-bg);
+    color: var(--green-fg);
+    border: 1px solid var(--green-border);
   }
   .badge-llm {
-    background: #f5f3ff;
-    color: #5b21b6;
-    border: 1px solid #ddd6fe;
+    background: var(--violet-bg);
+    color: var(--violet-fg);
+    border: 1px solid var(--violet-border);
   }
 
   .iaa-arrow { color: var(--color-muted); }
@@ -275,11 +264,11 @@ import { authors, affiliations, paper } from "../data/paper";
   .abstract-details summary {
     cursor: pointer;
     font-weight: 600;
-    color: #0369a1;
+    color: var(--primary-strong);
   }
   .abstract-details p {
     margin: 0.6rem 0 0;
-    color: #1e293b;
+    color: var(--foreground);
     line-height: 1.6;
   }
 
@@ -294,16 +283,14 @@ import { authors, affiliations, paper } from "../data/paper";
     flex-direction: column;
     padding: 1.1rem 1.2rem;
     border: 1px solid var(--color-border);
-    border-top: 4px solid #2563eb;
-    border-radius: 10px;
+    border-top: 4px solid var(--primary);
+    border-radius: var(--radius);
     background: var(--color-bg);
   }
   .finding-rq {
     font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #2563eb;
+    color: var(--primary-text);
   }
   .finding-question {
     margin: 0.35rem 0 0.4rem;
@@ -340,9 +327,9 @@ import { authors, affiliations, paper } from "../data/paper";
   .find-paper {
     margin: 0 0 1rem;
     padding: 1rem 1.2rem;
-    border-radius: 10px;
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
+    border-radius: var(--radius);
+    background: var(--primary-soft);
+    border: 1px solid var(--primary-border);
   }
   .find-paper-label {
     display: block;
@@ -358,33 +345,33 @@ import { authors, affiliations, paper } from "../data/paper";
     min-width: 0;
     font: inherit;
     padding: 0.55rem 0.75rem;
-    border: 1px solid #bfdbfe;
-    border-radius: 8px;
-    background: #ffffff;
+    border: 1px solid var(--primary-border);
+    border-radius: var(--radius);
+    background: var(--card);
   }
   .find-paper-row button {
     font: inherit;
     font-weight: 600;
     padding: 0.55rem 1rem;
     border: 0;
-    border-radius: 8px;
-    background: #2563eb;
-    color: #ffffff;
+    border-radius: var(--radius);
+    background: var(--primary);
+    color: var(--on-color);
     cursor: pointer;
     white-space: nowrap;
   }
   .find-paper-row button:hover {
-    background: #1d4ed8;
+    background: var(--primary-hover);
   }
   .cta-btn {
     display: inline-block;
     padding: 0.65rem 1.2rem;
-    border-radius: 8px;
-    background: #2563eb;
-    color: #ffffff;
+    border-radius: var(--radius);
+    background: var(--primary);
+    color: var(--on-color);
     text-decoration: none;
   }
   .cta-btn:hover {
-    background: #1d4ed8;
+    background: var(--primary-hover);
   }
 </style>

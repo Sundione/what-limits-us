@@ -1,0 +1,92 @@
+---
+// Paper Table 4: median Limitations-section length and average number of
+// distinct limitation codes per section, by conference and year. Static, zero JS.
+import { SECTION_EVOLUTION } from "../../data/resultsData";
+
+const years = SECTION_EVOLUTION.acl.map((r) => r.year);
+const rows = years.map((year) => ({
+  year,
+  acl: SECTION_EVOLUTION.acl.find((r) => r.year === year)!,
+  emnlp: SECTION_EVOLUTION.emnlp.find((r) => r.year === year)!,
+}));
+---
+<figure class="data-figure section-length">
+  <figcaption>
+    <span class="paper-ref">Table 4 in the paper</span>
+    Median length of the Limitations section (words) and the average number of distinct limitation codes per section.
+  </figcaption>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th rowspan="2">Year</th>
+          <th colspan="2" class="num group">ACL</th>
+          <th colspan="2" class="num group">EMNLP</th>
+        </tr>
+        <tr>
+          <th class="num">Median words</th>
+          <th class="num">Codes / section</th>
+          <th class="num">Median words</th>
+          <th class="num">Codes / section</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r) => (
+          <tr>
+            <td>{r.year}</td>
+            <td class="num">{r.acl.medWords.toFixed(1)}</td>
+            <td class="num">{r.acl.codesPerPaper.toFixed(2)}</td>
+            <td class="num">{r.emnlp.medWords.toFixed(1)}</td>
+            <td class="num">{r.emnlp.codesPerPaper.toFixed(2)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</figure>
+
+<aside class="observation" aria-label="Observation">
+  <span class="observation-label">Observation</span>
+  <p>
+    The paper reads this as authors adopting a more concise, multifaceted approach: fitting more kinds of limitation
+    into roughly the same space rather than describing a few in detail. One possible implication is that each
+    limitation now gets less elaboration, with sections leaning toward brief mentions rather than in-depth discussion.
+  </p>
+  <p class="observation-caveat">
+    This is an observation, not a finding: the data count words and codes, not how thoroughly each limitation is
+    explained, so confirming it would need a closer reading of the sections themselves.
+  </p>
+</aside>
+
+<style>
+  .section-length {
+    margin-bottom: 1rem;
+  }
+  .observation {
+    padding: 0.9rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    max-width: 860px;
+  }
+  .observation-label {
+    display: inline-block;
+    margin-bottom: 0.35rem;
+    padding: 0.05rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--card);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  .observation p {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+  .observation .observation-caveat {
+    margin-top: 0.5rem;
+    font-size: 0.82rem;
+    color: var(--muted-foreground);
+  }
+</style>

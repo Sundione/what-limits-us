@@ -1,0 +1,198 @@
+/* ==========================================================================
+   Design tokens (shadcn-style: zinc neutrals + blue primary), light & dark.
+
+   Dark values are declared twice: under prefers-color-scheme (follows the OS
+   when the viewer has not chosen) and under [data-theme="dark"] (the header
+   toggle). The :not([data-theme="light"]) guard lets an explicit light choice
+   beat an OS dark setting. All component CSS should use these variables, never
+   raw hex, so both modes stay in sync.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  --radius: 0.625rem;   /* shadcn rounded-lg */
+  --radius-sm: 0.5rem;   /* shadcn rounded-md */
+  --radius-lg: 0.875rem; /* shadcn rounded-xl */
+  --font-sans: "Inter Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+
+  /* Neutrals */
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --foreground-soft: #404040;
+  --surface: #fafafa;
+  --card: #ffffff;
+  --muted: #f5f5f5;
+  --muted-foreground: #636363;
+  --muted-foreground-faint: #737373;
+  --border: #e5e5e5;
+  --border-strong: #d4d4d4;
+  --input: #e5e5e5;
+  --input-bg: transparent;
+  --track: #e5e5e5;
+  --track-strong: #d4d4d4;
+  --inverse-bg: #171717;
+  --on-color: #ffffff;
+  --header-bg: rgb(255 255 255 / 0.9);
+
+  /* Primary (blue) */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-text: #2563eb;
+  --primary-strong: #1d4ed8;
+  --primary-soft: #eff6ff;
+  --primary-soft-2: #dbeafe;
+  --primary-border: #bfdbfe;
+  --ring: #93c5fd;
+
+  /* Tones for semantic badges and callouts: fg = text, bg = tint, border, solid = marks */
+  --amber-fg: #92400e;   --amber-bg: #fffbeb;   --amber-border: #fde68a;   --amber-solid: #d97706;
+  --green-fg: #047857;   --green-bg: #ecfdf5;   --green-border: #a7f3d0;   --green-solid: #059669;
+  --violet-fg: #6d28d9;  --violet-bg: #f5f3ff;  --violet-border: #ddd6fe;  --violet-solid: #7c3aed;
+  --rose-fg: #be123c;    --rose-bg: #fff1f2;    --rose-border: #fecdd3;    --rose-solid: #e11d48;
+  --orange-fg: #c2410c;  --orange-bg: #fff7ed;  --orange-border: #fed7aa;  --orange-solid: #ea580c;
+
+  /* Data colours (validated with the dataviz palette validator, light surface #ffffff) */
+  --theme-1: #d97706; /* Unsustainable Resources */
+  --theme-2: #2563eb; /* Experimental Constraints & Scope */
+  --theme-3: #059669; /* Flawed Data & Dependencies */
+  --theme-4: #7c3aed; /* Measurement & Verification */
+  --theme-5: #e11d48; /* Unsafe Behaviors & Risks */
+  --theme-nl: #64748b; /* Non-Limitation: deliberately neutral */
+  /* Text-safe variants of the theme hues (>= 4.5:1 on cards and their tints) */
+  --theme-1-text: #92400e; --theme-2-text: #1d4ed8; --theme-3-text: #047857;
+  --theme-4-text: #6d28d9; --theme-5-text: #be123c; --theme-nl-text: #475569;
+  --venue-acl-text: #005a8c;
+  --venue-acl: #0072b2;
+  --venue-emnlp: #e69f00;
+  --venue-acl-soft: #b6dbff;
+  --venue-emnlp-soft: #ffe2b3;
+  /* Categorical series (dataviz reference palette, fixed order, validated light + dark) */
+  --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-4: #eda100;
+  --series-5: #e87ba4; --series-6: #008300; --series-7: #6250d6; --series-8: #e34948;
+
+  /* Human vs. LLM provenance (DP1) */
+  --human-fg: #0f766e;  --human-bg: #f0fdfa;  --human-border: #99f6e4;
+  --llm-fg: #5b21b6;    --llm-bg: #f5f3ff;    --llm-border: #ddd6fe;
+
+  /* Legacy aliases used by older component CSS */
+  --color-bg: var(--background);
+  --color-surface: var(--surface);
+  --color-text: var(--foreground);
+  --color-muted: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--primary-text);
+  --color-llm: var(--llm-fg);
+  --color-llm-bg: var(--llm-bg);
+  --color-human: var(--human-fg);
+  --color-human-bg: var(--human-bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.5);
+    --background: #0a0a0a;
+    --foreground: #fafafa;
+    --foreground-soft: #d4d4d4;
+    --surface: #141414;
+    --card: #171717;
+    --muted: #262626;
+    --muted-foreground: #a1a1a1;
+    --muted-foreground-faint: #8a8a8a;
+    --border: #2a2a2a;
+    --border-strong: #3a3a3a;
+    --input: #333333;
+    --input-bg: rgb(255 255 255 / 0.045);
+    --track: #262626;
+    --track-strong: #404040;
+    --inverse-bg: #404040;
+    --header-bg: rgb(10 10 10 / 0.85);
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --primary-text: #60a5fa;
+    --primary-strong: #93c5fd;
+    --primary-soft: rgb(59 130 246 / 0.12);
+    --primary-soft-2: rgb(59 130 246 / 0.2);
+    --primary-border: rgb(59 130 246 / 0.4);
+    --ring: #1d4ed8;
+    --amber-fg: #fbbf24;   --amber-bg: rgb(245 158 11 / 0.12);  --amber-border: rgb(245 158 11 / 0.35);  --amber-solid: #d97706;
+    --green-fg: #34d399;   --green-bg: rgb(16 185 129 / 0.12);  --green-border: rgb(16 185 129 / 0.35);  --green-solid: #10b981;
+    --violet-fg: #c4b5fd;  --violet-bg: rgb(139 92 246 / 0.14); --violet-border: rgb(139 92 246 / 0.4);  --violet-solid: #8b5cf6;
+    --rose-fg: #fda4af;    --rose-bg: rgb(244 63 94 / 0.12);    --rose-border: rgb(244 63 94 / 0.35);    --rose-solid: #f43f5e;
+    --orange-fg: #fdba74;  --orange-bg: rgb(249 115 22 / 0.12); --orange-border: rgb(249 115 22 / 0.35); --orange-solid: #f97316;
+    --theme-1: #d97706;
+    --theme-2: #3b82f6;
+    --theme-3: #059669;
+    --theme-4: #8b5cf6;
+    --theme-5: #f43f5e;
+    --theme-nl: #7d8799;
+    --theme-1-text: #fbbf24; --theme-2-text: #93c5fd; --theme-3-text: #6ee7b7;
+    --theme-4-text: #c4b5fd; --theme-5-text: #fda4af; --theme-nl-text: #cbd5e1;
+    --venue-acl-text: #7cc0ee;
+    --venue-acl: #3a9ad9;
+    --venue-emnlp: #c98500;
+    --venue-acl-soft: #1e3a52;
+    --venue-emnlp-soft: #4a3610;
+    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
+    --series-5: #d55181; --series-6: #008300; --series-7: #9085e9; --series-8: #e66767;
+    --human-fg: #5eead4;  --human-bg: rgb(20 184 166 / 0.12);  --human-border: rgb(20 184 166 / 0.35);
+    --llm-fg: #c4b5fd;    --llm-bg: rgb(139 92 246 / 0.14);    --llm-border: rgb(139 92 246 / 0.4);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.5);
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --foreground-soft: #d4d4d4;
+  --surface: #141414;
+  --card: #171717;
+  --muted: #262626;
+  --muted-foreground: #a1a1a1;
+  --muted-foreground-faint: #8a8a8a;
+  --border: #2a2a2a;
+  --border-strong: #3a3a3a;
+  --input: #333333;
+  --input-bg: rgb(255 255 255 / 0.045);
+  --track: #262626;
+  --track-strong: #404040;
+  --inverse-bg: #404040;
+  --header-bg: rgb(10 10 10 / 0.85);
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-text: #60a5fa;
+  --primary-strong: #93c5fd;
+  --primary-soft: rgb(59 130 246 / 0.12);
+  --primary-soft-2: rgb(59 130 246 / 0.2);
+  --primary-border: rgb(59 130 246 / 0.4);
+  --ring: #1d4ed8;
+  --amber-fg: #fbbf24;   --amber-bg: rgb(245 158 11 / 0.12);  --amber-border: rgb(245 158 11 / 0.35);  --amber-solid: #d97706;
+  --green-fg: #34d399;   --green-bg: rgb(16 185 129 / 0.12);  --green-border: rgb(16 185 129 / 0.35);  --green-solid: #10b981;
+  --violet-fg: #c4b5fd;  --violet-bg: rgb(139 92 246 / 0.14); --violet-border: rgb(139 92 246 / 0.4);  --violet-solid: #8b5cf6;
+  --rose-fg: #fda4af;    --rose-bg: rgb(244 63 94 / 0.12);    --rose-border: rgb(244 63 94 / 0.35);    --rose-solid: #f43f5e;
+  --orange-fg: #fdba74;  --orange-bg: rgb(249 115 22 / 0.12); --orange-border: rgb(249 115 22 / 0.35); --orange-solid: #f97316;
+  --theme-1: #d97706;
+  --theme-2: #3b82f6;
+  --theme-3: #059669;
+  --theme-4: #8b5cf6;
+  --theme-5: #f43f5e;
+  --theme-nl: #7d8799;
+  --theme-1-text: #fbbf24; --theme-2-text: #93c5fd; --theme-3-text: #6ee7b7;
+  --theme-4-text: #c4b5fd; --theme-5-text: #fda4af; --theme-nl-text: #cbd5e1;
+  --venue-acl-text: #7cc0ee;
+  --venue-acl: #3a9ad9;
+  --venue-emnlp: #c98500;
+  --venue-acl-soft: #1e3a52;
+  --venue-emnlp-soft: #4a3610;
+  --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
+  --series-5: #d55181; --series-6: #008300; --series-7: #9085e9; --series-8: #e66767;
+  --human-fg: #5eead4;  --human-bg: rgb(20 184 166 / 0.12);  --human-border: rgb(20 184 166 / 0.35);
+  --llm-fg: #c4b5fd;    --llm-bg: rgb(139 92 246 / 0.14);    --llm-border: rgb(139 92 246 / 0.4);
+}

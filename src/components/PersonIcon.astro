@@ -4,7 +4,7 @@ interface Props {
   fill?: string;
   size?: number;
 }
-const { color = "#f1912a", fill = "#fdf3cc", size = 26 } = Astro.props;
+const { color = "var(--amber-solid)", fill = "var(--amber-bg)", size = 26 } = Astro.props;
 const scale = size / 26;
 ---
 <g transform={`scale(${scale})`}>

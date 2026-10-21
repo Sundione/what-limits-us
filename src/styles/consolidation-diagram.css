@@ -5,9 +5,9 @@
 .simpl-diagram-wrapper {
   margin: 1.5rem 0 2rem;
   padding: 2rem;
-  background: #ffffff;
-  border: 1px solid var(--color-border, #e2e8f0);
-  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--color-border, var(--border));
+  border-radius: var(--radius-lg);
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
 }
 
@@ -47,7 +47,7 @@
   margin: 0 0 1rem;
   font-size: 0.88rem;
   font-weight: 700;
-  color: #64748b;
+  color: var(--muted-foreground);
   letter-spacing: -0.1px;
 }
 
@@ -95,24 +95,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #94a3b8;
+  color: var(--muted-foreground-faint);
   transition: opacity 0.2s ease;
 }
 
 .pair-flow-arrow.arrow-purple svg {
-  color: #7c3aed;
+  color: var(--violet-fg);
 }
 
 .pair-flow-arrow.arrow-orange svg {
-  color: #ea580c;
+  color: var(--orange-fg);
 }
 
 .pair-flow-arrow.arrow-blue svg {
-  color: #0284c7;
+  color: var(--primary-text);
 }
 
 .pair-flow-arrow.arrow-gray svg {
-  color: #64748b;
+  color: var(--muted-foreground);
 }
 
 .pair-flow-arrow.dimmed {
@@ -136,7 +136,7 @@
 .simpl-cluster-card,
 .simpl-action-card {
   position: relative;
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 0.75rem 1rem 0.75rem 1.1rem;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -184,96 +184,96 @@
 .pill-purple,
 .cluster-purple,
 .action-purple {
-  background: #fbf7ff;
-  border-color: #ede5fa;
+  background: var(--violet-bg);
+  border-color: var(--violet-border);
 }
 .pill-purple .pill-accent-bar,
 .cluster-purple .cluster-accent-bar,
 .action-purple .action-accent-bar {
-  background: #7c3aed;
+  background: var(--violet-solid);
 }
 .pill-purple .pill-name {
-  color: #6d28d9;
+  color: var(--violet-fg);
   font-weight: 700;
 }
 .cluster-purple .cluster-name {
-  color: #6d28d9;
+  color: var(--violet-fg);
   font-weight: 700;
 }
 .action-purple .action-verb {
-  color: #7c3aed;
+  color: var(--violet-fg);
 }
 
 /* Orange Theme (ADD / Literature Coverage Gap) */
 .pill-orange,
 .cluster-orange,
 .action-orange {
-  background: #fff8f3;
-  border-color: #fed7aa;
+  background: var(--orange-bg);
+  border-color: var(--orange-border);
 }
 .pill-orange .pill-accent-bar,
 .cluster-orange .cluster-accent-bar,
 .action-orange .action-accent-bar {
-  background: #ea580c;
+  background: var(--orange-solid);
 }
 .pill-orange .pill-name {
-  color: #c2410c;
+  color: var(--orange-fg);
   font-weight: 700;
 }
 .cluster-orange .cluster-name {
-  color: #c2410c;
+  color: var(--orange-fg);
   font-weight: 700;
 }
 .action-orange .action-verb {
-  color: #ea580c;
+  color: var(--orange-fg);
 }
 
 /* Blue Theme (MERGE / Scope Limitation) */
 .pill-blue,
 .cluster-blue,
 .action-blue {
-  background: #f0f9ff;
-  border-color: #bae6fd;
+  background: var(--primary-soft);
+  border-color: var(--primary-border);
 }
 .pill-blue .pill-accent-bar,
 .cluster-blue .cluster-accent-bar,
 .action-blue .action-accent-bar {
-  background: #0284c7;
+  background: var(--primary);
 }
 .pill-blue .pill-name {
-  color: #0369a1;
+  color: var(--primary-strong);
   font-weight: 700;
 }
 .cluster-blue .cluster-name {
-  color: #0369a1;
+  color: var(--primary-strong);
   font-weight: 700;
 }
 .action-blue .action-verb {
-  color: #0284c7;
+  color: var(--primary-text);
 }
 
 /* Gray Theme (REJECT / Drop Cluster) */
 .pill-gray,
 .cluster-gray,
 .action-gray {
-  background: #f8fafc;
-  border-color: #e2e8f0;
+  background: var(--surface);
+  border-color: var(--border);
 }
 .pill-gray .pill-accent-bar,
 .cluster-gray .cluster-accent-bar,
 .action-gray .action-accent-bar {
-  background: #64748b;
+  background: var(--inverse-bg);
 }
 .pill-gray .pill-name {
-  color: #475569;
+  color: var(--muted-foreground);
   font-weight: 600;
 }
 .cluster-gray .cluster-name {
-  color: #334155;
+  color: var(--foreground-soft);
   font-weight: 600;
 }
 .action-gray .action-verb {
-  color: #475569;
+  color: var(--muted-foreground);
 }
 
 /* ---------------- Specific Card Interiors ---------------- */
@@ -301,7 +301,7 @@
 }
 .cluster-subtitle {
   font-size: 0.76rem;
-  color: #64748b;
+  color: var(--muted-foreground);
 }
 
 /* Column 3: Actions */
@@ -315,19 +315,18 @@
 }
 .action-headline {
   font-size: 0.88rem;
-  color: #0f172a;
+  color: var(--foreground);
 }
 .action-verb {
   font-weight: 800;
-  text-transform: uppercase;
 }
 .action-target {
   font-weight: 700;
-  color: #0f172a;
+  color: var(--foreground);
 }
 .action-explanation {
   font-size: 0.76rem;
-  color: #64748b;
+  color: var(--muted-foreground);
 }
 
 /* ---------------- Transitions & Flow Arrows ---------------- */
@@ -338,7 +337,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  color: #94a3b8;
+  color: var(--muted-foreground-faint);
   padding: 2.2rem 0 0;
   flex-shrink: 0;
 }
@@ -346,11 +345,11 @@
 .consolidate-label {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #475569;
+  color: var(--muted-foreground);
 }
 
 .arrow-svg {
-  color: #94a3b8;
+  color: var(--muted-foreground-faint);
 }
 
 @media (max-width: 960px) {
@@ -392,9 +391,9 @@
 /* ---------------- Human Review Callout Box ---------------- */
 .human-review-callout {
   margin-top: 1rem;
-  background: #f0fdf4;
-  border: 1.5px solid #10b981;
-  border-radius: 8px;
+  background: var(--green-bg);
+  border: 1.5px solid var(--green-solid);
+  border-radius: var(--radius);
   padding: 0.65rem 0.85rem;
 }
 
@@ -405,18 +404,18 @@
 }
 
 .human-icon {
-  color: #059669;
+  color: var(--green-fg);
   flex-shrink: 0;
 }
 
 .human-review-text {
   font-size: 0.8rem;
-  color: #065f46;
+  color: var(--green-fg);
   line-height: 1.35;
 }
 
 .human-review-text strong {
-  color: #047857;
+  color: var(--green-fg);
   font-weight: 700;
 }
 
@@ -424,9 +423,9 @@
 .cluster-deepdive-banner {
   margin-top: 1.75rem;
   padding: 1rem 1.25rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 1px solid var(--color-border, #e2e8f0);
-  border-radius: 10px;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--muted) 100%);
+  border: 1px solid var(--color-border, var(--border));
+  border-radius: var(--radius);
   animation: fadeIn 0.25s ease;
 }
 
@@ -445,18 +444,16 @@
   display: inline-block;
   font-size: 0.72rem;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #0369a1;
-  background: #e0f2fe;
+  color: var(--primary-strong);
+  background: var(--primary-soft);
   padding: 0.15rem 0.5rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   margin-bottom: 0.4rem;
 }
 
 .deepdive-content {
   margin: 0;
   font-size: 0.84rem;
-  color: #334155;
+  color: var(--foreground-soft);
   line-height: 1.5;
 }

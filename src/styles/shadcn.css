@@ -1,0 +1,399 @@
+/* ==========================================================================
+   shadcn/ui skin.
+
+   Maps the site's existing component classes onto shadcn/ui primitives
+   (Button, Badge, Card, Tabs, Input, Alert), following the class recipes in
+   shadcn-ui/ui apps/v4/registry/new-york-v4/ui/*.tsx. Colours come from the
+   tokens in theme.css, so every rule works in light and dark mode.
+
+   Every selector starts with `:root body` so this layer wins over the older
+   page stylesheets without !important. To restyle a component family, edit
+   its block here rather than the page CSS.
+   ========================================================================== */
+
+/* ---------- Typography: semibold, tight headings (shadcn docs) ---------- */
+:root body :is(h1, .page-main-title, .page-title) {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+:root body :is(
+  main h2, main h3, main h4, main h5,
+  .methodology-subheading, .results-subheading, .insights-heading, .eval-title, .temporal-title,
+  .lead-box-title, .showcase-title, .annotated-title, .format-hero-title, .aff-title, .takeaway-title,
+  .evolution-title, .drawer-title, .table-heading, .format-table-heading, .pb-title, .synthesis-title,
+  .insight-card-title, .point-title, .slice-title, .scenario-headline, .assigned-code-heading,
+  .bridge-heading, .detail-code-title, .inspector-title, .paper-card-title, .t-code-title,
+  .finding-question, .plain-steps-title, .theme-map-name, .theme-card-title, .stage-title, .panel-title
+) {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+:root body :is(main h2, .methodology-subheading, .results-subheading, .detail-code-title) {
+  letter-spacing: -0.025em;
+}
+/* Big figures: semibold, tabular */
+:root body :is(.kpi-val, .d-kpi-num, .iaa-num, .finding-number, .cluster-kpi-num, .banner-stat-num, .homogeneity-num) {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Eyebrow labels: plain muted text, no shouting caps ---------- */
+:root body :is(
+  .kpi-tag, .rq-kicker, .finding-rq, .step-label, .box-label, .presets-label, .segment-label,
+  .theme-pills-label, .chips-label, .starter-label, .insight-metric-label, .p-label, .index-num,
+  .delta-col-hint, .iaa-formula, .kpi-sub-label
+) {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted-foreground);
+}
+
+/* ---------- Badge (shadcn: rounded-full, text-xs, font-medium) ---------- */
+:root body :is(
+  .section-kpi-badge, .section-corpus-pill, .subnav-corpus-badge, .showcase-badge, .tldr-badge,
+  .bridge-kpi-pill, .format-hero-badge, .ir-badge, .ir-stat, .insight-badge, .point-badge, .iaa-tag,
+  .slice-badge, .status-pill, .type-pill, .decision-pill, .sig-badge, .nonsig-badge, .low-support-badge,
+  .format-spike-badge, .delta-badge, .pair-lift-badge, .pair-dir-badge, .t-stat-pill, .pill-badge,
+  .new-origin-badge, .item-evo-tag, .metric-tag-stable, .metric-tag-exp, .entry-version-tag,
+  .corpus-tag, .table-cat-badge, .prevalence-theme-tag, .theme-tag-small, .assigned-theme-tag,
+  .iaa-delta-pill, .iaa-comp-pill, .iaa-f1-label, .cluster-share-badge, .cluster-num-pill,
+  .tip-cat-tag, .chip-type-tag, .codebook-badge, .paper-id-badge, .taxonomy-summary-pill,
+  .prevalence-meta-pill, .transition-method-badge, .index-badge, .scenario-index-pill, .stage-pill,
+  .p-highlight-tag, .dim-tab-count, .format-count-badge, .table-sub-count, .theme-num-tag,
+  .theme-count-tag, .deepdive-badge, .takeaway-badge
+) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: 0;
+  max-width: 100%;
+  white-space: normal;
+}
+/* Neutral variants for the generic section labels */
+:root body :is(.section-kpi-badge, .showcase-badge, .format-hero-badge, .bridge-kpi-pill, .scenario-index-pill) {
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+:root body :is(.section-corpus-pill, .subnav-corpus-badge, .taxonomy-summary-pill, .prevalence-meta-pill,
+  .transition-method-badge, .codebook-badge, .paper-id-badge, .table-sub-count, .format-count-badge) {
+  background: var(--muted);
+  color: var(--muted-foreground);
+  border: 1px solid transparent;
+}
+:root body .tldr-badge {
+  background: var(--primary);
+  color: var(--on-color);
+  border: 1px solid transparent;
+}
+
+/* ---------- Card (shadcn: rounded-xl border bg-card shadow-sm) ---------- */
+:root body :is(
+  .kpi-card, .d-kpi-card, .iaa-card, .finding-card, .takeaway-card, .insight-card, .lead-point-card,
+  .synthesis-card, .pairing-card, .transition-row-card, .format-row-card,
+  .worked-scenario-card, .showcase-card, .flow-step-card, .aff-hero-card, .format-hero-card,
+  .temporal-hero-card, .figure-wrapper-card, .profile-card, .eval-context-banner, .rq-intuitive-lead-box,
+  .simple-showcase-wrap, .worked-step-card, .detail-canvas, .master-sidebar, .detail-pane, .master-pane,
+  .explorer-toolbar, .pair-card-v2, .pair-data-card, .cluster-select-card, .analysis-card,
+  .evolution-summary-card, .theme-context-card, .eval-takeaway-card, .cluster-takeaway-card,
+  .simpl-pill-card, .simpl-cluster-card, .simpl-action-card, .stage-detail-card, .paper-meta-card,
+  .plain-steps, .trace-unit, .walkthrough-to-consolidation-bridge, .homogeneity-hero-banner,
+  .per-code-table-wrapper, .table-accordion-bar, .pattern-card
+) {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+/* Nested cards inside a card: flatter, no extra shadow */
+:root body :is(.kpi-card, .insight-card, .worked-scenario-card, .showcase-card, .rq-intuitive-lead-box,
+  .aff-hero-card, .format-hero-card, .temporal-hero-card, .simple-showcase-wrap, .eval-context-banner)
+  :is(.worked-step-card, .lead-point-card, .showcase-card, .flow-step-card, .insight-card, .pairing-card) {
+  box-shadow: none;
+}
+/* List rows (paper cards, prevalence rows): quieter than full cards */
+:root body :is(.paper-card, .transition-row-card, .format-row-card) {
+  box-shadow: none;
+  border-radius: var(--radius);
+}
+:root body .paper-card.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+/* ---------- Button ---------- */
+/* default (primary) */
+:root body :is(.cta-btn, .bridge-cta-btn, .find-paper-row button, .link-pill.link-explore,
+  .detail-explore-btn, .primary-link, .ir-explore-cta) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  padding: 0.375rem 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: var(--on-color);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: none;
+  transform: none;
+  transition: background-color 0.15s ease;
+}
+:root body :is(.cta-btn, .bridge-cta-btn, .find-paper-row button, .link-pill.link-explore,
+  .detail-explore-btn, .primary-link, .ir-explore-cta):hover {
+  background: var(--primary-hover);
+  color: var(--on-color);
+  text-decoration: none;
+  transform: none;
+}
+/* outline */
+:root body :is(.link-pill, .surprise-btn, .evolution-toggle-btn, .page-nav-btn, .reset-filters-btn,
+  .add-code-trigger-btn, .expand-codes-btn, .subtle-link, .copy-btn, .disclosure-toggle-btn,
+  .toggle-prompt-btn, .abstract-toggle-btn, .table-accordion-toggle-btn .toggle-chevron) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  padding: 0.375rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: var(--shadow-xs);
+  transform: none;
+  transition: background-color 0.15s ease;
+}
+:root body :is(.link-pill, .surprise-btn, .evolution-toggle-btn, .page-nav-btn, .reset-filters-btn,
+  .add-code-trigger-btn, .expand-codes-btn, .subtle-link, .copy-btn, .disclosure-toggle-btn,
+  .toggle-prompt-btn, .abstract-toggle-btn):hover:not(:disabled) {
+  background: var(--muted);
+  color: var(--foreground);
+  text-decoration: none;
+  transform: none;
+}
+:root body .link-pill-pending {
+  opacity: 0.55;
+  box-shadow: none;
+}
+/* outline, small (in-card actions) */
+:root body :is(.action-btn, .action-btn-link, .t-explore-mini-btn, .p-explore-action-btn,
+  .flow-step-explore-btn, .detail-action-btn, .starter-btn) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: var(--shadow-xs);
+  transform: none;
+}
+:root body :is(.action-btn, .action-btn-link, .t-explore-mini-btn, .p-explore-action-btn,
+  .flow-step-explore-btn, .detail-action-btn, .starter-btn):hover {
+  background: var(--muted);
+  color: var(--foreground);
+  text-decoration: none;
+}
+/* secondary (starter suggestions read as soft chips) */
+:root body .starter-btn {
+  background: var(--muted);
+  border-color: transparent;
+  box-shadow: none;
+}
+:root body .starter-btn:hover {
+  background: var(--border);
+}
+
+/* ---------- Tabs / segmented controls (shadcn TabsList + TabsTrigger) ---------- */
+:root body :is(.segmented-btn-group, .transition-dir-toggle, .filter-pill-group, .format-view-toggle,
+  .aff-mode-toggle, .view-mode-toggle, .preset-buttons, .subview-pills, .picker-tabs-row) {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 2px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 3px;
+  background: var(--muted);
+  border: 0;
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+:root body :is(.seg-btn, .t-toggle-btn, .filter-pill, .f-toggle-btn, .aff-toggle-btn, .mode-btn,
+  .preset-btn, .subview-pill-btn, .picker-tab-btn) {
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: none;
+  transform: none;
+}
+:root body :is(.seg-btn, .t-toggle-btn, .filter-pill, .f-toggle-btn, .aff-toggle-btn, .mode-btn,
+  .preset-btn, .subview-pill-btn, .picker-tab-btn):hover {
+  color: var(--foreground);
+  background: transparent;
+}
+:root body :is(.seg-btn-active, .t-toggle-btn.t-btn-active, .filter-pill.active, .f-toggle-btn.f-btn-active,
+  .aff-toggle-btn.aff-btn-active, .mode-btn.active, .preset-btn.active, .subview-pill-btn.subview-pill-active,
+  .picker-tab-btn.picker-tab-active) {
+  background: var(--background);
+  color: var(--foreground);
+  border-color: var(--input-bg);
+  box-shadow: var(--shadow-sm);
+}
+:root body :is(.seg-btn-active, .t-toggle-btn.t-btn-active, .filter-pill.active, .f-toggle-btn.f-btn-active,
+  .aff-toggle-btn.aff-btn-active, .mode-btn.active, .preset-btn.active, .subview-pill-btn.subview-pill-active,
+  .picker-tab-btn.picker-tab-active) * {
+  color: inherit;
+}
+:root body .t-toggle-btn small {
+  color: var(--muted-foreground);
+}
+
+/* Option cards that switch a whole panel (RQ2 dimensions, RQ3 views) */
+:root body :is(.dimension-tab-btn, .d-nav-btn, .stage-tab-btn, .drawer-step-btn) {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow-xs);
+  transform: none;
+}
+:root body :is(.dimension-tab-btn, .d-nav-btn, .stage-tab-btn, .drawer-step-btn):hover {
+  background: var(--muted);
+}
+:root body :is(.dimension-tab-btn.dim-tab-active, .d-nav-btn.d-nav-active, .stage-tab-btn.active, .drawer-step-btn.active) {
+  border-color: var(--foreground);
+  box-shadow: 0 0 0 1px var(--foreground);
+  background: var(--card);
+}
+
+/* In-page sub-nav: ghost buttons */
+:root body .subnav-link {
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: none;
+}
+:root body .subnav-link:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+:root body :is(.methodology-subnav-sticky, .results-subnav-sticky) .subnav-link.is-active {
+  background: var(--muted);
+  color: var(--foreground);
+  border-color: transparent;
+}
+
+/* ---------- Input & select (shadcn: h-9 rounded-md border-input shadow-xs) ---------- */
+:root body :is(input[type="search"], input[type="text"], select, .table-search-box) {
+  min-height: 2.25rem;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-sm);
+  background-color: var(--input-bg);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  box-shadow: var(--shadow-xs);
+}
+:root body .table-search-box input {
+  min-height: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+:root body :is(input[type="search"], input[type="text"], select):focus-visible {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 50%, transparent);
+}
+:root body select option {
+  background: var(--card);
+  color: var(--foreground);
+}
+
+/* ---------- Alert / callout (shadcn Alert: rounded-lg border px-4 py-3 text-sm) ---------- */
+:root body :is(.tldr, .rq-answer, .find-paper, .stat-explanation-banner, .format-takeaway-banner,
+  .cluster-method-banner, .traceback-provenance-box, .excerpt-callout, .pattern-legend,
+  .causal-caveat-box, .implicit-note-banner, .implicit-report-banner, .human-review-callout) {
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+:root body :is(.tldr, .rq-answer, .find-paper, .excerpt-callout) {
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+:root body .human-review-callout {
+  border-width: 1px;
+}
+
+/* ---------- Tables (shadcn Table: text-sm, muted header, row borders) ---------- */
+:root body :is(.presence-table, .per-code-table, .temporal-data-table, .evolution-table, .aff-table) th {
+  font-weight: 500;
+  color: var(--muted-foreground);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ---------- Links ---------- */
+:root body main a:not([class]) {
+  color: var(--primary-text);
+  text-underline-offset: 4px;
+}
+
+/* ---------- Narrow screens: let labels and buttons wrap instead of overflowing ---------- */
+:root body :is(.section-corpus-pill, .transition-method-badge, .taxonomy-summary-pill, .prevalence-meta-pill,
+  .format-hero-badge, .ir-stat, .insight-metric-label) {
+  white-space: normal;
+  max-width: 100%;
+}
+@media (max-width: 640px) {
+  :root body :is(.link-pill, .surprise-btn, .evolution-toggle-btn, .page-nav-btn, .reset-filters-btn,
+    .add-code-trigger-btn, .expand-codes-btn, .subtle-link, .copy-btn, .action-btn, .action-btn-link,
+    .t-explore-mini-btn, .p-explore-action-btn, .flow-step-explore-btn, .starter-btn, .cta-btn,
+    .bridge-cta-btn, .primary-link, .ir-explore-cta, .detail-explore-btn) {
+    white-space: normal;
+    max-width: 100%;
+    text-align: left;
+  }
+  :root body :is(.kpi-tag, .rq-kicker, .finding-rq, .step-label, .box-label, .presets-label,
+    .segment-label, .theme-pills-label, .chips-label, .starter-label, .insight-metric-label) {
+    white-space: normal;
+  }
+}
+
+:root body .transition-method-badge span {
+  white-space: normal;
+}
+:root body .top-utility-bar {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+:root body .subnav-corpus-badge {
+  white-space: nowrap;
+}
