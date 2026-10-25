@@ -36,20 +36,31 @@ export const paper = {
     "the NLP community.",
   links: {
     arxiv: "https://arxiv.org/abs/2609.15191",
-    // ACL Anthology page not yet live (paper pending Findings of EMNLP 2026 publication) - fill in once published.
-    aclAnthology: null as string | null,
+    aclAnthology: "https://aclanthology.org/2026.findings-emnlp.2386/",
     datasetGithub: "https://github.com/Sundione/nlp-self-reported-limitations",
     // Not verified anywhere in the dataset repo or paper - do not invent a URL.
     datasetHuggingFace: null as string | null,
   },
-  bibtex: `@misc{thaepprasit2026what,
-      title         = {What Limits Us? Analyzing Self-Reported Limitations in NLP Research},
-      author        = {Tawan Thaepprasit and Peeranuth Kehasukcharoen and Ding Wang and Remi Denton and Peerapon Vateekul and Piyawat Lertvittayakumjorn},
-      year          = {2026},
-      eprint        = {2609.15191},
-      archivePrefix = {arXiv},
-      primaryClass  = {cs.CL},
-      url           = {https://arxiv.org/abs/2609.15191},
-      note          = {Accepted to Findings of EMNLP 2026}
+  // Official entry from https://aclanthology.org/2026.findings-emnlp.2386.bib
+  bibtex: `@inproceedings{thaepprasit-etal-2026-limits,
+    title = "What Limits Us? Analyzing Self-Reported Limitations in {NLP} Research",
+    author = "Thaepprasit, Tawan  and
+      Kehasukcharoen, Peeranuth  and
+      Wang, Ding  and
+      Denton, Remi  and
+      Vateekul, Peerapon  and
+      Lertvittayakumjorn, Piyawat",
+    editor = "Lee, Hung-Yi  and
+      Dev, Sunipa  and
+      Li, Jessy  and
+      Elliott, Desmond",
+    booktitle = "Findings of the {A}ssociation for {C}omputational {L}inguistics: {EMNLP} 2026",
+    month = oct,
+    year = "2026",
+    address = "Budapest, Hungary",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2026.findings-emnlp.2386/",
+    pages = "51260--51297",
+    ISBN = "979-8-89176-462-0"
 }`,
 };

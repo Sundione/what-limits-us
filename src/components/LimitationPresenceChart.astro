@@ -232,7 +232,8 @@ function exploreUrl(year: number, venue: string) {
             no: bar.row.totalPapers - bar.row.papersWithLimitations,
             pct: bar.pct.toFixed(1),
             failure: bar.row.extractionFailures,
-            missing: bar.row.noExplicitLimitations,
+            implicit: bar.row.implicitlyReported,
+            truly: bar.row.trulyMissing,
             exploreUrl: exploreUrl(bar.year, bar.venue.toLowerCase()),
           });
           return (
@@ -306,7 +307,8 @@ function exploreUrl(year: number, venue: string) {
             has: p.row.papersWithLimitations,
             pct: p.pct.toFixed(1),
             failure: p.row.extractionFailures,
-            missing: p.row.noExplicitLimitations,
+            implicit: p.row.implicitlyReported,
+            truly: p.row.trulyMissing,
             exploreUrl: exploreUrl(p.row.year, "acl"),
           });
           return (
@@ -332,7 +334,8 @@ function exploreUrl(year: number, venue: string) {
             has: p.row.papersWithLimitations,
             pct: p.pct.toFixed(1),
             failure: p.row.extractionFailures,
-            missing: p.row.noExplicitLimitations,
+            implicit: p.row.implicitlyReported,
+            truly: p.row.trulyMissing,
             exploreUrl: exploreUrl(p.row.year, "emnlp"),
           });
           return (
@@ -468,7 +471,7 @@ function exploreUrl(year: number, venue: string) {
   </div>
 
   <p class="presence-caption">
-    <strong>Interactive Tip:</strong> Click any item in the legend above to toggle that bar segment or line on/off. Hover over a legend item to isolate that specific data stream. From EMNLP 2022 onward, the % adoption line reflects policy adoption (&ldquo;pipeline failures&rdquo; are inconclusive and not counted as non-adopters).
+    <strong>Interactive Tip:</strong> Click any item in the legend above to toggle that bar segment or line on/off. Hover over a legend item to isolate that specific data stream. From EMNLP 2022 onward, papers flagged as missing a Limitations section were manually inspected; extraction pipeline failures are not counted as missing.
   </p>
 
   <details class="presence-table-details">
@@ -478,7 +481,7 @@ function exploreUrl(year: number, venue: string) {
       <thead>
         <tr>
           <th>Venue</th><th>Year</th><th>Total papers</th><th>Has Limitations</th>
-          <th>Pipeline failure</th><th>Truly missing</th><th>Adoption %</th>
+          <th>Implicitly report<sup>∗</sup></th><th>Truly missing<sup>∗</sup></th><th>Pipeline failure</th><th>Adoption %</th>
         </tr>
       </thead>
       <tbody>
@@ -488,17 +491,30 @@ function exploreUrl(year: number, venue: string) {
             <td>{row.year}</td>
             <td>{row.totalPapers.toLocaleString()}</td>
             <td>{row.papersWithLimitations.toLocaleString()}</td>
+            <td>{row.implicitlyReported === null ? "—" : row.implicitlyReported.toLocaleString()}</td>
+            <td>{row.trulyMissing === null ? "—" : row.trulyMissing.toLocaleString()}</td>
             <td>{row.extractionFailures === null ? "—" : row.extractionFailures.toLocaleString()}</td>
-            <td>{row.noExplicitLimitations === null ? "—" : row.noExplicitLimitations.toLocaleString()}</td>
             <td><strong>{adoptionPct(row).toFixed(1)}%</strong></td>
           </tr>
         ))}
       </tbody>
     </table>
     </div>
-    <p class="presence-table-note">
-      &ldquo;Pipeline failure&rdquo; = extraction pipeline could not parse PDF (inconclusive). &ldquo;Truly missing&rdquo; = verified to lack a section. Only tracked from EMNLP 2022 onward. From paper Section 4.1 / Table 3.
-    </p>
+    <div class="presence-table-note">
+      <p>
+        From EMNLP 2022 onward, we manually inspected every paper our extraction pipeline flagged as missing a required
+        Limitations section (Table 3 and Section 4.1 in the paper):
+      </p>
+      <ul>
+        <li><strong>Implicitly report</strong>: limitations discussed within paragraphs embedded in other sections, not in a standalone section.</li>
+        <li><strong>Truly missing</strong>: no discussion of limitations found anywhere in the text.</li>
+        <li><strong>Pipeline failure</strong>: flagged only because our extraction pipeline failed; the paper has a Limitations section.</li>
+      </ul>
+      <p>
+        <sup>∗</sup> Non-compliance with the mandatory reporting policy. Totals: 50 implicitly report, 45 truly missing,
+        41 pipeline failures.
+      </p>
+    </div>
   </details>
 </div>
 
@@ -695,8 +711,8 @@ function exploreUrl(year: number, venue: string) {
         if (ttNo) ttNo.textContent = Number(d.no).toLocaleString();
 
         if (ttBreakdown) {
-          if (d.failure !== null && d.missing !== null && d.failure !== undefined) {
-            ttBreakdown.innerHTML = `(incl. ${Number(d.failure).toLocaleString()} extraction failures &bull; ${Number(d.missing).toLocaleString()} truly missing)`;
+          if (d.failure !== null && d.truly !== null && d.failure !== undefined) {
+            ttBreakdown.innerHTML = `Flagged: ${Number(d.implicit).toLocaleString()} implicitly report &bull; ${Number(d.truly).toLocaleString()} truly missing &bull; ${Number(d.failure).toLocaleString()} pipeline failures`;
           } else {
             ttBreakdown.innerHTML = "";
           }
@@ -1089,5 +1105,12 @@ function exploreUrl(year: number, venue: string) {
     margin-top: 0.5rem;
     max-width: 44rem;
     line-height: 1.4;
+  }
+  .presence-table-note p,
+  .presence-table-note ul {
+    margin: 0 0 0.35rem;
+  }
+  .presence-table-note ul {
+    padding-left: 1.1rem;
   }
 </style>

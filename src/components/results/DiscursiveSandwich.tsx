@@ -81,7 +81,7 @@ export default function DiscursiveSandwich() {
           </div>
           <div class="rq3-implicit-body">
             <p>
-              While analyzing the LLM-annotated data, the authors found Limitations sections that contain{" "}
+              While analyzing the LLM-annotated data, we found Limitations sections that contain{" "}
               <strong>only non-limitation codes</strong>. A manual review showed the limitation appearing only as
               proposed future work. For example, a paper might state{" "}
               <em>"Expanding beyond A and B remains an area for future exploration,"</em> without explicitly
@@ -109,11 +109,11 @@ export default function DiscursiveSandwich() {
       <section class="rq3-block">
         <h3 class="rq3-heading">Recurring discursive patterns</h3>
         <p class="rq3-lead">
-          Next, the paper looks at what sits immediately <strong>before</strong> and <strong>after</strong> each
+          Next, we look at what sits immediately <strong>before</strong> and <strong>after</strong> each
           limitation, and compares it with a permutation null that shuffles the code sequence within each paper
           (2,000 permutations). Sequential proximity does not by itself imply a semantic relationship, but these
-          non-random patterns are noteworthy because they align with potential rhetorical strategies, even if
-          deliberate authorial intent cannot be confirmed.
+          non-random patterns are worth noting as common ways of writing about limitations; sentence order alone
+          cannot tell us what authors intended.
         </p>
 
         {/* Real example: the three moves in one section */}
@@ -144,8 +144,8 @@ export default function DiscursiveSandwich() {
             <h4 class="pattern-name">Preemptive Buffer</h4>
             <p class="pattern-what">
               Of the non-limitation codes that precede a limitation, <strong>17.5% are Strong Reported
-              Performance</strong> (null 11.8%). It may cushion a disclosure by preceding it with a statement of
-              strong results. When the limitation is <strong>Empirical Underperformance</strong>, this buffer
+              Performance</strong> (null 11.8%). It places a limitation in context by first stating what the method does
+              well. When the limitation is <strong>Empirical Underperformance</strong>, this buffer
               precedes it <strong>23.3%</strong> of the time (null 9.1%, about 2.6×).
             </p>
             <RealExample
@@ -172,8 +172,8 @@ export default function DiscursiveSandwich() {
             <p class="pattern-what">
               Among non-limitation codes immediately following a limitation, <strong>40.2% are Future Work</strong>{" "}
               and <strong>19.7% are Contextual Justification</strong>, both significantly higher than the null
-              (32.8% and 17.0%). It may help soften a limitation by suggesting future work or justifying why the
-              limitation was unavoidable.
+              (32.8% and 17.0%). It pairs a limitation with a way forward (future work) or with the reason behind
+              it (a justification).
             </p>
             <RealExample
               lines={[
@@ -228,7 +228,7 @@ export default function DiscursiveSandwich() {
         <p class="rq3-caveat">
           <Info size={16} aria-hidden="true" />
           <span>
-            Since these patterns were inferred solely from sequential order, the paper encourages future studies to
+            Since these patterns were inferred solely from sequential order, we encourage future studies to
             analyze code relations semantically for deeper insights.
           </span>
         </p>

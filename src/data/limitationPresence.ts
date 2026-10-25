@@ -24,21 +24,25 @@ export interface PresenceRow {
   papersWithLimitations: number;
   extractionFailures: number | null;
   noExplicitLimitations: number | null;
+  // Paper Table 3 splits noExplicitLimitations (= their sum) into papers that
+  // implicitly report limitations in other sections and papers truly missing them.
+  implicitlyReported: number | null;
+  trulyMissing: number | null;
 }
 
 export const presenceRows: PresenceRow[] = [
-  { venue: "ACL", year: 2020, totalPapers: 778, papersWithLimitations: 19, extractionFailures: null, noExplicitLimitations: null },
-  { venue: "ACL", year: 2021, totalPapers: 1167, papersWithLimitations: 34, extractionFailures: null, noExplicitLimitations: null },
-  { venue: "ACL", year: 2022, totalPapers: 1031, papersWithLimitations: 94, extractionFailures: null, noExplicitLimitations: null },
-  { venue: "ACL", year: 2023, totalPapers: 1976, papersWithLimitations: 1941, extractionFailures: 13, noExplicitLimitations: 22 },
-  { venue: "ACL", year: 2024, totalPapers: 1915, papersWithLimitations: 1898, extractionFailures: 6, noExplicitLimitations: 11 },
-  { venue: "ACL", year: 2025, totalPapers: 3086, papersWithLimitations: 3066, extractionFailures: 7, noExplicitLimitations: 13 },
-  { venue: "EMNLP", year: 2020, totalPapers: 1198, papersWithLimitations: 58, extractionFailures: null, noExplicitLimitations: null },
-  { venue: "EMNLP", year: 2021, totalPapers: 1271, papersWithLimitations: 54, extractionFailures: null, noExplicitLimitations: null },
-  { venue: "EMNLP", year: 2022, totalPapers: 1376, papersWithLimitations: 1346, extractionFailures: 0, noExplicitLimitations: 30 },
-  { venue: "EMNLP", year: 2023, totalPapers: 2106, papersWithLimitations: 2087, extractionFailures: 3, noExplicitLimitations: 16 },
-  { venue: "EMNLP", year: 2024, totalPapers: 2271, papersWithLimitations: 2264, extractionFailures: 4, noExplicitLimitations: 3 },
-  { venue: "EMNLP", year: 2025, totalPapers: 3214, papersWithLimitations: 3206, extractionFailures: 8, noExplicitLimitations: 0 },
+  { venue: "ACL", year: 2020, totalPapers: 778, papersWithLimitations: 19, extractionFailures: null, noExplicitLimitations: null, implicitlyReported: null, trulyMissing: null },
+  { venue: "ACL", year: 2021, totalPapers: 1167, papersWithLimitations: 34, extractionFailures: null, noExplicitLimitations: null, implicitlyReported: null, trulyMissing: null },
+  { venue: "ACL", year: 2022, totalPapers: 1031, papersWithLimitations: 94, extractionFailures: null, noExplicitLimitations: null, implicitlyReported: null, trulyMissing: null },
+  { venue: "ACL", year: 2023, totalPapers: 1976, papersWithLimitations: 1941, extractionFailures: 13, noExplicitLimitations: 22, implicitlyReported: 13, trulyMissing: 9 },
+  { venue: "ACL", year: 2024, totalPapers: 1915, papersWithLimitations: 1898, extractionFailures: 6, noExplicitLimitations: 11, implicitlyReported: 4, trulyMissing: 7 },
+  { venue: "ACL", year: 2025, totalPapers: 3086, papersWithLimitations: 3066, extractionFailures: 7, noExplicitLimitations: 13, implicitlyReported: 6, trulyMissing: 7 },
+  { venue: "EMNLP", year: 2020, totalPapers: 1198, papersWithLimitations: 58, extractionFailures: null, noExplicitLimitations: null, implicitlyReported: null, trulyMissing: null },
+  { venue: "EMNLP", year: 2021, totalPapers: 1271, papersWithLimitations: 54, extractionFailures: null, noExplicitLimitations: null, implicitlyReported: null, trulyMissing: null },
+  { venue: "EMNLP", year: 2022, totalPapers: 1376, papersWithLimitations: 1346, extractionFailures: 0, noExplicitLimitations: 30, implicitlyReported: 20, trulyMissing: 10 },
+  { venue: "EMNLP", year: 2023, totalPapers: 2106, papersWithLimitations: 2087, extractionFailures: 3, noExplicitLimitations: 16, implicitlyReported: 5, trulyMissing: 11 },
+  { venue: "EMNLP", year: 2024, totalPapers: 2271, papersWithLimitations: 2264, extractionFailures: 4, noExplicitLimitations: 3, implicitlyReported: 2, trulyMissing: 1 },
+  { venue: "EMNLP", year: 2025, totalPapers: 3214, papersWithLimitations: 3206, extractionFailures: 8, noExplicitLimitations: 0, implicitlyReported: 0, trulyMissing: 0 },
 ];
 
 export function adoptionPct(row: PresenceRow): number {

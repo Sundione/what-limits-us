@@ -376,7 +376,8 @@ export default function Explorer() {
             </svg>
             <input
               type="search"
-              placeholder="Search by paper title or keywords…"
+              placeholder="Search ACL & EMNLP 2020–2025 papers by title or keywords…"
+              aria-describedby="search-scope-note"
               value={search}
               onInput={(e) => {
                 const val = (e.target as HTMLInputElement).value;
@@ -477,6 +478,10 @@ export default function Explorer() {
             </button>
           </div>
         </div>
+        <p id="search-scope-note" class="search-scope-note">
+          Covers ACL and EMNLP papers (main conference and Findings) published 2020–2025 that include a Limitations
+          section.
+        </p>
 
         {/* 5 Thematic Filter Pills */}
         <div class="theme-pills-bar">
@@ -630,7 +635,21 @@ export default function Explorer() {
         <div class="master-pane">
           {filtered.length === 0 ? (
             <div class="empty-list-notice">
-              <p>No papers match your current filters.</p>
+              {search.trim() ? (
+                <>
+                  <p>
+                    <strong>No papers found for &ldquo;{search.trim()}&rdquo;.</strong>
+                  </p>
+                  <p class="empty-scope-note">
+                    We may not have this paper. Our dataset covers ACL and EMNLP papers (main conference and Findings)
+                    published 2020–2025 that include a Limitations section, so a paper outside that range or without a
+                    Limitations section will not appear here.
+                    {activeFiltersCount > 1 && " Other active filters may also be hiding it."}
+                  </p>
+                </>
+              ) : (
+                <p>No papers match your current filters.</p>
+              )}
               <button type="button" class="btn-subtle" onClick={clearAllFilters}>
                 Clear filters
               </button>
@@ -1002,6 +1021,10 @@ function PaperDetailInspector({
               {detail.llm.codebookVersion.replace(/_/g, " ")}
             </span>
           </div>
+          <p class="profile-note">
+            Each segment counts the <strong>distinct codes</strong> this paper received in a theme, not how many
+            sentences mention them. A code that appears in five sentences still counts once.
+          </p>
 
           {/* Segmented Distribution Bar */}
           <div class="profile-segmented-bar">

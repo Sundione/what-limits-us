@@ -1,5 +1,5 @@
 ---
-import { Search, BookOpen } from "lucide-preact";
+import { Search, BookOpen, BookMarked } from "lucide-preact";
 import BrandIcon from "./BrandIcon.astro";
 import { paper } from "../data/paper";
 const { links } = paper;
@@ -10,6 +10,14 @@ const { links } = paper;
     <BrandIcon name="arxiv" size={16} class="link-icon" />
     <span>arXiv</span>
   </a>
+
+  <!-- ACL Anthology (published version) -->
+  {links.aclAnthology && (
+    <a class="link-pill link-anthology" href={links.aclAnthology} target="_blank" rel="noopener noreferrer" title="Read the published paper in the ACL Anthology">
+      <BookMarked size={16} class="link-icon" aria-hidden="true" />
+      <span>ACL Anthology</span>
+    </a>
+  )}
 
   <!-- GitHub -->
   <a class="link-pill link-github" href={links.datasetGithub} target="_blank" rel="noopener noreferrer" title="View dataset repository on GitHub">

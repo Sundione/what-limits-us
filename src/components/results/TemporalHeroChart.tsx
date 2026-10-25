@@ -204,24 +204,9 @@ export default function TemporalHeroChart() {
   const emnlpMandateX = xForYear(2022);
   const aclMandateX = xForYear(2023);
 
-  // Smooth Catmull-Rom to Cubic Bezier curve path generator
-  const createSmoothPath = (pts: { x: number; y: number }[]): string => {
-    if (pts.length === 0) return "";
-    if (pts.length === 1) return `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
-    let d = `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
-    for (let i = 0; i < pts.length - 1; i++) {
-      const p0 = pts[Math.max(0, i - 1)];
-      const p1 = pts[i];
-      const p2 = pts[i + 1];
-      const p3 = pts[Math.min(pts.length - 1, i + 2)];
-      const cp1x = p1.x + (p2.x - p0.x) / 6;
-      const cp1y = p1.y + (p2.y - p0.y) / 6;
-      const cp2x = p2.x - (p3.x - p1.x) / 6;
-      const cp2y = p2.y - (p3.y - p1.y) / 6;
-      d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
-    }
-    return d;
-  };
+  // Straight segments between yearly points (no smoothing, so lines never overshoot the data)
+  const createLinePath = (pts: { x: number; y: number }[]): string =>
+    pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
 
   // Active series lines data (all lines use uniform, robust thickness and reliable Non-Limitation flag)
   // Colour follows the code, not its position: a code keeps its slot while it
@@ -260,7 +245,7 @@ export default function TemporalHeroChart() {
           total: pt.total,
         };
       });
-      const pathD = createSmoothPath(points);
+      const pathD = createLinePath(points);
       return {
         code,
         displayName,
@@ -491,7 +476,7 @@ export default function TemporalHeroChart() {
         {/* View Switchers & Legend Pill */}
         <div class="view-switchers-group">
           {/* Visual Key: Solid (Limitation) vs Dashed (Non-Limitation) */}
-          <div class="line-style-legend-pill" title="Limitations use solid lines. Non-limitation rhetorical buffers use dashed lines.">
+          <div class="line-style-legend-pill" title="Limitation codes use solid lines; non-limitation codes use dashed lines.">
             <span class="legend-style-item">
               <svg width="22" height="10" viewBox="0 0 22 10" class="legend-line-svg" aria-hidden="true">
                 <line x1="0" y1="5" x2="22" y2="5" stroke="var(--muted-foreground)" stroke-width="3" stroke-linecap="round" />

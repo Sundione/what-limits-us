@@ -224,6 +224,12 @@ export default function CodebookExplorer() {
       </div>
 
       {/* THEME MAP: the 5 limitation themes + non-limitation moves at a glance */}
+      <p class="theme-map-note">
+        <strong>How codes are grouped:</strong> after the final round, we prompted an LLM to cluster the 40 limitation
+        codes around one question, <em>&ldquo;Why are these limitations?&rdquo;</em>, giving five themes, each code in
+        exactly one (Appendix K.8 in the paper). The themes only organize the codebook for reading; codes are assigned to
+        papers individually. The 10 non-limitation codes form their own group.
+      </p>
       <div class="theme-map-grid">
         {THEMES.map((theme) => {
           const entries = CODEBOOK_ENTRIES.filter((e) => e.themeId === theme.id);
@@ -604,17 +610,6 @@ export default function CodebookExplorer() {
               <span class="metric-lbl">First Introduced</span>
               <span class="metric-val">{currentEntry.originVersion}</span>
             </div>
-            <div class="metric-sep"></div>
-            <div class="metric-cell">
-              <span class="metric-lbl">Evolution Status</span>
-              <span class="metric-val">
-                {currentEntry.expansions.length > 0 ? (
-                  <span class="metric-tag-exp">Expanded ({currentEntry.expansions.map((e) => e.version).join(", ")})</span>
-                ) : (
-                  <span class="metric-tag-stable">Stable across rounds</span>
-                )}
-              </span>
-            </div>
           </div>
 
           {/* SECTION 1: FORMAL DEFINITION */}
@@ -753,18 +748,33 @@ export default function CodebookExplorer() {
 }
 
 
+// Highest yearly share of any code, so the shared scale fits every code.
+const ALL_CODES_MAX = Math.max(
+  ...Object.values(temporalMatrix.codeData).flatMap((d) => Object.values(d.all).map((p) => p.pct)),
+);
+
+/** Rounds max up to a "nice" axis top and returns evenly spaced ticks (at most 5 including 0). */
+function niceTicks(max: number): number[] {
+  const step = [1, 2, 2.5, 5, 10, 20, 25, 50].find((s) => max / s <= 4) ?? 50;
+  const top = Math.ceil(max / step) * step;
+  return Array.from({ length: Math.round(top / step) + 1 }, (_, i) => i * step);
+}
+
 /** Share of each year's papers carrying the code (all venues), as a small line chart. */
 function CodeTrend({ code, color }: { code: string; color: string }) {
+  const [shared, setShared] = useState(false);
   const series = temporalMatrix.codeData[code]?.all;
   if (!series) return null;
   const years = temporalMatrix.years;
   const points = years.map((y) => ({ year: y, ...series[String(y)] }));
-  const max = Math.max(...points.map((p) => p.pct), 1);
+  const ticks = niceTicks(shared ? ALL_CODES_MAX : Math.max(...points.map((p) => p.pct), 1));
+  const max = ticks[ticks.length - 1];
   const W = 320;
-  const H = 90;
-  const padX = 18;
-  const padY = 14;
-  const x = (i: number) => padX + (i * (W - 2 * padX)) / (years.length - 1);
+  const H = 110;
+  const padL = 36;
+  const padR = 14;
+  const padY = 10;
+  const x = (i: number) => padL + (i * (W - padL - padR)) / (years.length - 1);
   const y = (v: number) => H - padY - (v / max) * (H - 2 * padY);
   const path = points.map((p, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(p.pct).toFixed(1)}`).join(" ");
   const first = points[0];
@@ -773,6 +783,12 @@ function CodeTrend({ code, color }: { code: string; color: string }) {
     <div class="code-trend">
       <svg viewBox={`0 0 ${W} ${H + 16}`} class="code-trend-svg" role="img"
         aria-label={`${code}: ${first.pct.toFixed(1)}% of papers in ${first.year}, ${last.pct.toFixed(1)}% in ${last.year}`}>
+        {ticks.map((t) => (
+          <g key={t}>
+            <line x1={padL} x2={W - padR} y1={y(t)} y2={y(t)} class="code-trend-grid" />
+            <text x={padL - 6} y={y(t) + 3.5} text-anchor="end" class="code-trend-tick">{`${t}%`}</text>
+          </g>
+        ))}
         <path d={path} fill="none" stroke={color} stroke-width="2.5" stroke-linejoin="round" />
         {points.map((p, i) => (
           <g key={p.year}>
@@ -783,6 +799,15 @@ function CodeTrend({ code, color }: { code: string; color: string }) {
           </g>
         ))}
       </svg>
+      <div class="code-trend-scale" role="group" aria-label="Y-axis scale">
+        <span>Y-axis:</span>
+        <button type="button" aria-pressed={!shared} class={!shared ? "active" : ""} onClick={() => setShared(false)}>
+          Fit this code
+        </button>
+        <button type="button" aria-pressed={shared} class={shared ? "active" : ""} onClick={() => setShared(true)}>
+          Same for all codes (0–{niceTicks(ALL_CODES_MAX).at(-1)}%)
+        </button>
+      </div>
       <p class="code-trend-caption">
         {first.pct.toFixed(1)}% of papers in {first.year} &rarr; <strong>{last.pct.toFixed(1)}%</strong> in {last.year}.
         Few 2020–2021 papers had a Limitations section (n = {points[0].total}, {points[1].total}), so early values are noisy.

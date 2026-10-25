@@ -43,7 +43,7 @@ export default function AreaAndAffiliation() {
   return (
     <div class="area-affiliation-section">
       <p class="rq-intro">
-        The paper cross-analyzes limitation codes with three paper attributes, in this order:{" "}
+        We cross-analyze limitation codes with three paper attributes, in this order:{" "}
         <a href="#rq2-area">research area</a>, <a href="#rq2-format">paper format</a>, and{" "}
         <a href="#rq2-affiliation">author affiliation</a>.
       </p>
@@ -77,7 +77,7 @@ export default function AreaAndAffiliation() {
           as Human-Centered NLP and <em>Societal and Ethical Risks</em>, or Efficient NLP and{" "}
           <em>Hyperparameter Sensitivity</em>, reflecting each subfield's priorities. But these 32 cells are only
           2.76% of the table: overall, the field reports limitations in remarkably similar proportions, a{" "}
-          <strong>field-wide homogeneity</strong> whose causes the paper leaves to future work.
+          <strong>field-wide homogeneity</strong> whose causes we leave to future work.
         </p>
         <figure class="data-figure">
           <figcaption>

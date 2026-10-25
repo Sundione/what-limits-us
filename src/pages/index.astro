@@ -36,7 +36,7 @@ import { authors, affiliations, paper } from "../data/paper";
       <span class="tldr-badge">TL;DR</span>
     </div>
     <p class="tldr-text">
-      This paper analyzed Limitations sections from <strong>16,067 ACL and EMNLP papers</strong> to understand their trends over time, their correlations with paper attributes, and the rhetorical strategies researchers use to present them.
+      We analyzed the Limitations sections of <strong>16,047 ACL and EMNLP papers published 2020–2025</strong> to understand how they changed over time, how they relate to paper attributes, and the writing patterns that recur around them.
     </p>
     <details class="abstract-details">
       <summary>Read the full abstract</summary>
@@ -49,11 +49,13 @@ import { authors, affiliations, paper } from "../data/paper";
     <article class="finding-card">
       <span class="finding-rq">RQ1 · Over time</span>
       <h3 class="finding-question">How have reported limitations changed?</h3>
-      <p class="finding-number">31% &rarr; 66%</p>
+      <p class="finding-stat">
+        Papers reporting <strong>Scope Limitation</strong> rose from <span class="stat-num">31%</span> to{" "}
+        <span class="stat-num">66%</span> <span class="stat-context">(2020 &rarr; 2025)</span>
+      </p>
       <p class="finding-answer">
-        <strong>Scope Limitation</strong> (explicitly bounding what a study covers) rose from 31% of papers in 2020
-        to 66% in 2025, overtaking Methodological Constraints around the time the section became mandatory.
-        This is a temporal association; the paper does not claim the policy caused it.
+        Scope Limitation (explicitly bounding what a study covers) overtook Methodological Constraints around the
+        time the section became mandatory. This is a temporal association; we do not claim the policy caused it.
       </p>
       <div class="finding-links">
         <a href={`${import.meta.env.BASE_URL}results#temporal-rq1`}>See the trend &rarr;</a>
@@ -64,9 +66,12 @@ import { authors, affiliations, paper } from "../data/paper";
     <article class="finding-card">
       <span class="finding-rq">RQ2 · Across the field</span>
       <h3 class="finding-question">Do subfields and institutions differ?</h3>
-      <p class="finding-number">~97% alike</p>
+      <p class="finding-stat">
+        In <span class="stat-num">~97%</span> of <strong>research area × limitation code</strong> pairs, the reporting
+        rate is not significantly different from the field as a whole
+      </p>
       <p class="finding-answer">
-        Mostly not: about 97% of (research area, limitation) pairs match the field-wide average.
+        Mostly not: research areas report each limitation at similar rates.
         One clear difference: papers without large-company authors report Scope Limitation more often
         (63.6% vs. 56.6%).
       </p>
@@ -78,10 +83,13 @@ import { authors, affiliations, paper } from "../data/paper";
     <article class="finding-card">
       <span class="finding-rq">RQ3 · How it is written</span>
       <h3 class="finding-question">How do authors frame a limitation?</h3>
-      <p class="finding-number">40% &rarr; future work</p>
+      <p class="finding-stat">
+        The statement right after a limitation is <strong>Future Work</strong>{" "}
+        <span class="stat-num">40.2%</span> of the time <span class="stat-context">(32.8% expected by chance)</span>
+      </p>
       <p class="finding-answer">
-        A limitation is often followed directly by future work (40.2% of transitions, vs. 32.8% expected by chance), a pattern the paper calls the Soft Landing.
-        In 2025, 90 papers had a Limitations section with only non-limitation statements, such as future-work plans.
+        We call this pattern the Soft Landing.
+        Also, in 2025, 90 papers had a Limitations section with only non-limitation statements, such as future-work plans.
       </p>
       <div class="finding-links">
         <a href={`${import.meta.env.BASE_URL}results#discursive-rq3`}>See the patterns &rarr;</a>
@@ -91,7 +99,7 @@ import { authors, affiliations, paper } from "../data/paper";
   </div>
 
   <form class="find-paper" action={`${import.meta.env.BASE_URL}explore`} method="get" role="search">
-    <label for="find-paper-q" class="find-paper-label">Published at ACL or EMNLP since 2020? See how your own Limitations section was coded.</label>
+    <label for="find-paper-q" class="find-paper-label">Published at ACL or EMNLP 2020–2025 with a Limitations section? See how yours was coded.</label>
     <div class="find-paper-row">
       <input id="find-paper-q" name="q" type="search" placeholder="Paste your paper's title…" required />
       <button type="submit">Find my paper</button>
@@ -296,12 +304,31 @@ import { authors, affiliations, paper } from "../data/paper";
     margin: 0.35rem 0 0.4rem;
     font-size: 1.05rem;
   }
-  .finding-number {
-    margin: 0 0 0.4rem;
-    font-size: 1.6rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
+  /* One sentence carries the number and what it measures, at close sizes,
+     so the figure is never read without its subject. */
+  .finding-stat {
+    margin: 0.1rem 0 0.7rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: var(--radius-sm);
+    background: var(--muted);
+    font-size: 1.02rem;
+    line-height: 1.45;
     color: var(--color-text);
+  }
+  .finding-stat strong {
+    font-weight: 650;
+  }
+  .stat-num {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--primary-text);
+    white-space: nowrap;
+  }
+  .stat-context {
+    font-size: 0.88rem;
+    color: var(--color-muted);
+    white-space: nowrap;
   }
   .finding-answer {
     margin: 0 0 0.8rem;

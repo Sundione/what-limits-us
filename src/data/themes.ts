@@ -129,7 +129,7 @@ export const THEMES: ThemeDefinition[] = [
     number: 0,
     name: "Non-Limitation Codes (Context, Mitigations & Future Work)",
     shortTitle: "Non-Limitation (Discourse)",
-    description: "Rhetorical moves that accompany limitation disclosures: future work, contextual defense, method strengths, mitigations, and performance claims.",
+    description: "Statements that accompany limitations without being limitations themselves: future work, context and justification, method details and strengths, mitigations, and reported results.",
     color: "var(--theme-nl)",
     text: "var(--theme-nl-text)",
     bgLight: "color-mix(in srgb, var(--theme-nl) 9%, transparent)",

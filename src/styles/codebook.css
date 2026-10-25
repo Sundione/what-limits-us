@@ -1148,9 +1148,47 @@
   height: auto;
   display: block;
 }
-.code-trend-year {
+.code-trend-year,
+.code-trend-tick {
   font-size: 10px;
   fill: var(--muted-foreground);
+}
+.code-trend-grid {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+.code-trend-scale {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+.code-trend-scale button {
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--foreground);
+  font: inherit;
+  cursor: pointer;
+}
+.code-trend-scale button.active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-color);
+}
+.theme-map-note {
+  margin: 0 0 0.6rem;
+  max-width: 80ch;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--color-muted);
+}
+.theme-map-note strong {
+  color: var(--foreground);
 }
 .code-trend-caption {
   margin: 0.4rem 0 0;

@@ -2,7 +2,7 @@
 import "@fontsource-variable/inter";
 import "../styles/theme.css";
 import "../styles/shadcn.css";
-import { House, Workflow, BookOpen, Search, ChartColumn, Sun, Moon } from "lucide-preact";
+import { House, Workflow, BookOpen, Search, ChartColumn, Sun, Moon, BookMarked } from "lucide-preact";
 import LogoMark from "../components/LogoMark.astro";
 import BrandIcon from "../components/BrandIcon.astro";
 import { paper } from "../data/paper";
@@ -101,16 +101,31 @@ const isItemActive = (key: string) => {
             target="_blank"
             rel="noopener noreferrer"
             title="Read paper on arXiv"
+            aria-label="arXiv"
           >
             <BrandIcon name="arxiv" size={15} class="action-icon" />
             <span>arXiv</span>
           </a>
+          {paper.links.aclAnthology && (
+            <a
+              class="nav-action-btn"
+              href={paper.links.aclAnthology}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Read the published paper in the ACL Anthology"
+              aria-label="ACL Anthology"
+            >
+              <BookMarked size={15} class="action-icon" aria-hidden="true" />
+              <span>ACL Anthology</span>
+            </a>
+          )}
           <a
             class="nav-action-btn"
             href={paper.links.datasetGithub}
             target="_blank"
             rel="noopener noreferrer"
             title="View dataset repository on GitHub"
+            aria-label="GitHub"
           >
             <BrandIcon name="github" size={15} class="action-icon" />
             <span>GitHub</span>
@@ -472,7 +487,18 @@ const isItemActive = (key: string) => {
   .badge-human { background: var(--human-bg); color: var(--human-fg); border: 1px solid var(--human-border); }
 
   /* Responsive Navbar */
-  @media (max-width: 960px) {
+  /* Mid widths: the paper links shrink to icons so the one-row header fits */
+  @media (max-width: 1240px) {
+    .nav-action-btn {
+      width: 2.25rem;
+      padding: 0;
+    }
+    .nav-action-btn span {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1023px) {
     :root {
       --header-h: 107px;
     }
