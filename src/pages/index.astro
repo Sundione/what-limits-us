@@ -13,7 +13,9 @@ import { authors, affiliations, paper } from "../data/paper";
   <p class="authors">
     {authors.map((author, i) => (
       <>
-        <span>{author.name}<sup>{author.affiliation === "chula" ? "†" : "‡"}{author.corresponding ? "*" : ""}</sup></span>
+        <span>{author.url ? (
+          <a class="author-link" href={author.url} target="_blank" rel="noopener noreferrer">{author.name}</a>
+        ) : author.name}<sup>{author.affiliation === "chula" ? "†" : "‡"}{author.corresponding ? "*" : ""}</sup></span>
         {i < authors.length - 1 ? ", " : ""}
       </>
     ))}
@@ -164,6 +166,18 @@ import { authors, affiliations, paper } from "../data/paper";
     font-size: 1.05rem;
     line-height: 1.6;
     margin-bottom: 0.35rem;
+  }
+  .author-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--color-muted);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .author-link:hover,
+  .author-link:focus-visible {
+    color: var(--primary-text);
+    text-decoration-color: currentColor;
   }
   .affiliations {
     color: var(--color-muted);

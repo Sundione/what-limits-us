@@ -2,15 +2,16 @@ export interface Author {
   name: string;
   affiliation: "chula" | "google";
   corresponding?: boolean;
+  url?: string; // personal homepage; the name links here when set
 }
 
 export const authors: Author[] = [
-  { name: "Tawan Thaepprasit", affiliation: "chula" },
+  { name: "Tawan Thaepprasit", affiliation: "chula", url: "https://sundione.github.io/Sundione/" },
   { name: "Peeranuth Kehasukcharoen", affiliation: "chula" },
   { name: "Ding Wang", affiliation: "google" },
   { name: "Remi Denton", affiliation: "google" },
   { name: "Peerapon Vateekul", affiliation: "chula", corresponding: true },
-  { name: "Piyawat Lertvittayakumjorn", affiliation: "google" },
+  { name: "Piyawat Lertvittayakumjorn", affiliation: "google", url: "https://plkumjorn.github.io/" },
 ];
 
 export const affiliations: Record<Author["affiliation"], string> = {
