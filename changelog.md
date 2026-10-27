@@ -29,6 +29,13 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
   the pinned dataset commit, regenerates the data, builds the site, and
   deploys it to GitHub Pages on every push to `main`.
 
+### Fixed
+
+- Bumped the pinned dataset commit to `c77e5f8`, which restores the PDF
+  reading order of the Limitations paragraphs in 8 papers (e.g.
+  `2025.acl-short.26`). The explorer's sentence order and the
+  `?after=` / `?before=` pattern filters now follow the corrected order.
+
 ### Notes
 
 - The methodology figure, codebook version-diff browser, results/charts
